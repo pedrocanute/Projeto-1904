@@ -29,8 +29,5 @@
     <ClInclude Include="movimentacao.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\movimentacao.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

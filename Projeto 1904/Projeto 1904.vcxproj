@@ -28,7 +28,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\movimentacao.h" />
     <ClInclude Include="movimentacao.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
