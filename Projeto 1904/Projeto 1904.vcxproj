@@ -26,9 +26,11 @@
     <ClCompile Include="movimentacao.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="projetil.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="movimentacao.h" />
+    <ClInclude Include="projetil.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
