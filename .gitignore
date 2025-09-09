@@ -72,3 +72,4 @@ dkms.conf
 
 # debug information files
 *.dwo
+/Projeto 1904/allegro.log
