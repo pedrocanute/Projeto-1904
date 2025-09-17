@@ -21,12 +21,18 @@
     <ClCompile Include="main.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="movimentacao.c">
+    <ClCompile Include="personagens.c">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="projetil.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="movimentacao.h">
+    <ClInclude Include="projetil.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="personagens.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

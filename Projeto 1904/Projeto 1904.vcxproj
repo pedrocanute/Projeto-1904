@@ -23,12 +23,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
-    <ClCompile Include="movimentacao.c">
+    <ClCompile Include="personagens.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="projetil.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="movimentacao.h" />
+    <ClInclude Include="personagens.h" />
+    <ClInclude Include="projetil.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
