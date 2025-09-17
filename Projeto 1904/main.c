@@ -103,13 +103,13 @@ int main() {
                 bot.posicaoY++;
                 bot.altura++;
             }
-            if ((bot.posicaoX >= jogador.posicaoXp && bot.posicaoX <= jogador.largurap && bot.posicaoY >= jogador.y && bot.posicaoY <= jogador.alturap) || (bot.largura >= jogador.posicaoXp && bot.largura <= jogador.largurap && bot.altura >= jogador.posicaoYp && bot.altura >= jogador.alturap))
+            if ((bot.posicaoX >= jogador.posicaoXp && bot.posicaoX <= jogador.largurap && bot.posicaoY >= jogador.posicaoYp && bot.posicaoY <= jogador.alturap) || (bot.largura >= jogador.posicaoXp && bot.largura <= jogador.largurap && bot.altura >= jogador.posicaoYp && bot.altura >= jogador.alturap))
                 cor = al_map_rgb(255, 0, 0);
             else
                 cor = al_map_rgb(0, 0, 0);
         }
         al_clear_to_color(al_map_rgb(255, 255, 255));
-        //al_draw_filled_rectangle(jogador.posicaoX, jogador.posicaoY, jogador.posicaoX + larguraJogador, jogador.posicaoY + alturaJogador, cor);
+        al_draw_filled_rectangle(jogador.posicaoXp, jogador.posicaoYp, jogador.posicaoXp + larguraJogador, jogador.posicaoYp + alturaJogador, cor);
         al_draw_filled_rectangle(bot.posicaoX, bot.posicaoY, bot.largura, bot.altura, cor);
         atirar(&projetil, jogador, espaco, projetilLargura, projetilAltura, alturaJogador, width, projetilVelocidade);
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");

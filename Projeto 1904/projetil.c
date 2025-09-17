@@ -1,9 +1,9 @@
 #include "projetil.h"
 
-void atirar(ProjetilPosicao* pp, Posicao jogador, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int width, float projetilVelocidade) {
+void atirar(ProjetilPosicao* pp, Jogador jogador, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int width, float projetilVelocidade) {
     if (espaco && !pp->projetilAtivo) {
-        pp-> projetilX = jogador.jogadorX;
-        pp-> projetilY = jogador.jogadorY + (alturaJogador/2) - (projetilAltura/2);
+        pp-> projetilX = jogador.posicaoXp;
+        pp-> projetilY = jogador.posicaoYp + (alturaJogador/2) - (projetilAltura/2);
         pp-> projetilAtivo = true;
     }
 
