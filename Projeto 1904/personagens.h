@@ -4,11 +4,11 @@
 #include <stdbool.h>
 
 typedef struct {
-	float posicaoXp, posicaoYp, largurap, alturap;
+	int posicaoXp, posicaoYp, largurap, alturap;
 }Jogador;
 
 typedef struct {
-	float posicaoX, posicaoY, largura, altura;
+	int posicaoX, posicaoY, largura, altura;
 }Inimigo;
 
 // Funções jogador

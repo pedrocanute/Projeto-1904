@@ -11,27 +11,34 @@
 #include "projetil.h"
 
 int main() {
-
+    //Inicializações do Allegro
     al_init();
     al_init_font_addon();
     al_init_image_addon();
     al_install_keyboard();
     al_init_primitives_addon();
 
-    const int width = 640, height = 480, fps = 60;
-    const int larguraJogador = 32, alturaJogador = 32;
+    //Declaração de variáveis
+    //Janela do jogo
+    const int width = 640, height = 480, fps = 60; 
+    bool jogando = true;
+    //Jogador
+    Jogador jogador = { 320, 240};
+    jogador.largurap = 32; 
+    jogador.alturap = 32;
     const float velocidade = 5.5f;
+    bool w = false, a = false, s = false, d = false, espaco = false;
     const int projetilLargura = 16, projetilAltura = 16;
     const float projetilVelocidade = 9.0;
-    bool jogando = true;
-    bool w = false, a = false, s = false, d = false, espaco = false;
-    Jogador jogador = { 320.0, 240.0 };
+    ProjetilPosicao projetil = { 0, 0, false };
+    //Inimigo
     Inimigo bot;
     bot.posicaoX = 630;
     bot.posicaoY = 480 / 2 - 50 / 2;
-    bot.largura = bot.posicaoX + 50;
-    bot.altura = bot.posicaoY + 50;
-    ProjetilPosicao projetil = { 0, 0, false };
+    bot.largura = 50;
+    bot.altura = 50;
+
+    //Declarações do Allegro
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
 
     ALLEGRO_DISPLAY* janela = al_create_display(width, height);
@@ -49,15 +56,17 @@ int main() {
 
     ALLEGRO_EVENT event;
 
+    //Loop do jogo
     while (jogando) {
-        while (!al_is_event_queue_empty(fila_eventos)) {
+        while (!al_is_event_queue_empty(fila_eventos)) { //Garante que todos os eventos sejam executados | múltiplos eventos podem ser executado em um único loop.
 
-            ALLEGRO_EVENT evento;
+            ALLEGRO_EVENT event;
             al_wait_for_event(fila_eventos, &event);
 
             if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
                 jogando = false;
 
+            //ações jogador
             else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
                 if (event.keyboard.keycode == ALLEGRO_KEY_W)
                     w = true;
@@ -84,34 +93,32 @@ int main() {
             }
             else if (event.type == ALLEGRO_EVENT_TIMER) {
                 mover(&jogador, w, a, s, d, velocidade);
-                restringirPosicao(&jogador, width, height, larguraJogador, alturaJogador);
+                restringirPosicao(&jogador, width, height, jogador.largurap, jogador.alturap);
             }
 
-            if (jogador.posicaoXp < bot.posicaoX) {
+            //ações bot
+            //Perseguição
+            if (jogador.posicaoXp + jogador.largurap / 2 < bot.posicaoX + bot.largura / 2)
                 bot.posicaoX--;
-                bot.largura--;
-            }
-            else if (jogador.posicaoXp > bot.posicaoX) {
+            else if (jogador.posicaoXp + jogador.largurap / 2 > bot.posicaoX + bot.largura / 2)
                 bot.posicaoX++;
-                bot.largura++;
-            }
-            if (jogador.posicaoYp < bot.posicaoY) {
+            if (jogador.posicaoYp + jogador.alturap / 2 < bot.posicaoY + bot.altura / 2)
                 bot.posicaoY--;
-                bot.altura--;
-            }
-            else if (jogador.posicaoYp > bot.posicaoY) {
+            else if (jogador.posicaoYp + jogador.alturap / 2 > bot.posicaoY + bot.altura / 2) 
                 bot.posicaoY++;
-                bot.altura++;
-            }
-            if ((bot.posicaoX >= jogador.posicaoXp && bot.posicaoX <= jogador.largurap && bot.posicaoY >= jogador.posicaoYp && bot.posicaoY <= jogador.alturap) || (bot.largura >= jogador.posicaoXp && bot.largura <= jogador.largurap && bot.altura >= jogador.posicaoYp && bot.altura >= jogador.alturap))
-                cor = al_map_rgb(255, 0, 0);
+
+            //Colisão
+            if (jogador.posicaoXp <= bot.posicaoX + bot.largura && jogador.posicaoXp + jogador.largurap >= bot.posicaoX && jogador.posicaoYp <= bot.posicaoY + bot.altura && jogador.posicaoYp + jogador.alturap >= bot.posicaoY)
+                // Colidiu
+                cor = al_map_rgb(255, 0, 0); 
             else
-                cor = al_map_rgb(0, 0, 0);
+                // Não colidiu
+                cor = al_map_rgb(0, 0, 0); 
         }
         al_clear_to_color(al_map_rgb(255, 255, 255));
-        al_draw_filled_rectangle(jogador.posicaoXp, jogador.posicaoYp, jogador.posicaoXp + larguraJogador, jogador.posicaoYp + alturaJogador, cor);
-        al_draw_filled_rectangle(bot.posicaoX, bot.posicaoY, bot.largura, bot.altura, cor);
-        atirar(&projetil, jogador, espaco, projetilLargura, projetilAltura, alturaJogador, width, projetilVelocidade);
+        al_draw_filled_rectangle(jogador.posicaoXp, jogador.posicaoYp, jogador.posicaoXp + jogador.largurap, jogador.posicaoYp + jogador.alturap, cor);
+        al_draw_filled_rectangle(bot.posicaoX, bot.posicaoY, bot.posicaoX + bot.largura, bot.posicaoY + bot.altura, cor);
+        atirar(&projetil, jogador, espaco, projetilLargura, projetilAltura, jogador.alturap, width, projetilVelocidade);
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
         al_flip_display();
     }
