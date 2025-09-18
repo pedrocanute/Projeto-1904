@@ -9,6 +9,7 @@
 
 #include "personagens.h"
 #include "projetil.h"
+#include "inimigo.h"
 
 int main() {
     //Inicializações do Allegro
@@ -98,14 +99,7 @@ int main() {
 
             //ações bot
             //Perseguição
-            if (jogador.posicaoXp + jogador.largurap / 2 < bot.posicaoX + bot.largura / 2)
-                bot.posicaoX--;
-            else if (jogador.posicaoXp + jogador.largurap / 2 > bot.posicaoX + bot.largura / 2)
-                bot.posicaoX++;
-            if (jogador.posicaoYp + jogador.alturap / 2 < bot.posicaoY + bot.altura / 2)
-                bot.posicaoY--;
-            else if (jogador.posicaoYp + jogador.alturap / 2 > bot.posicaoY + bot.altura / 2) 
-                bot.posicaoY++;
+            perseguir(&bot, &jogador);
 
             //Colisão
             if (jogador.posicaoXp <= bot.posicaoX + bot.largura && jogador.posicaoXp + jogador.largurap >= bot.posicaoX && jogador.posicaoYp <= bot.posicaoY + bot.altura && jogador.posicaoYp + jogador.alturap >= bot.posicaoY)
@@ -115,6 +109,7 @@ int main() {
                 // Não colidiu
                 cor = al_map_rgb(0, 0, 0); 
         }
+        //Imagens plotadas na tela
         al_clear_to_color(al_map_rgb(255, 255, 255));
         al_draw_filled_rectangle(jogador.posicaoXp, jogador.posicaoYp, jogador.posicaoXp + jogador.largurap, jogador.posicaoYp + jogador.alturap, cor);
         al_draw_filled_rectangle(bot.posicaoX, bot.posicaoY, bot.posicaoX + bot.largura, bot.posicaoY + bot.altura, cor);
@@ -123,6 +118,7 @@ int main() {
         al_flip_display();
     }
 
+    //Destroys
     al_destroy_font(font);
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);

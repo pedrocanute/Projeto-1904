@@ -22,6 +22,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="inimigo.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="personagens.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -29,6 +30,7 @@
     <ClCompile Include="projetil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inimigo.h" />
     <ClInclude Include="personagens.h" />
     <ClInclude Include="projetil.h" />
   </ItemGroup>

@@ -7,10 +7,6 @@ typedef struct {
 	int posicaoXp, posicaoYp, largurap, alturap;
 }Jogador;
 
-typedef struct {
-	int posicaoX, posicaoY, largura, altura;
-}Inimigo;
-
 // Funções jogador
 void mover(Jogador *p, bool w, bool a, bool s, bool d, float velocidade);
 
