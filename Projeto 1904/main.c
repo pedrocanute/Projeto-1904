@@ -7,47 +7,62 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 
-#include "personagens.h"
+#include "personagem.h"
 #include "projetil.h"
+#include "input.h"
 #include "inimigo.h"
 
+#pragma region Defines
+//PROGRAMA
+#define WIDTH 640
+#define HEIGHT 480
+#define FPS 60
+
+//PERSONAGEM
+#define VELOCIDADE_JOGADOR 5.5f
+#define LARGURA_JOGADOR 32
+#define ALTURA_JOGADOR 32
+
+//PROJETIL
+#define VELOCIDADE_PROJETIL 5.0f
+#define CADENCIA 0.2f
+#define LARGURA_PROJETIL 16
+#define ALTURA_PROJETIL 16
+
+//INIMIGO
+#define VELOCIDADE_INIMIGO 1.5f
+#pragma endregion
+
 int main() {
-    //Inicializações do Allegro
+
     al_init();
     al_init_font_addon();
     al_init_image_addon();
     al_install_keyboard();
     al_init_primitives_addon();
 
-    //Declaração de variáveis
-    //Janela do jogo
-    const int width = 640, height = 480, fps = 60; 
+//DECLARAÇÃO DE VARIÁVEIS
     bool jogando = true;
-    //Jogador
-    Jogador jogador = { 320, 240};
-    jogador.largurap = 32; 
-    jogador.alturap = 32;
-    const float velocidade = 5.5f;
     bool w = false, a = false, s = false, d = false, espaco = false;
-    const int projetilLargura = 16, projetilAltura = 16;
-    const float projetilVelocidade = 9.0;
-    ProjetilPosicao projetil = { 0, 0, false };
-    //Inimigo
+    Jogador jogador = { 320.0, 240.0 };
+    ProjetilPosicao projetil = { 0 };
+
+    //INIMIGO
     Inimigo bot;
     bot.posicaoX = 630;
-    bot.posicaoY = 480 / 2 - 50 / 2;
-    bot.largura = 50;
-    bot.altura = 50;
+    bot.posicaoY = 480 / 2.0f - 50 / 2.0f;
+    bot.largura = 50.0f;
+    bot.altura = 50.0f;
+    ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);   
 
-    //Declarações do Allegro
-    ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
+//--------------------------//    
 
-    ALLEGRO_DISPLAY* janela = al_create_display(width, height);
+    ALLEGRO_DISPLAY* janela = al_create_display(WIDTH, HEIGHT);
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
 
     ALLEGRO_FONT* font = al_create_builtin_font();
-    ALLEGRO_TIMER* timer = al_create_timer(1.0 / fps);
+    ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue();
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
@@ -57,68 +72,44 @@ int main() {
 
     ALLEGRO_EVENT event;
 
-    //Loop do jogo
     while (jogando) {
-        while (!al_is_event_queue_empty(fila_eventos)) { //Garante que todos os eventos sejam executados | múltiplos eventos podem ser executado em um único loop.
+        al_wait_for_event(fila_eventos, &event);
 
-            ALLEGRO_EVENT event;
-            al_wait_for_event(fila_eventos, &event);
-
-            if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-                jogando = false;
-
-            //ações jogador
-            else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-                if (event.keyboard.keycode == ALLEGRO_KEY_W)
-                    w = true;
-                if (event.keyboard.keycode == ALLEGRO_KEY_S)
-                    s = true;
-                if (event.keyboard.keycode == ALLEGRO_KEY_A)
-                    a = true;
-                if (event.keyboard.keycode == ALLEGRO_KEY_D)
-                    d = true;
-                if (event.keyboard.keycode == ALLEGRO_KEY_SPACE)
-                    espaco = true;
-            }
-            else if (event.type == ALLEGRO_EVENT_KEY_UP) {
-                if (event.keyboard.keycode == ALLEGRO_KEY_W)
-                    w = false;
-                if (event.keyboard.keycode == ALLEGRO_KEY_S)
-                    s = false;
-                if (event.keyboard.keycode == ALLEGRO_KEY_A)
-                    a = false;
-                if (event.keyboard.keycode == ALLEGRO_KEY_D)
-                    d = false;
-                if (event.keyboard.keycode == ALLEGRO_KEY_SPACE)
-                    espaco = false;
-            }
-            else if (event.type == ALLEGRO_EVENT_TIMER) {
-                mover(&jogador, w, a, s, d, velocidade);
-                restringirPosicao(&jogador, width, height, jogador.largurap, jogador.alturap);
-            }
-
-            //ações bot
-            //Perseguição
-            perseguir(&bot, &jogador);
-
-            //Colisão
-            if (jogador.posicaoXp <= bot.posicaoX + bot.largura && jogador.posicaoXp + jogador.largurap >= bot.posicaoX && jogador.posicaoYp <= bot.posicaoY + bot.altura && jogador.posicaoYp + jogador.alturap >= bot.posicaoY)
-                // Colidiu
-                cor = al_map_rgb(255, 0, 0); 
-            else
-                // Não colidiu
-                cor = al_map_rgb(0, 0, 0); 
+        //CONDICAO DE PARADA
+        if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            jogando = false;
         }
-        //Imagens plotadas na tela
+        //VERIFICACAO DE TECLAS
+        if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP)
+            verificar_Input(event, &w, &a, &s, &d, &espaco);
+
+        //MOVIMENTACAO E RESTRICAO DO PERSONAGEM
+        if (event.type == ALLEGRO_EVENT_TIMER) {
+            mover(&jogador, w, a, s, d, VELOCIDADE_JOGADOR);
+            restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
+            perseguir(&bot, &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR, VELOCIDADE_INIMIGO);
+        }
+
+
+        //Colisão
+        if ((jogador.jogadorX <= bot.posicaoX + bot.largura) && 
+            (jogador.jogadorX + LARGURA_JOGADOR >= bot.posicaoX) && 
+            (jogador.jogadorY <= bot.posicaoY + bot.altura) && 
+            (jogador.jogadorY + ALTURA_JOGADOR >= bot.posicaoY))
+            // Colidiu
+            cor = al_map_rgb(255, 0, 0);
+        else
+            // Não colidiu
+            cor = al_map_rgb(0, 0, 0);
+
         al_clear_to_color(al_map_rgb(255, 255, 255));
-        al_draw_filled_rectangle(jogador.posicaoXp, jogador.posicaoYp, jogador.posicaoXp + jogador.largurap, jogador.posicaoYp + jogador.alturap, cor);
         al_draw_filled_rectangle(bot.posicaoX, bot.posicaoY, bot.posicaoX + bot.largura, bot.posicaoY + bot.altura, cor);
-        atirar(&projetil, jogador, espaco, projetilLargura, projetilAltura, jogador.alturap, width, projetilVelocidade);
+        al_draw_filled_rectangle(jogador.jogadorX, jogador.jogadorY, jogador.jogadorX + LARGURA_JOGADOR, jogador.jogadorY + ALTURA_JOGADOR, al_map_rgb(0, 0, 0));
+        atirar(&projetil, jogador, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA);
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
         al_flip_display();
     }
 
-    //Destroys
     al_destroy_font(font);
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);

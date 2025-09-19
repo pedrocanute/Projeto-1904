@@ -23,15 +23,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="inimigo.c" />
+    <ClCompile Include="input.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="personagens.c">
+    <ClCompile Include="personagem.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="projetil.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inimigo.h" />
-    <ClInclude Include="personagens.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="personagem.h" />
     <ClInclude Include="projetil.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
