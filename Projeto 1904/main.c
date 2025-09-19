@@ -14,8 +14,8 @@
 
 #pragma region Defines
 //PROGRAMA
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1280
+#define HEIGHT 720
 #define FPS 60
 
 //PERSONAGEM
@@ -24,13 +24,13 @@
 #define ALTURA_JOGADOR 32
 
 //PROJETIL
-#define VELOCIDADE_PROJETIL 5.0f
+#define VELOCIDADE_PROJETIL 15.0f
 #define CADENCIA 0.2f
 #define LARGURA_PROJETIL 16
 #define ALTURA_PROJETIL 16
 
 //INIMIGO
-#define VELOCIDADE_INIMIGO 1.5f
+#define VELOCIDADE_INIMIGO 3.0f
 #pragma endregion
 
 int main() {
@@ -49,10 +49,10 @@ int main() {
 
     //INIMIGO
     Inimigo bot;
-    bot.posicaoX = 630;
-    bot.posicaoY = 480 / 2.0f - 50 / 2.0f;
-    bot.largura = 50.0f;
-    bot.altura = 50.0f;
+    bot.botX = 1500;
+    bot.botY = 480 / 2.0f - 50 / 2.0f;
+    bot.larguraBot = 50.0f;
+    bot.alturaBot = 50.0f;
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);   
 
 //--------------------------//    
@@ -92,10 +92,10 @@ int main() {
 
 
         //Colisão
-        if ((jogador.jogadorX <= bot.posicaoX + bot.largura) && 
-            (jogador.jogadorX + LARGURA_JOGADOR >= bot.posicaoX) && 
-            (jogador.jogadorY <= bot.posicaoY + bot.altura) && 
-            (jogador.jogadorY + ALTURA_JOGADOR >= bot.posicaoY))
+        if ((jogador.jogadorX <= bot.botX + bot.larguraBot) && 
+            (jogador.jogadorX + LARGURA_JOGADOR >= bot.botX) && 
+            (jogador.jogadorY <= bot.botY + bot.alturaBot) && 
+            (jogador.jogadorY + ALTURA_JOGADOR >= bot.botY))
             // Colidiu
             cor = al_map_rgb(255, 0, 0);
         else
@@ -103,7 +103,7 @@ int main() {
             cor = al_map_rgb(0, 0, 0);
 
         al_clear_to_color(al_map_rgb(255, 255, 255));
-        al_draw_filled_rectangle(bot.posicaoX, bot.posicaoY, bot.posicaoX + bot.largura, bot.posicaoY + bot.altura, cor);
+        al_draw_filled_rectangle(bot.botX, bot.botY, bot.botX + bot.larguraBot, bot.botY + bot.alturaBot, cor);
         al_draw_filled_rectangle(jogador.jogadorX, jogador.jogadorY, jogador.jogadorX + LARGURA_JOGADOR, jogador.jogadorY + ALTURA_JOGADOR, al_map_rgb(0, 0, 0));
         atirar(&projetil, jogador, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA);
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
