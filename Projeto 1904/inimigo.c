@@ -6,10 +6,10 @@
 
 // FUNCAO COLISAO
 bool detectarColisao(Inimigo* bot, Jogador* jogador, float larguraJogador, float alturaJogador) {
-    float botEsquerda = bot->posicaoX;
-    float botDireita = bot->posicaoX + bot->largura;
-    float botTopo = bot->posicaoY;
-    float botBaixo = bot->posicaoY + bot->altura;
+    float botEsquerda = bot->botX;
+    float botDireita = bot->botX + bot->larguraBot;
+    float botTopo = bot->botY;
+    float botBaixo = bot->botY + bot->alturaBot;
 
     float jogadorEsquerda = jogador->jogadorX;
     float jogadorDireita = jogador->jogadorX + larguraJogador;
@@ -28,30 +28,30 @@ void perseguir(Inimigo* bot, Jogador* jogador, float larguraJogador, float altur
     float jogadorCentroX = jogador->jogadorX + (larguraJogador / 2.0f);
     float jogadorCentroY = jogador->jogadorY + (alturaJogador / 2.0f);
 
-    float botCentroX = bot->posicaoX + (bot->largura / 2.0f);
-    float botCentroY = bot->posicaoY + (bot->altura / 2.0f);
+    float botCentroX = bot->botX + (bot->larguraBot / 2.0f);
+    float botCentroY = bot->botY + (bot->alturaBot / 2.0f);
 
     // GUARDA POSICOES DO BOT
-    float novaPosicaoX = bot->posicaoX;
-    float novaPosicaoY = bot->posicaoY;
+    float novaPosicaoX = bot->botX;
+    float novaPosicaoY = bot->botY;
 
     // EIXO X - CENTRO SEGUE O CENTRO
     if (botCentroX < jogadorCentroX) {
         float distancia = jogadorCentroX - botCentroX;
         if (distancia <= velocidadeInimigo) {
-            novaPosicaoX = jogadorCentroX - (bot->largura / 2.0f);
+            novaPosicaoX = jogadorCentroX - (bot->larguraBot / 2.0f);
         }
         else {
-            novaPosicaoX = bot->posicaoX + velocidadeInimigo;
+            novaPosicaoX = bot->botX + velocidadeInimigo;
         }
     }
     else if (botCentroX > jogadorCentroX) {
         float distancia = botCentroX - jogadorCentroX;
         if (distancia <= velocidadeInimigo) {
-            novaPosicaoX = jogadorCentroX - (bot->largura / 2.0f);
+            novaPosicaoX = jogadorCentroX - (bot->larguraBot / 2.0f);
         }
         else {
-            novaPosicaoX = bot->posicaoX - velocidadeInimigo;
+            novaPosicaoX = bot->botX - velocidadeInimigo;
         }
     }
 
@@ -59,37 +59,37 @@ void perseguir(Inimigo* bot, Jogador* jogador, float larguraJogador, float altur
     if (botCentroY < jogadorCentroY) {
         float distancia = jogadorCentroY - botCentroY;
         if (distancia <= velocidadeInimigo) {
-            novaPosicaoY = jogadorCentroY - (bot->altura / 2.0f);
+            novaPosicaoY = jogadorCentroY - (bot->alturaBot / 2.0f);
         }
         else {
-            novaPosicaoY = bot->posicaoY + velocidadeInimigo;
+            novaPosicaoY = bot->botY + velocidadeInimigo;
         }
     }
     else if (botCentroY > jogadorCentroY) {
         float distancia = botCentroY - jogadorCentroY;
         if (distancia <= velocidadeInimigo) {
-            novaPosicaoY = jogadorCentroY - (bot->altura / 2.0f);
+            novaPosicaoY = jogadorCentroY - (bot->alturaBot / 2.0f);
         }
         else {
-            novaPosicaoY = bot->posicaoY - velocidadeInimigo;
+            novaPosicaoY = bot->botY - velocidadeInimigo;
         }
     }
 
     // TESTA MOVIMENTO EIXO X
-    float posicaoXOriginal = bot->posicaoX;
-    bot->posicaoX = novaPosicaoX;
+    float posicaoXOriginal = bot->botX;
+    bot->botX = novaPosicaoX;
 
     // COLIDIU? PARA O MOVIMENTO
     if (detectarColisao(bot, jogador, larguraJogador, alturaJogador)) {
-        bot->posicaoX = posicaoXOriginal;
+        bot->botX = posicaoXOriginal;
     }
 
     // TESTA MOVIMENTO EIXO Y
-    float posicaoYOriginal = bot->posicaoY;
-    bot->posicaoY = novaPosicaoY;
+    float posicaoYOriginal = bot->botY;
+    bot->botY = novaPosicaoY;
 
     // COLIDIU? PARA O MOVIMENTO
     if (detectarColisao(bot, jogador, larguraJogador, alturaJogador)) {
-        bot->posicaoY = posicaoYOriginal;
+        bot->botY = posicaoYOriginal;
     }
 }

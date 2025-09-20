@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 typedef struct {
-	int posicaoX, posicaoY, largura, altura;
+	int botX, botY, larguraBot, alturaBot;
 }Inimigo;
 
 void perseguir(Inimigo* bot, Jogador* jogador, float larguraJogador, float alturaJogador, float velocidadeInimigo);
