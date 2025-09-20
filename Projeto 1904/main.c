@@ -14,23 +14,23 @@
 
 #pragma region Defines
 //PROGRAMA
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1280
+#define HEIGHT 720
 #define FPS 60
 
 //PERSONAGEM
-#define VELOCIDADE_JOGADOR 5.5f
+#define VELOCIDADE_JOGADOR 6.5f
 #define LARGURA_JOGADOR 32
 #define ALTURA_JOGADOR 32
 
 //PROJETIL
-#define VELOCIDADE_PROJETIL 5.0f
+#define VELOCIDADE_PROJETIL 15.0f
 #define CADENCIA 0.2f
 #define LARGURA_PROJETIL 16
 #define ALTURA_PROJETIL 16
 
 //INIMIGO
-#define VELOCIDADE_INIMIGO 1.5f
+#define VELOCIDADE_INIMIGO 3.5f
 #pragma endregion
 
 int main() {
@@ -49,7 +49,7 @@ int main() {
 
     //INIMIGO
     Inimigo bot;
-    bot.posicaoX = 630;
+    bot.posicaoX = 1350;
     bot.posicaoY = 480 / 2.0f - 50 / 2.0f;
     bot.largura = 50.0f;
     bot.altura = 50.0f;
@@ -89,7 +89,6 @@ int main() {
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
             perseguir(&bot, &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR, VELOCIDADE_INIMIGO);
         }
-
 
         //Colisão
         if ((jogador.jogadorX <= bot.posicaoX + bot.largura) && 

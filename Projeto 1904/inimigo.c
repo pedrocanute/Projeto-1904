@@ -4,65 +4,92 @@
 #include "inimigo.h"
 #include "personagem.h"
 
-void perseguir(Inimigo* bot, Jogador* jogador, float larguraJogador, float alturaJogador, float velocidadeInimigo) {
+// FUNCAO COLISAO
+bool detectarColisao(Inimigo* bot, Jogador* jogador, float larguraJogador, float alturaJogador) {
+    float botEsquerda = bot->posicaoX;
+    float botDireita = bot->posicaoX + bot->largura;
+    float botTopo = bot->posicaoY;
+    float botBaixo = bot->posicaoY + bot->altura;
+
     float jogadorEsquerda = jogador->jogadorX;
     float jogadorDireita = jogador->jogadorX + larguraJogador;
     float jogadorTopo = jogador->jogadorY;
     float jogadorBaixo = jogador->jogadorY + alturaJogador;
 
-    // Movimento horizontal
-    if (bot->posicaoX < jogadorEsquerda) {
-        // Bot à esquerda - sua borda DIREITA deve parar na borda ESQUERDA do jogador
-        float bordaDireitaBot = bot->posicaoX + bot->largura;
-        float distancia = jogadorEsquerda - bordaDireitaBot;
+    // VER SOBREPOSICAO
+    return (botEsquerda < jogadorDireita &&
+        botDireita > jogadorEsquerda &&
+        botTopo < jogadorBaixo &&
+        botBaixo > jogadorTopo);
+}
 
+void perseguir(Inimigo* bot, Jogador* jogador, float larguraJogador, float alturaJogador, float velocidadeInimigo) {
+    // CENTRO JOGADOR E BOT
+    float jogadorCentroX = jogador->jogadorX + (larguraJogador / 2.0f);
+    float jogadorCentroY = jogador->jogadorY + (alturaJogador / 2.0f);
+
+    float botCentroX = bot->posicaoX + (bot->largura / 2.0f);
+    float botCentroY = bot->posicaoY + (bot->altura / 2.0f);
+
+    // GUARDA POSICOES DO BOT
+    float novaPosicaoX = bot->posicaoX;
+    float novaPosicaoY = bot->posicaoY;
+
+    // EIXO X - CENTRO SEGUE O CENTRO
+    if (botCentroX < jogadorCentroX) {
+        float distancia = jogadorCentroX - botCentroX;
         if (distancia <= velocidadeInimigo) {
-            // Posiciona a borda direita do bot exatamente na borda esquerda do jogador
-            bot->posicaoX = jogadorEsquerda - bot->largura;
+            novaPosicaoX = jogadorCentroX - (bot->largura / 2.0f);
         }
         else {
-            // Move normalmente
-            bot->posicaoX += velocidadeInimigo;
+            novaPosicaoX = bot->posicaoX + velocidadeInimigo;
         }
     }
-    else if (bot->posicaoX > jogadorDireita) {
-        // Bot à direita - sua borda ESQUERDA deve parar na borda DIREITA do jogador
-        float distancia = bot->posicaoX - jogadorDireita;
-
+    else if (botCentroX > jogadorCentroX) {
+        float distancia = botCentroX - jogadorCentroX;
         if (distancia <= velocidadeInimigo) {
-            // Posiciona a borda esquerda do bot exatamente na borda direita do jogador
-            bot->posicaoX = jogadorDireita;
+            novaPosicaoX = jogadorCentroX - (bot->largura / 2.0f);
         }
         else {
-            // Move normalmente
-            bot->posicaoX -= velocidadeInimigo;
+            novaPosicaoX = bot->posicaoX - velocidadeInimigo;
         }
     }
 
-
-    // Movimento vertical
-    if (bot->posicaoY < jogadorTopo) {
-        // Bot acima - move para baixo até a borda
-        float distancia = jogadorTopo - bot->posicaoY;
+    // EIXO Y
+    if (botCentroY < jogadorCentroY) {
+        float distancia = jogadorCentroY - botCentroY;
         if (distancia <= velocidadeInimigo) {
-            // Se pode chegar na borda neste frame, vai direto para a borda
-            bot->posicaoY = jogadorTopo;
+            novaPosicaoY = jogadorCentroY - (bot->altura / 2.0f);
         }
         else {
-            // Senão, move a velocidade normal
-            bot->posicaoY += velocidadeInimigo;
+            novaPosicaoY = bot->posicaoY + velocidadeInimigo;
         }
     }
-    else if (bot->posicaoY > jogadorBaixo) {
-        // Bot abaixo - move para cima até a borda
-        float distancia = bot->posicaoY - jogadorBaixo;
+    else if (botCentroY > jogadorCentroY) {
+        float distancia = botCentroY - jogadorCentroY;
         if (distancia <= velocidadeInimigo) {
-            // Se pode chegar na borda neste frame, vai direto para a borda
-            bot->posicaoY = jogadorBaixo;
+            novaPosicaoY = jogadorCentroY - (bot->altura / 2.0f);
         }
         else {
-            // Senão, move a velocidade normal
-            bot->posicaoY -= velocidadeInimigo;
+            novaPosicaoY = bot->posicaoY - velocidadeInimigo;
         }
+    }
+
+    // TESTA MOVIMENTO EIXO X
+    float posicaoXOriginal = bot->posicaoX;
+    bot->posicaoX = novaPosicaoX;
+
+    // COLIDIU? PARA O MOVIMENTO
+    if (detectarColisao(bot, jogador, larguraJogador, alturaJogador)) {
+        bot->posicaoX = posicaoXOriginal;
+    }
+
+    // TESTA MOVIMENTO EIXO Y
+    float posicaoYOriginal = bot->posicaoY;
+    bot->posicaoY = novaPosicaoY;
+
+    // COLIDIU? PARA O MOVIMENTO
+    if (detectarColisao(bot, jogador, larguraJogador, alturaJogador)) {
+        bot->posicaoY = posicaoYOriginal;
     }
 }
