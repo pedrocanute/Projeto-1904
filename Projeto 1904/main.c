@@ -12,12 +12,13 @@ int main() {
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
 
-    //DECLARAÇÃO DE VARIÁVEIS
+//--DECLARACAO DE VARIAVEIS--//
+
     bool jogando = true;
     bool w = false, a = false, s = false, d = false, espaco = false, shift = false;
     ProjetilPosicao projetil = { 0 };
 
-    //INIMIGO
+    // INIMIGO
     Inimigo bot;
     bot.larguraBot = 50.0f;
     bot.alturaBot = 50.0f;
@@ -34,6 +35,7 @@ int main() {
     int frames_por_sprite = 11;
     bool virado_direita = true;
 
+
     //PROJETIL
     ALLEGRO_BITMAP* projetilDireita = al_load_bitmap("imagens/VacinaProjetilDireita.png");
     ALLEGRO_BITMAP* projetilEsquerda = al_load_bitmap("imagens/VacinaProjetilEsquerda.png");
@@ -44,6 +46,9 @@ int main() {
 
     // CAMERA
     float posicaoCamera[2] = { 0, 0 };
+
+//-----------------//
+
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
@@ -61,16 +66,17 @@ int main() {
     while (jogando) {
         al_wait_for_event(fila_eventos, &event);
 
-        //CONDICAO DE PARADA
+        // CONDICAO DE PARADA
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             jogando = false;
         }
 
-        //VERIFICACAO DE TECLAS
+        // VERIFICACAO DE TECLAS
+
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP)
             verificar_Input(event, &w, &a, &s, &d, &espaco, &shift);
 
-        //MOVIMENTACAO E RESTRICAO DO PERSONAGEM
+        // MOVIMENTACAO E RESTRICAO DO PERSONAGEM
         if (event.type == ALLEGRO_EVENT_TIMER) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
@@ -78,7 +84,8 @@ int main() {
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
         }
 
-        //Colisão
+        // Colisao
+
         if ((jogador.jogadorX <= bot.botX + bot.larguraBot) &&
             (jogador.jogadorX + LARGURA_JOGADOR >= bot.botX) &&
             (jogador.jogadorY <= bot.botY + bot.alturaBot) &&
@@ -93,9 +100,11 @@ int main() {
 
         al_clear_to_color(cor);
         desenhar_cenario(cenario1, cenario2, jogador.jogadorX, posicaoCamera);
+
         al_draw_filled_rectangle(bot.botX, bot.botY, bot.botX + bot.larguraBot, bot.botY + bot.alturaBot, cor);
         desenhar_jogador(jogador, w, a, s, d, sprite_andando_direita, sprite_andando_esquerda, &frame_atual, &contador_frame, frames_por_sprite, &virado_direita);
         atirar(&projetil, jogador, bot, projetilDireita, projetilEsquerda, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, ALTURA_PROJETIL, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, bot.botX, bot.botY, posicaoCamera);
+
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
         al_flip_display();
     }
