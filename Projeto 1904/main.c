@@ -1,54 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-
-#include "personagem.h"
-#include "projetil.h"
-#include "input.h"
-#include "inimigo.h"
-
-#pragma region Defines
-//PROGRAMA
-#define WIDTH 1920
-#define HEIGHT 1200
-#define FPS 60
-
-//PERSONAGEM
-#define VELOCIDADE_JOGADOR 4.5f
-#define LARGURA_JOGADOR 80
-#define ALTURA_JOGADOR 96
-
-//PROJETIL
-#define VELOCIDADE_PROJETIL 15.5f
-#define CADENCIA 0.2f
-#define LARGURA_PROJETIL 16
-#define ALTURA_PROJETIL 16
-
-//INIMIGO
-#define VELOCIDADE_INIMIGO 3.5f
-#pragma endregion
-
-void desenhar_cenario(ALLEGRO_BITMAP* cenario1, ALLEGRO_BITMAP* cenario2, Jogador jogador) {
-    static float paralax1 = 0;
-    static float paralax2 = 1280;
-
-
-    if (jogador.jogadorX < 1200) {
-
-        al_draw_bitmap(cenario1, 0, 0, 0);
-        al_draw_bitmap(cenario2, 1280, 0, 0);
-    }
-    if (jogador.jogadorX > 1200) {
-        al_draw_bitmap(cenario1, paralax1-= 10, 0, 0);
-        al_draw_bitmap(cenario2, paralax2-= 10, 0, 0);
-    }
-    
-}
+ï»¿#include "configuracoes.h"
 
 int main() {
 
@@ -62,40 +12,39 @@ int main() {
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
 
-//DECLARAÇÃO DE VARIÁVEIS
+//--DECLARACAO DE VARIAVEIS--//
     bool jogando = true;
-    bool w = false, a = false, s = false, d = false, espaco = false;
-    Jogador jogador = { 320.0, 240.0 };
+    bool w = false, a = false, s = false, d = false, espaco = false, shift = false;
     ProjetilPosicao projetil = { 0 };
-    
 
-    //INIMIGO
+    // INIMIGO
     Inimigo bot;
-    bot.botX = 1350;
-    bot.botY = 480 / 2.0f - 50 / 2.0f;
     bot.larguraBot = 50.0f;
     bot.alturaBot = 50.0f;
-    ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);   
+    bot.botX = 1350;
+    bot.botY = 520;
+    ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
 
-    //JOGADOR
+    // JOGADOR
+    Jogador jogador = { 120.0, 520.0 };
     ALLEGRO_BITMAP* sprite_andando_direita = al_load_bitmap("AndandoDireita.png");
     ALLEGRO_BITMAP* sprite_andando_esquerda = al_load_bitmap("AndandoEsquerda.png");
     int frame_atual = 0;
     int contador_frame = 0;
-    int frames_por_sprite = 8; // Controla a velocidade da animação
-    bool virado_direita = true; // Controla qual direção o jogador está virado
+    int frames_por_sprite = 11;
+    bool virado_direita = true;
 
-    //CENARIO
-
+    // CENARIO
     ALLEGRO_BITMAP* cenario1 = al_load_bitmap("Mapa01.png");
     ALLEGRO_BITMAP* cenario2 = al_load_bitmap("Mapa02.png");
 
-
-//--------------------------//    
-
+    // CAMERA
+    float posicaoCamera[2] = { 0, 0 };
+//-----------------//
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_TRANSFORM camera;
 
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue();
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
@@ -105,37 +54,43 @@ int main() {
 
     ALLEGRO_EVENT event;
 
+    //LOOP PRINCIPAL
     while (jogando) {
         al_wait_for_event(fila_eventos, &event);
 
-        //CONDICAO DE PARADA
+        // CONDICAO DE PARADA
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             jogando = false;
         }
-        //VERIFICACAO DE TECLAS
-        if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP)
-            verificar_Input(event, &w, &a, &s, &d, &espaco);
 
-        //MOVIMENTACAO E RESTRICAO DO PERSONAGEM
+        // VERIFICACAO DE TECLAS
+        if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP)
+            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift);
+
+        // MOVIMENTACAO E RESTRICAO DO PERSONAGEM
         if (event.type == ALLEGRO_EVENT_TIMER) {
-            mover(&jogador, w, a, s, d, VELOCIDADE_JOGADOR);
+            mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
             perseguir(&bot, &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR, VELOCIDADE_INIMIGO);
+            camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
         }
 
-        //Colisão
-        if ((jogador.jogadorX <= bot.botX + bot.larguraBot) && 
-            (jogador.jogadorX + LARGURA_JOGADOR >= bot.botX) && 
-            (jogador.jogadorY <= bot.botY + bot.alturaBot) && 
+        // Colisao
+        if ((jogador.jogadorX <= bot.botX + bot.larguraBot) &&
+            (jogador.jogadorX + LARGURA_JOGADOR >= bot.botX) &&
+            (jogador.jogadorY <= bot.botY + bot.alturaBot) &&
             (jogador.jogadorY + ALTURA_JOGADOR >= bot.botY))
-            // Colidiu
             cor = al_map_rgb(255, 0, 0);
         else
-            // Não colidiu
             cor = al_map_rgb(0, 0, 0);
+
+        al_identity_transform(&camera);
+        al_translate_transform(&camera, -posicaoCamera[0], -posicaoCamera[1]);
+        al_use_transform(&camera);
+
         al_clear_to_color(cor);
-        desenhar_cenario(cenario1, cenario2, jogador);
-        
+        desenhar_cenario(cenario1, cenario2, jogador.jogadorX, posicaoCamera);
+
         al_draw_filled_rectangle(bot.botX, bot.botY, bot.botX + bot.larguraBot, bot.botY + bot.alturaBot, cor);
         desenhar_jogador(jogador, w, a, s, d, sprite_andando_direita, sprite_andando_esquerda, &frame_atual, &contador_frame, frames_por_sprite, &virado_direita);
         atirar(&projetil, jogador, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA);

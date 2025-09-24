@@ -1,21 +1,50 @@
 #include "personagem.h"
 
-void mover(Jogador* p, bool w, bool a, bool s, bool d,  float velocidade) {
+void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift,  float velocidade, int* frames_por_sprite) {
+    float velocidade_caminhada = velocidade;
+    float velocidade_corrida = velocidade * 1.5;
     if (w)
-        p-> jogadorY -= velocidade;
-    if (a)  
-        p-> jogadorX -= velocidade;
-    if (s)  
-        p-> jogadorY += velocidade;
-    if (d) 
-        p-> jogadorX += velocidade;
+        if (shift){
+            p-> jogadorY -= velocidade_corrida;
+            *frames_por_sprite = 4;
+        }
+        else {
+            p->jogadorY -= velocidade_caminhada;
+            *frames_por_sprite = 11;
+        }
+    if (a)
+        if (shift){
+            p->jogadorX -= velocidade_corrida; 
+            *frames_por_sprite = 4;
+        }
+        else {
+            p->jogadorX -= velocidade_caminhada;
+            *frames_por_sprite = 11;
+        }
+    if (s) 
+        if (shift) {
+            p->jogadorY += velocidade_corrida;
+            *frames_por_sprite = 4;
+        }
+        else {
+            p->jogadorY += velocidade_caminhada;
+            *frames_por_sprite = 11;
+        }
+    if (d)
+        if (shift) {
+            p->jogadorX += velocidade_corrida;
+            *frames_por_sprite = 4;
+        }
+        else {
+            p->jogadorX += velocidade_caminhada;
+            *frames_por_sprite = 11;
+        }
 }
 
 void restringirPosicao(Jogador* p, float WIDTH, float HEIGHT, float larguraJogador, float alturaJogador) {
     if (p->jogadorX < 0) p->jogadorX = 0;
     if (p->jogadorY < 0) p->jogadorY = 0;
-    if (p->jogadorY < (HEIGHT / 2) - alturaJogador )  p->jogadorY = (HEIGHT / 2) - alturaJogador;
-    if (p->jogadorX > WIDTH - larguraJogador)  p->jogadorX = WIDTH - larguraJogador;
+    if (p->jogadorY < (HEIGHT / 2 ) - alturaJogador + 52)  p->jogadorY = (HEIGHT / 2 ) - alturaJogador + 52;
     if (p->jogadorY > HEIGHT - alturaJogador)   p->jogadorY = HEIGHT - alturaJogador;
 
 }
@@ -64,4 +93,12 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, ALLEGRO_B
     al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
         jogador.jogadorX, jogador.jogadorY, 0);
 
+}
+
+void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador) {
+
+    posicaoCamera[0] = jogador.jogadorX - (larguraTela / 2) + (larguraJogador / 2);
+
+    if (posicaoCamera[0] < 0)
+        posicaoCamera[0] = 0;
 }

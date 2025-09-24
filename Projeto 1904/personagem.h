@@ -9,7 +9,7 @@ typedef struct {
 }Jogador;
 
 // Funções jogador
-void mover(Jogador *p, bool w, bool a, bool s, bool d, float velocidade);
+void mover(Jogador *p, bool w, bool a, bool s, bool d, bool shift, float velocidade, int* frames_por_sprite);
 
 void restringirPosicao(Jogador* p, float maximoX, float maximoY, float larguraJogador, float alturaJogador);
 
