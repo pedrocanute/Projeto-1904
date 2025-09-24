@@ -14,17 +14,17 @@
 
 #pragma region Defines
 //PROGRAMA
-#define WIDTH 1280
-#define HEIGHT 720
+#define WIDTH 1920
+#define HEIGHT 1200
 #define FPS 60
 
 //PERSONAGEM
-#define VELOCIDADE_JOGADOR 5.5f
-#define LARGURA_JOGADOR 79
-#define ALTURA_JOGADOR 97
+#define VELOCIDADE_JOGADOR 4.5f
+#define LARGURA_JOGADOR 80
+#define ALTURA_JOGADOR 96
 
 //PROJETIL
-#define VELOCIDADE_PROJETIL 15.0f
+#define VELOCIDADE_PROJETIL 15.5f
 #define CADENCIA 0.2f
 #define LARGURA_PROJETIL 16
 #define ALTURA_PROJETIL 16
@@ -33,51 +33,22 @@
 #define VELOCIDADE_INIMIGO 3.5f
 #pragma endregion
 
-void desenhar_jogador_animado(Jogador jogador, bool w, bool a, bool s, bool d, ALLEGRO_BITMAP* sprite_direita,
-    ALLEGRO_BITMAP* sprite_esquerda, int* frame_atual, int* contador_frame,
-    int frames_por_sprite, bool* virado_direita) {
+void desenhar_cenario(ALLEGRO_BITMAP* cenario1, ALLEGRO_BITMAP* cenario2, Jogador jogador) {
+    static float paralax1 = 0;
+    static float paralax2 = 1280;
 
-    // Determina qual sprite usar baseado na tecla pressionada
-    if (d || (d && s) || (d && w)) {
-        *virado_direita = true;
-    }
-    else if (a || (a && s) || (a && w)) {
-        *virado_direita = false;
-    }
 
-    ALLEGRO_BITMAP* sprite_atual = sprite_direita;
-    if (*virado_direita) {
-        sprite_atual = sprite_direita;
-    }
-    else {
-        sprite_atual = sprite_esquerda;
-    }
+    if (jogador.jogadorX < 1200) {
 
-    // Atualiza a animação apenas se estiver se movendo
-    if (a || d || (sprite_atual == sprite_direita && s) || (sprite_atual == sprite_direita && w) || (sprite_atual == sprite_esquerda && s) || sprite_atual == sprite_esquerda && w) {
-        (*contador_frame)++;
-        if (*contador_frame >= frames_por_sprite) {
-            *frame_atual = (*frame_atual + 1) % 2; // 2 colunas no spritesheet
-            *contador_frame = 0;
-        }
+        al_draw_bitmap(cenario1, 0, 0, 0);
+        al_draw_bitmap(cenario2, 1280, 0, 0);
     }
-    else {
-        // Parado - usa o primeiro frame
-        *frame_atual = 0;
-        *contador_frame = 1;
+    if (jogador.jogadorX > 1200) {
+        al_draw_bitmap(cenario1, paralax1-= 10, 0, 0);
+        al_draw_bitmap(cenario2, paralax2-= 10, 0, 0);
     }
-
-    // Calcula as coordenadas do frame no spritesheet
-    int largura_frame = al_get_bitmap_width(sprite_atual) / 2; // 2 colunas
-    int altura_frame = al_get_bitmap_height(sprite_atual);
-    int sx = *frame_atual * largura_frame;
-    int sy = 0;
-
-    // Desenha o sprite
-    al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
-        jogador.jogadorX, jogador.jogadorY, 0);
+    
 }
-
 
 int main() {
 
@@ -87,11 +58,16 @@ int main() {
     al_install_keyboard();
     al_init_primitives_addon();
 
+    ALLEGRO_DISPLAY* janela = al_create_display(WIDTH, HEIGHT);
+    al_set_window_title(janela, "Projeto 1904");
+    al_set_window_position(janela, 200, 200);
+
 //DECLARAÇÃO DE VARIÁVEIS
     bool jogando = true;
     bool w = false, a = false, s = false, d = false, espaco = false;
     Jogador jogador = { 320.0, 240.0 };
     ProjetilPosicao projetil = { 0 };
+    
 
     //INIMIGO
     Inimigo bot;
@@ -101,7 +77,7 @@ int main() {
     bot.alturaBot = 50.0f;
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);   
 
-    //Jogador
+    //JOGADOR
     ALLEGRO_BITMAP* sprite_andando_direita = al_load_bitmap("AndandoDireita.png");
     ALLEGRO_BITMAP* sprite_andando_esquerda = al_load_bitmap("AndandoEsquerda.png");
     int frame_atual = 0;
@@ -109,12 +85,14 @@ int main() {
     int frames_por_sprite = 8; // Controla a velocidade da animação
     bool virado_direita = true; // Controla qual direção o jogador está virado
 
+    //CENARIO
+
+    ALLEGRO_BITMAP* cenario1 = al_load_bitmap("Mapa01.png");
+    ALLEGRO_BITMAP* cenario2 = al_load_bitmap("Mapa02.png");
+
 
 //--------------------------//    
 
-    ALLEGRO_DISPLAY* janela = al_create_display(WIDTH, HEIGHT);
-    al_set_window_title(janela, "Projeto 1904");
-    al_set_window_position(janela, 200, 200);
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
@@ -155,10 +133,11 @@ int main() {
         else
             // Não colidiu
             cor = al_map_rgb(0, 0, 0);
-
-        al_clear_to_color(al_map_rgb(255, 255, 255));
+        al_clear_to_color(cor);
+        desenhar_cenario(cenario1, cenario2, jogador);
+        
         al_draw_filled_rectangle(bot.botX, bot.botY, bot.botX + bot.larguraBot, bot.botY + bot.alturaBot, cor);
-        desenhar_jogador_animado(jogador, w, a, s, d, sprite_andando_direita, sprite_andando_esquerda, &frame_atual, &contador_frame, frames_por_sprite, &virado_direita);
+        desenhar_jogador(jogador, w, a, s, d, sprite_andando_direita, sprite_andando_esquerda, &frame_atual, &contador_frame, frames_por_sprite, &virado_direita);
         atirar(&projetil, jogador, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA);
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
         al_flip_display();
@@ -167,6 +146,8 @@ int main() {
     al_destroy_font(font);
     al_destroy_bitmap(sprite_andando_direita);
     al_destroy_bitmap(sprite_andando_esquerda);
+    al_destroy_bitmap(cenario1);
+    al_destroy_bitmap(cenario2);
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);
     al_destroy_timer(timer);
