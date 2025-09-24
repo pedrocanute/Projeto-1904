@@ -5,6 +5,7 @@
 
 typedef struct {
 	float jogadorX, jogadorY;
+	bool paraDireita, paraEsquerda;
 }Jogador;
 
 // Funções jogador

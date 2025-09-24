@@ -26,8 +26,8 @@
 //PROJETIL
 #define VELOCIDADE_PROJETIL 15.0f
 #define CADENCIA 0.2f
-#define LARGURA_PROJETIL 16
-#define ALTURA_PROJETIL 16
+#define LARGURA_PROJETIL 27
+#define ALTURA_PROJETIL 15
 
 //INIMIGO
 #define VELOCIDADE_INIMIGO 3.5f
@@ -44,7 +44,7 @@ int main() {
 //DECLARAÇÃO DE VARIÁVEIS
     bool jogando = true;
     bool w = false, a = false, s = false, d = false, espaco = false;
-    Jogador jogador = { 320.0, 240.0 };
+    Jogador jogador = { 320.0, 240.0, true, false };
     ProjetilPosicao projetil = { 0 };
 
     //INIMIGO
@@ -63,6 +63,8 @@ int main() {
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_BITMAP* projetilDireita = al_load_bitmap("imagens/VacinaProjetilDireita.png");
+    ALLEGRO_BITMAP* projetilEsquerda = al_load_bitmap("imagens/VacinaProjetilEsquerda.png");
 
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue();
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
@@ -104,7 +106,7 @@ int main() {
         al_clear_to_color(al_map_rgb(255, 255, 255));
         al_draw_filled_rectangle(bot.botX, bot.botY, bot.botX + bot.larguraBot, bot.botY + bot.alturaBot, cor);
         al_draw_filled_rectangle(jogador.jogadorX, jogador.jogadorY, jogador.jogadorX + LARGURA_JOGADOR, jogador.jogadorY + ALTURA_JOGADOR, al_map_rgb(0, 0, 0));
-        atirar(&projetil, jogador, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA);
+        atirar(&projetil, jogador, bot, projetilDireita, projetilEsquerda, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, ALTURA_PROJETIL, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, bot.botX, bot.botY);
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
         al_flip_display();
     }
@@ -113,6 +115,8 @@ int main() {
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);
     al_destroy_timer(timer);
+    al_destroy_bitmap(projetilDireita);
+    al_destroy_bitmap(projetilEsquerda);
 
     return 0;
 }

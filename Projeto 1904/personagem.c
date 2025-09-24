@@ -3,12 +3,19 @@
 void mover(Jogador* p, bool w, bool a, bool s, bool d, float velocidade) {
     if (w)
         p-> jogadorY -= velocidade;
-    if (a)  
+    if (a)  {
         p-> jogadorX -= velocidade;
+        p-> paraEsquerda = true;
+        p-> paraDireita = false;
+    }
     if (s)  
         p-> jogadorY += velocidade;
-    if (d) 
+    if (d){
         p-> jogadorX += velocidade;
+        p-> paraDireita = true;
+        p-> paraEsquerda = false;
+    }
+        
 }
 
 void restringirPosicao(Jogador* p, float WIDTH, float HEIGHT, float larguraJogador, float alturaJogador) {
