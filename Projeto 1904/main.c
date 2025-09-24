@@ -1,4 +1,4 @@
-﻿#include "configuracoes.h"
+#include "configuracoes.h"
 
 int main() {
 
@@ -13,6 +13,7 @@ int main() {
     al_set_window_position(janela, 200, 200);
 
 //--DECLARACAO DE VARIAVEIS--//
+
     bool jogando = true;
     bool w = false, a = false, s = false, d = false, espaco = false, shift = false;
     ProjetilPosicao projetil = { 0 };
@@ -26,7 +27,7 @@ int main() {
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
 
     // JOGADOR
-    Jogador jogador = { 120.0, 520.0 };
+    Jogador jogador = { 120.0, 520.0, true, false };
     ALLEGRO_BITMAP* sprite_andando_direita = al_load_bitmap("AndandoDireita.png");
     ALLEGRO_BITMAP* sprite_andando_esquerda = al_load_bitmap("AndandoEsquerda.png");
     int frame_atual = 0;
@@ -34,13 +35,20 @@ int main() {
     int frames_por_sprite = 11;
     bool virado_direita = true;
 
+
+    //PROJETIL
+    ALLEGRO_BITMAP* projetilDireita = al_load_bitmap("imagens/VacinaProjetilDireita.png");
+    ALLEGRO_BITMAP* projetilEsquerda = al_load_bitmap("imagens/VacinaProjetilEsquerda.png");
+
     // CENARIO
     ALLEGRO_BITMAP* cenario1 = al_load_bitmap("Mapa01.png");
     ALLEGRO_BITMAP* cenario2 = al_load_bitmap("Mapa02.png");
 
     // CAMERA
     float posicaoCamera[2] = { 0, 0 };
+
 //-----------------//
+
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
@@ -64,6 +72,7 @@ int main() {
         }
 
         // VERIFICACAO DE TECLAS
+
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP)
             verificar_Input(event, &w, &a, &s, &d, &espaco, &shift);
 
@@ -76,6 +85,7 @@ int main() {
         }
 
         // Colisao
+
         if ((jogador.jogadorX <= bot.botX + bot.larguraBot) &&
             (jogador.jogadorX + LARGURA_JOGADOR >= bot.botX) &&
             (jogador.jogadorY <= bot.botY + bot.alturaBot) &&
@@ -93,7 +103,8 @@ int main() {
 
         al_draw_filled_rectangle(bot.botX, bot.botY, bot.botX + bot.larguraBot, bot.botY + bot.alturaBot, cor);
         desenhar_jogador(jogador, w, a, s, d, sprite_andando_direita, sprite_andando_esquerda, &frame_atual, &contador_frame, frames_por_sprite, &virado_direita);
-        atirar(&projetil, jogador, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA);
+        atirar(&projetil, jogador, bot, projetilDireita, projetilEsquerda, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, ALTURA_PROJETIL, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, bot.botX, bot.botY, posicaoCamera);
+
         al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
         al_flip_display();
     }
@@ -106,6 +117,8 @@ int main() {
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);
     al_destroy_timer(timer);
+    al_destroy_bitmap(projetilDireita);
+    al_destroy_bitmap(projetilEsquerda);
 
     return 0;
 }
