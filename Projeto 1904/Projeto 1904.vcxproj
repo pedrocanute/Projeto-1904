@@ -22,6 +22,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cenario.c" />
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="main.c" />
@@ -31,6 +32,8 @@
     <ClCompile Include="projetil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cenario.h" />
+    <ClInclude Include="configuracoes.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="personagem.h" />
