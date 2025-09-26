@@ -41,33 +41,40 @@ void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocid
     }
 
     if (d) {
-        p->paraDireita = true;    
+        p->paraDireita = true;
+        p->paraEsquerda = false;
 
         if (shift) {
-            p->jogadorX += velocidade_corrida;    
+            p->jogadorX += velocidade_corrida;
             *frames_por_sprite = 4;
         }
         else {
-            p->jogadorX += velocidade_caminhada; 
+            p->jogadorX += velocidade_caminhada;
             *frames_por_sprite = 11;
         }
     }
 }
 
-
 void restringirPosicao(Jogador* p, float WIDTH, float HEIGHT, float larguraJogador, float alturaJogador) {
-    if (p->jogadorX < 0) p->jogadorX = 0;
-    if (p->jogadorY < 0) p->jogadorY = 0;
+    if (p->jogadorX < 0) 
+        p->jogadorX = 0;
+    if (p->jogadorY < 0) 
+        p->jogadorY = 0;
 
-    if (p->jogadorY < (HEIGHT / 2) - alturaJogador + 52)  p->jogadorY = (HEIGHT / 2) - alturaJogador + 52;
-    if (p->jogadorY > HEIGHT - alturaJogador)   p->jogadorY = HEIGHT - alturaJogador;
+    if (p->jogadorY < (HEIGHT / 2) - alturaJogador + 52) 
+        p->jogadorY = (HEIGHT / 2) - alturaJogador + 52;
+    if (p->jogadorY > HEIGHT - alturaJogador) 
+        p->jogadorY = HEIGHT - alturaJogador;
 }
 
-void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, ALLEGRO_BITMAP* sprite_direita,
-    ALLEGRO_BITMAP* sprite_esquerda, int* frame_atual, int* contador_frame,
-    int frames_por_sprite, bool* virado_direita) {
+// FUNÇÃO ATUALIZADA - para 3 colunas na animação de tiro
+void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espaco,
+    ALLEGRO_BITMAP* sprite_direita, ALLEGRO_BITMAP* sprite_esquerda,
+    ALLEGRO_BITMAP* sprite_atirando_direita, ALLEGRO_BITMAP* sprite_atirando_esquerda,
+    int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita,
+    int* frame_tiro, int* contador_frame_tiro) {
 
-    // Determina qual sprite usar baseado na tecla pressionada
+    // Determina direção baseado no movimento
     if (d || (d && s) || (d && w)) {
         *virado_direita = true;
     }
@@ -75,42 +82,71 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, ALLEGRO_B
         *virado_direita = false;
     }
 
-    ALLEGRO_BITMAP* sprite_atual = sprite_direita;
-    if (*virado_direita) {
-        sprite_atual = sprite_direita;
-    }
-    else {
-        sprite_atual = sprite_esquerda;
-    }
+    // ESCOLHER SPRITE E SISTEMA DE ANIMAÇÃO
+    ALLEGRO_BITMAP* sprite_atual;
+    bool esta_atirando = espaco;
+    bool esta_em_movimento = (a || d || s || w);
 
-    // Atualiza a animação apenas se estiver se movendo
-    if (a || d || (sprite_atual == sprite_direita && s) || (sprite_atual == sprite_direita && w) || (sprite_atual == sprite_esquerda && s) || sprite_atual == sprite_esquerda && w) {
-        (*contador_frame)++;
-        if (*contador_frame >= frames_por_sprite) {
-            *frame_atual = (*frame_atual + 1) % 2; // 2 colunas no spritesheet
-            *contador_frame = 0;
+    if (esta_atirando) {
+        // USANDO SPRITES DE TIRO - 3 COLUNAS do SPRiTESHEET
+        if (*virado_direita) {
+            sprite_atual = sprite_atirando_direita;
         }
+        else {
+            sprite_atual = sprite_atirando_esquerda;
+        }
+
+        // ANIMAÇÃO DE TIRO - SINCRONIZADA COM CADENCIA
+        (*contador_frame_tiro)++;
+        if (*contador_frame_tiro >= 4) {  // 4 frames = mantém sincronia com cadência
+            *frame_tiro = (*frame_tiro + 1) % 3; // MUDANÇA: 3 colunas ao invés de 2
+            *contador_frame_tiro = 0;
+        }
+
+        // Calcula coordenadas usando 3 colunas
+        int largura_frame = al_get_bitmap_width(sprite_atual) / 3; // MUDANÇA: dividir por 3
+        int altura_frame = al_get_bitmap_height(sprite_atual);
+        int sx = *frame_tiro * largura_frame;
+        int sy = 0;
+
+        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
+            jogador.jogadorX, jogador.jogadorY, 0);
     }
     else {
-        // Parado - usa o primeiro frame
-        *frame_atual = 0;
-        *contador_frame = 1;
+        // USANDO SPRITES NORMAIS DE CAMINHADA (ainda 2 colunas)
+        if (*virado_direita) {
+            sprite_atual = sprite_direita;
+        }
+        else {
+            sprite_atual = sprite_esquerda;
+        }
+
+        // ANIMAÇÃO NORMAL DE CAMINHADA (2 colunas)
+        if (esta_em_movimento) {
+            (*contador_frame)++;
+            if (*contador_frame >= frames_por_sprite) {
+                *frame_atual = (*frame_atual + 1) % 2; // Ainda 2 colunas para caminhada
+                *contador_frame = 0;
+            }
+        }
+        else {
+            // Parado - primeiro frame
+            *frame_atual = 0;
+            *contador_frame = 1;
+        }
+
+        // Calcula coordenadas usando 2 colunas para caminhada
+        int largura_frame = al_get_bitmap_width(sprite_atual) / 2; // 2 colunas para caminhada
+        int altura_frame = al_get_bitmap_height(sprite_atual);
+        int sx = *frame_atual * largura_frame;
+        int sy = 0;
+
+        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
+            jogador.jogadorX, jogador.jogadorY, 0);
     }
-
-    // Calcula as coordenadas do frame no spritesheet
-    int largura_frame = al_get_bitmap_width(sprite_atual) / 2; // 2 colunas
-    int altura_frame = al_get_bitmap_height(sprite_atual);
-    int sx = *frame_atual * largura_frame;
-    int sy = 0;
-
-    // Desenha o sprite
-    al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
-        jogador.jogadorX, jogador.jogadorY, 0);
-
 }
 
 void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador) {
-
     posicaoCamera[0] = jogador.jogadorX - (larguraTela / 2) + (larguraJogador / 2);
 
     if (posicaoCamera[0] < 0)

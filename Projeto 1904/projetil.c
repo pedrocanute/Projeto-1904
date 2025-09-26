@@ -1,20 +1,22 @@
 #include "projetil.h"
 #include "inimigo.h"
 
-void atirar(ProjetilPosicao* pp, Jogador jogador, Inimigo bot, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float novaPosicaoX, float novaPosicaoY, float* posicaoCamera) {
+void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos,
+    ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda,
+    bool espaco, int projetilLargura, int projetilAltura, int alturaJogador,
+    int larguraJogador, int width, float projetilVelocidade,
+    float projetilCadencia, float* posicaoCamera) {
 
     const float projetilTimer = al_get_time();
 
     // CRIAR PROJÉTEIS
     if (espaco && projetilTimer >= pp->proxProjetil) {
         for (int i = 0; i < 50; i++) {
-            // A PARTIR DO XY DO JOGADOR
             if (pp->projetilAtivo[i] == false) {
                 pp->projetilX[i] = jogador.jogadorX;
                 pp->projetilY[i] = jogador.jogadorY + (alturaJogador / 2) - (projetilAltura / 2);
                 pp->projetilAtivo[i] = true;
 
-                // DIRECIONAR PROJÉTIL
                 if (jogador.paraDireita) {
                     pp->projetilDirecao[i] = +projetilVelocidade;
                 }
@@ -22,50 +24,55 @@ void atirar(ProjetilPosicao* pp, Jogador jogador, Inimigo bot, ALLEGRO_BITMAP* p
                     pp->projetilDirecao[i] = -projetilVelocidade;
                 }
 
-                // INTERVALO 
                 pp->proxProjetil = projetilTimer + projetilCadencia;
                 break;
             }
         }
     }
 
-    // CÁLCULO DOS LIMITES DA CÂMERA
-    float cameraLeft = posicaoCamera[0];                    // Limite esquerdo
-    float cameraRight = posicaoCamera[0] + width;          // Limite direito  
-    float cameraTop = posicaoCamera[1];                     // Limite superior
-    float cameraBottom = posicaoCamera[1] + 720;           // Limite inferior (altura da tela)
-
-    // Margem extra para não cortar projéteis muito cedo
-    float margem = 100.0f;
-
     // MOVER E VERIFICAR PROJÉTEIS
     for (int i = 0; i < 50; i++) {
         if (pp->projetilAtivo[i]) {
-            // MOVER PROJÉTIL
             pp->projetilX[i] += pp->projetilDirecao[i];
 
-            // DESENHAR PROJÉTIL (baseado na direção original, não atual)
+            // DESENHAR PROJÉTIL
             if (pp->projetilDirecao[i] > 0) {
-                // Indo para direita
                 al_draw_bitmap(projetilDireita, pp->projetilX[i], pp->projetilY[i], 0);
             }
             else {
-                // Indo para esquerda  
                 al_draw_bitmap(projetilEsquerda, pp->projetilX[i], pp->projetilY[i], 0);
             }
 
-            // VERIFICAR COLISÃO COM INIMIGO
-            if (pp->projetilX[i] + projetilLargura >= novaPosicaoX &&
-                pp->projetilY[i] + projetilAltura >= novaPosicaoY &&
-                pp->projetilX[i] <= novaPosicaoX + bot.larguraBot &&
-                pp->projetilY[i] <= novaPosicaoY + bot.alturaBot) {
+            // VERIFICAR COLISÃO COM TODOS OS INIMIGOS
+            bool colidiu = false;
+            for (int j = 0; j < numInimigos; j++) {
+                if (!inimigos[j].ativo) continue;
+
+                if (pp->projetilX[i] + projetilLargura >= inimigos[j].botX &&
+                    pp->projetilY[i] + projetilAltura >= inimigos[j].botY &&
+                    pp->projetilX[i] <= inimigos[j].botX + inimigos[j].larguraBot &&
+                    pp->projetilY[i] <= inimigos[j].botY + inimigos[j].alturaBot) {
+
+                    // SISTEMA DE VIDA
+                    inimigos[j].vida--;
+
+                    // Só mata se a vida chegar a 0
+                    if (inimigos[j].vida <= 0) {
+                        inimigos[j].ativo = false;
+                    }
+
+                    pp->projetilAtivo[i] = false; // Projétil desaparece
+                    colidiu = true;
+                    break;
+                }
+            }
+
+            if (colidiu) {
                 pp->projetilAtivo[i] = false;
             }
-            // VERIFICAR SE SAIU DOS LIMITES DA CÂMERA (com margem)
-            else if (pp->projetilX[i] + projetilLargura < cameraLeft - margem ||     // Saiu pela esquerda
-                pp->projetilX[i] > cameraRight + margem ||                      // Saiu pela direita
-                pp->projetilY[i] + projetilAltura < cameraTop - margem ||       // Saiu por cima
-                pp->projetilY[i] > cameraBottom + margem) {                     // Saiu por baixo
+            // VERIFICA LIMITES DA CAMERA
+            else if (pp->projetilX[i] < posicaoCamera[0] - 100 ||
+                pp->projetilX[i] > posicaoCamera[0] + width + 100) {
                 pp->projetilAtivo[i] = false;
             }
         }
