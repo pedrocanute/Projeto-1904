@@ -12,29 +12,47 @@ int main() {
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
 
-//--DECLARACAO DE VARIAVEIS--//
+    //--DECLARACAO DE VARIAVEIS--//
 
     bool jogando = true;
     bool w = false, a = false, s = false, d = false, espaco = false, shift = false;
     ProjetilPosicao projetil = { 0 };
 
-    // INIMIGO
-    Inimigo bot;
-    bot.larguraBot = 50.0f;
-    bot.alturaBot = 50.0f;
-    bot.botX = 1350;
-    bot.botY = 520;
+    // CARREGAMENTO DOS SPRITES DOS INIMIGOS
+    ALLEGRO_BITMAP* zumbi_direita = al_load_bitmap("ZumbiAndandoDireita.png");
+    ALLEGRO_BITMAP* zumbi_esquerda = al_load_bitmap("ZumbiAndandoEsquerda.png");
+    ALLEGRO_BITMAP* rato_direita = al_load_bitmap("RatoAndandoDireita.png");
+    ALLEGRO_BITMAP* rato_esquerda = al_load_bitmap("RatoAndandoEsquerda.png");
+    ALLEGRO_BITMAP* mosquito_direita = al_load_bitmap("MosquitoDireita.png");
+    ALLEGRO_BITMAP* mosquito_esquerda = al_load_bitmap("MosquitoEsquerda.png");
+
+    // CAMERA
+    float posicaoCamera[2] = { 0, 0 };
+
+    // ARRAY DE 20 INIMIGOS
+    Inimigo inimigos[MAX_INIMIGOS];
+    inicializar_array_inimigos(inimigos, MAX_INIMIGOS,
+        zumbi_direita, zumbi_esquerda,
+        rato_direita, rato_esquerda,
+        mosquito_direita, mosquito_esquerda,
+        posicaoCamera);
+
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
 
     // JOGADOR
     Jogador jogador = { 120.0, 520.0, true, false };
     ALLEGRO_BITMAP* sprite_andando_direita = al_load_bitmap("AndandoDireita.png");
     ALLEGRO_BITMAP* sprite_andando_esquerda = al_load_bitmap("AndandoEsquerda.png");
+    ALLEGRO_BITMAP* sprite_atirando_direita = al_load_bitmap("AtirandoDireita.png");
+    ALLEGRO_BITMAP* sprite_atirando_esquerda = al_load_bitmap("AtirandoEsquerda.png");
+
+    // Variáveis de animação normal
     int frame_atual = 0;
     int contador_frame = 0;
     int frames_por_sprite = 11;
     bool virado_direita = true;
-
+    int frame_tiro = 0;
+    int contador_frame_tiro = 0;
 
     //PROJETIL
     ALLEGRO_BITMAP* projetilDireita = al_load_bitmap("imagens/VacinaProjetilDireita.png");
@@ -44,11 +62,8 @@ int main() {
     ALLEGRO_BITMAP* cenario1 = al_load_bitmap("Mapa01.png");
     ALLEGRO_BITMAP* cenario2 = al_load_bitmap("Mapa02.png");
 
-    // CAMERA
-    float posicaoCamera[2] = { 0, 0 };
 
-//-----------------//
-
+    //-----------------//
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
@@ -72,7 +87,6 @@ int main() {
         }
 
         // VERIFICACAO DE TECLAS
-
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP)
             verificar_Input(event, &w, &a, &s, &d, &espaco, &shift);
 
@@ -80,16 +94,25 @@ int main() {
         if (event.type == ALLEGRO_EVENT_TIMER) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
-            perseguir(&bot, &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR, VELOCIDADE_INIMIGO);
+            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS,
+                zumbi_direita, zumbi_esquerda,
+                rato_direita, rato_esquerda,
+                mosquito_direita, mosquito_esquerda,
+                posicaoCamera);
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
         }
+        
+        // VERIFICA COLISAO
+        bool colidiu = false;
+        for (int i = 0; i < MAX_INIMIGOS; i++) {
+            if (detectarColisao(&inimigos[i], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
+                colidiu = true;
+                break;
+            }
+        }
 
-        // Colisao
-
-        if ((jogador.jogadorX <= bot.botX + bot.larguraBot) &&
-            (jogador.jogadorX + LARGURA_JOGADOR >= bot.botX) &&
-            (jogador.jogadorY <= bot.botY + bot.alturaBot) &&
-            (jogador.jogadorY + ALTURA_JOGADOR >= bot.botY))
+        // FICA VERMELHO S ECOLIDIR
+        if (colidiu)
             cor = al_map_rgb(255, 0, 0);
         else
             cor = al_map_rgb(0, 0, 0);
@@ -101,11 +124,23 @@ int main() {
         al_clear_to_color(cor);
         desenhar_cenario(cenario1, cenario2, jogador.jogadorX, posicaoCamera);
 
-        al_draw_filled_rectangle(bot.botX, bot.botY, bot.botX + bot.larguraBot, bot.botY + bot.alturaBot, cor);
-        desenhar_jogador(jogador, w, a, s, d, sprite_andando_direita, sprite_andando_esquerda, &frame_atual, &contador_frame, frames_por_sprite, &virado_direita);
-        atirar(&projetil, jogador, bot, projetilDireita, projetilEsquerda, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, ALTURA_PROJETIL, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, bot.botX, bot.botY, posicaoCamera);
+        // DESENHAR TODOS OS INIMIGOS ATIVOS
+        desenhar_jogador(jogador, w, a, s, d, espaco,sprite_andando_direita, sprite_andando_esquerda,sprite_atirando_direita, sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite, &virado_direita,&frame_tiro, &contador_frame_tiro);
+        desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
-        al_draw_text(font, al_map_rgb(0, 0, 0), 230, 200, 0, "TESTE");
+        // ATIRAR
+        atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS,projetilDireita, projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera);
+
+        // Contador de inimigos restantes NAO ESTA FUNCIUONANDO
+        int inimigos_restantes = 0;
+        for (int i = 0; i < MAX_INIMIGOS; i++) {
+            if (inimigos[i].ativo) inimigos_restantes++;
+        }
+
+        char texto[100];
+        sprintf_s(texto, sizeof(texto), "PROJETO 1904 - INIMIGOS RESTANTES: %d", inimigos_restantes);
+        al_draw_text(font, al_map_rgb(255, 255, 255), 10, 10, 0, texto);
+
         al_flip_display();
     }
 
@@ -114,11 +149,19 @@ int main() {
     al_destroy_bitmap(sprite_andando_esquerda);
     al_destroy_bitmap(cenario1);
     al_destroy_bitmap(cenario2);
+    al_destroy_bitmap(projetilDireita);
+    al_destroy_bitmap(projetilEsquerda);
+    al_destroy_bitmap(zumbi_direita);
+    al_destroy_bitmap(zumbi_esquerda);
+    al_destroy_bitmap(sprite_atirando_direita);
+    al_destroy_bitmap(sprite_atirando_esquerda);
+    al_destroy_bitmap(rato_direita);
+    al_destroy_bitmap(rato_esquerda);
+    al_destroy_bitmap(mosquito_direita);
+    al_destroy_bitmap(mosquito_esquerda);
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);
     al_destroy_timer(timer);
-    al_destroy_bitmap(projetilDireita);
-    al_destroy_bitmap(projetilEsquerda);
 
     return 0;
 }
