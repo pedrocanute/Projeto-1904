@@ -66,11 +66,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
 }
 
 // SPAWNA INIMIGOS COM BASE NA CAMERA
-void respawn_inimigo_na_camera(Inimigo* inimigo,
-    ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq,
-    ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq,
-    ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq,
-    float* posicaoCamera) {
+void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
 
     // SEMPRE PELA DIREITA
     float camera_direita = posicaoCamera[0] + 1280; 
@@ -99,29 +95,17 @@ void respawn_inimigo_na_camera(Inimigo* inimigo,
     }
 }
 
-void inicializar_array_inimigos(Inimigo* inimigos, int quantidade,
-    ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq,
-    ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq,
-    ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq,
-    float* posicaoCamera) {
+void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
 
     srand((unsigned int)time(NULL));
 
     // Inicializar todos os inimigos usando spawn baseado na câmera
     for (int i = 0; i < quantidade; i++) {
-        respawn_inimigo_na_camera(&inimigos[i],
-            zumbi_dir, zumbi_esq,
-            rato_dir, rato_esq,
-            mosquito_dir, mosquito_esq,
-            posicaoCamera);
+        respawn_inimigo_na_camera(&inimigos[i], zumbi_dir, zumbi_esq, rato_dir, rato_esq, mosquito_dir, mosquito_esq, posicaoCamera);
     }
 }
 
-void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade,
-    ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq,
-    ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq,
-    ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq,
-    float* posicaoCamera) {
+void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
 
     float camera_esquerda = posicaoCamera[0]; // Limite esquerdo da câmera
 
@@ -137,11 +121,7 @@ void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade,
 
         // PASSOU DA ESQUERDA? RESPAWNA
         if (inimigos[i].botX + inimigos[i].larguraBot < camera_esquerda - 100) {
-            respawn_inimigo_na_camera(&inimigos[i],
-                zumbi_dir, zumbi_esq,
-                rato_dir, rato_esq,
-                mosquito_dir, mosquito_esq,
-                posicaoCamera);
+            respawn_inimigo_na_camera(&inimigos[i],zumbi_dir, zumbi_esq, rato_dir, rato_esq, mosquito_dir, mosquito_esq, posicaoCamera);
         }
     }
 }

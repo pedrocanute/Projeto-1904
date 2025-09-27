@@ -67,12 +67,7 @@ void restringirPosicao(Jogador* p, float WIDTH, float HEIGHT, float larguraJogad
         p->jogadorY = HEIGHT - alturaJogador;
 }
 
-// FUNÇÃO ATUALIZADA - para 3 colunas na animação de tiro
-void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espaco,
-    ALLEGRO_BITMAP* sprite_direita, ALLEGRO_BITMAP* sprite_esquerda,
-    ALLEGRO_BITMAP* sprite_atirando_direita, ALLEGRO_BITMAP* sprite_atirando_esquerda,
-    int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita,
-    int* frame_tiro, int* contador_frame_tiro) {
+void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espaco, ALLEGRO_BITMAP* sprite_direita, ALLEGRO_BITMAP* sprite_esquerda, ALLEGRO_BITMAP* sprite_atirando_direita, ALLEGRO_BITMAP* sprite_atirando_esquerda, int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita, int* frame_tiro, int* contador_frame_tiro) {
 
     // Determina direção baseado no movimento
     if (d || (d && s) || (d && w)) {
@@ -99,12 +94,12 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
         // ANIMAÇÃO DE TIRO - SINCRONIZADA COM CADENCIA
         (*contador_frame_tiro)++;
         if (*contador_frame_tiro >= 4) {  // 4 frames = mantém sincronia com cadência
-            *frame_tiro = (*frame_tiro + 1) % 3; // MUDANÇA: 3 colunas ao invés de 2
+            *frame_tiro = (*frame_tiro + 1) % 3; 
             *contador_frame_tiro = 0;
         }
 
-        // Calcula coordenadas usando 3 colunas
-        int largura_frame = al_get_bitmap_width(sprite_atual) / 3; // MUDANÇA: dividir por 3
+        // Calcula coordenadas usando 3 colunas do spritesheet
+        int largura_frame = al_get_bitmap_width(sprite_atual) / 3; 
         int altura_frame = al_get_bitmap_height(sprite_atual);
         int sx = *frame_tiro * largura_frame;
         int sy = 0;
@@ -113,7 +108,7 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
             jogador.jogadorX, jogador.jogadorY, 0);
     }
     else {
-        // USANDO SPRITES NORMAIS DE CAMINHADA (ainda 2 colunas)
+        // USANDO SPRITES NORMAIS DE CAMINHADA
         if (*virado_direita) {
             sprite_atual = sprite_direita;
         }
@@ -125,7 +120,7 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
         if (esta_em_movimento) {
             (*contador_frame)++;
             if (*contador_frame >= frames_por_sprite) {
-                *frame_atual = (*frame_atual + 1) % 2; // Ainda 2 colunas para caminhada
+                *frame_atual = (*frame_atual + 1) % 2; 
                 *contador_frame = 0;
             }
         }

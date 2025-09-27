@@ -14,10 +14,6 @@ typedef struct {
     float proxProjetil;
 } ProjetilPosicao;
 
-void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos,
-    ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda,
-    bool espaco, int projetilLargura, int projetilAltura, int alturaJogador,
-    int larguraJogador, int width, float projetilVelocidade,
-    float projetilCadencia, float* posicaoCamera);
+void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera);
 
 #endif
