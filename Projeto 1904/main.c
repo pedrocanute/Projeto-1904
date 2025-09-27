@@ -18,6 +18,11 @@ int main() {
     bool w = false, a = false, s = false, d = false, espaco = false, shift = false;
     ProjetilPosicao projetil = { 0 };
 
+    // TIMER PARA SPAWN DE INIMIGOS
+    float timer_spawn_inimigos = 0.0;
+    bool spawn_ativo = false;
+    const float TEMPO_SPAWN = 3.0; 
+
     // CARREGAMENTO DOS SPRITES DOS INIMIGOS
     ALLEGRO_BITMAP* zumbi_direita = al_load_bitmap("ZumbiAndandoDireita.png");
     ALLEGRO_BITMAP* zumbi_esquerda = al_load_bitmap("ZumbiAndandoEsquerda.png");
@@ -31,11 +36,7 @@ int main() {
 
     // ARRAY DE 20 INIMIGOS
     Inimigo inimigos[MAX_INIMIGOS];
-    inicializar_array_inimigos(inimigos, MAX_INIMIGOS,
-        zumbi_direita, zumbi_esquerda,
-        rato_direita, rato_esquerda,
-        mosquito_direita, mosquito_esquerda,
-        posicaoCamera);
+    inicializar_array_inimigos(inimigos, MAX_INIMIGOS, zumbi_direita, zumbi_esquerda, rato_direita, rato_esquerda, mosquito_direita, mosquito_esquerda, posicaoCamera);
 
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
 
@@ -61,7 +62,6 @@ int main() {
     // CENARIO
     ALLEGRO_BITMAP* cenario1 = al_load_bitmap("Mapa01.png");
     ALLEGRO_BITMAP* cenario2 = al_load_bitmap("Mapa02.png");
-
 
     //-----------------//
 
@@ -94,24 +94,48 @@ int main() {
         if (event.type == ALLEGRO_EVENT_TIMER) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
-            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS,
-                zumbi_direita, zumbi_esquerda,
-                rato_direita, rato_esquerda,
-                mosquito_direita, mosquito_esquerda,
-                posicaoCamera);
+
+            // ATUALIZA MOVIMENTO DOS INIMIGOS (SEM RESPAWN AUTOMATICO)
+            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS, zumbi_direita, zumbi_esquerda, rato_direita, rato_esquerda, mosquito_direita, mosquito_esquerda, posicaoCamera);
+
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
         }
-        
+
         // VERIFICA COLISAO
         bool colidiu = false;
         for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (detectarColisao(&inimigos[i], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
+            if (colisao_jogador_inimigo(&inimigos[i], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
                 colidiu = true;
                 break;
             }
         }
 
-        // FICA VERMELHO S ECOLIDIR
+        // CONTA INIMIGOS ATIVOS
+        int inimigos_restantes = 0;
+        for (int i = 0; i < MAX_INIMIGOS; i++) {
+            if (inimigos[i].ativo) 
+                inimigos_restantes++;
+        }
+
+        // SISTEMA DE RESPAWN COM TIMER DE 5 SEGUNDOS
+        if (inimigos_restantes == 0) { // Não há inimigos ativos
+            if (spawn_ativo == false) {
+                // Inicia o timer
+                timer_spawn_inimigos = al_get_time();
+                spawn_ativo = true;
+            }
+            else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
+                // 5 segundos passaram, respawn todos os inimigos
+                inicializar_array_inimigos(inimigos, MAX_INIMIGOS, zumbi_direita, zumbi_esquerda, rato_direita, rato_esquerda, mosquito_direita, mosquito_esquerda, posicaoCamera);
+                spawn_ativo = false;
+            }
+        }
+        else {
+            // Há inimigos ativos, desativa o timer
+            spawn_ativo = false;
+        }
+
+        // FICA VERMELHO SE COLIDIR
         if (colidiu)
             cor = al_map_rgb(255, 0, 0);
         else
@@ -125,20 +149,26 @@ int main() {
         desenhar_cenario(cenario1, cenario2, jogador.jogadorX, posicaoCamera);
 
         // DESENHAR TODOS OS INIMIGOS ATIVOS
-        desenhar_jogador(jogador, w, a, s, d, espaco,sprite_andando_direita, sprite_andando_esquerda,sprite_atirando_direita, sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite, &virado_direita,&frame_tiro, &contador_frame_tiro);
+        desenhar_jogador(jogador, w, a, s, d, espaco, sprite_andando_direita, sprite_andando_esquerda, sprite_atirando_direita, sprite_atirando_esquerda, &frame_atual, &contador_frame, frames_por_sprite, &virado_direita, &frame_tiro, &contador_frame_tiro);
         desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
         // ATIRAR
-        atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS,projetilDireita, projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera);
+        atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, projetilDireita, projetilEsquerda, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera);
 
-        // Contador de inimigos restantes NAO ESTA FUNCIUONANDO
-        int inimigos_restantes = 0;
-        for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (inimigos[i].ativo) inimigos_restantes++;
-        }
-
+        // TEXTO INFORMATIVO COM TIMER
         char texto[100];
-        sprintf_s(texto, sizeof(texto), "PROJETO 1904 - INIMIGOS RESTANTES: %d", inimigos_restantes);
+        if (spawn_ativo) {
+            float tempo_restante = TEMPO_SPAWN - (al_get_time() - timer_spawn_inimigos);
+            if (tempo_restante > 0) {
+                sprintf_s(texto, sizeof(texto), "PROJETO 1904 - NOVOS INIMIGOS EM: %.1f s", tempo_restante);
+            }
+            else {
+                sprintf_s(texto, sizeof(texto), "PROJETO 1904 - SPAWNING...");
+            }
+        }
+        else {
+            sprintf_s(texto, sizeof(texto), "PROJETO 1904 - INIMIGOS RESTANTES: %d", inimigos_restantes);
+        }
         al_draw_text(font, al_map_rgb(255, 255, 255), 10, 10, 0, texto);
 
         al_flip_display();

@@ -13,6 +13,7 @@
 #include "projetil.h"
 #include "input.h"
 #include "inimigo.h"
+#include "colisao.h"
 #include "cenario.h"
 
 // DEFINES

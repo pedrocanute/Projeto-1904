@@ -26,7 +26,7 @@ void desenhar_cenario(ALLEGRO_BITMAP* cenario1, ALLEGRO_BITMAP* cenario2, float 
         // CALCULA POSICAO DA CAMERA
         float pos_X = indice * larguraCenario;
 
-        // Desenha apenas se estiver próximo da área visível (otimização)
+        // Desenha apenas se estiver próximo da área visível
         if (pos_X >= posicaoCamera[0] - larguraCenario && pos_X <= posicaoCamera[0] + WIDTH + larguraCenario) {
             al_draw_bitmap(cenario, pos_X, 0, 0);
         }

@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cenario.c" />
+    <ClCompile Include="colisao.c" />
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="main.c" />
@@ -33,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cenario.h" />
+    <ClInclude Include="colisao.h" />
     <ClInclude Include="configuracoes.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="input.h" />
