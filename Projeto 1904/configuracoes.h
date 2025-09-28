@@ -9,13 +9,6 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 
-#include "personagem.h"
-#include "projetil.h"
-#include "input.h"
-#include "inimigo.h"
-#include "colisao.h"
-#include "cenario.h"
-
 // DEFINES
 #define WIDTH 1280
 #define HEIGHT 720

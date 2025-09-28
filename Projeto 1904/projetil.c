@@ -1,8 +1,7 @@
 #include "projetil.h"
-#include "inimigo.h"
-#include "colisao.h"
+#include "fases.h"
 
-void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera) {
+void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase) {
 
     const float projetilTimer = al_get_time();
 
@@ -44,7 +43,12 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                 if (colisao_projetil_inimigo(pp->projetilX[i], pp->projetilY[i], projetilLargura, projetilAltura, &inimigos[j])) {
                     // SISTEMA DE VIDA E “MORTE” 
                     inimigos[j].vida--;
-                    if (inimigos[j].vida <= 0) inimigos[j].ativo = false;
+                    if (inimigos[j].vida <= 0) {
+                        
+                        inimigos[j].ativo = false;
+                        sistemaFase->inimigosMortos++;
+                    }
+
 
                     pp->projetilAtivo[i] = false;
                     colidiu = true;

@@ -5,6 +5,7 @@
 #include <math.h>
 #include "inimigo.h"
 #include "personagem.h"
+#include "fases.h"
 
 void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, ALLEGRO_BITMAP* sprite_dir, ALLEGRO_BITMAP* sprite_esq) {
 
@@ -19,7 +20,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
     inimigo->virado_direita = false;
     inimigo->em_movimento = true;
     inimigo->ativo = true;
-    inimigo->vida = 2;
+    inimigo->vida = 1;
 
     // ATRIBUTOS DOS INIMIGOS
     switch (tipo) {
@@ -31,13 +32,13 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
     case TIPO_RATO:
         inimigo->larguraBot = 60.0f;
         inimigo->alturaBot = 50.0f;
-        inimigo->velocidade = 3.5f;
+        inimigo->velocidade = 2.8f;
         break;
     case TIPO_MOSQUITO:
         inimigo->larguraBot = 80.0f;
         inimigo->alturaBot = 80.0f;
         inimigo->frames_por_sprite = 6;
-        inimigo->velocidade = 4.5f;
+        inimigo->velocidade = 2.9f;
         break;
     }
 }
@@ -119,5 +120,38 @@ void desenhar_inimigo(Inimigo* inimigo, bool em_movimento) {
 void desenhar_todos_inimigos(Inimigo* inimigos, int quantidade) {
     for (int i = 0; i < quantidade; i++) {
         desenhar_inimigo(&inimigos[i], inimigos[i].em_movimento);
+    }
+}
+
+int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos) {
+    int inimigosAtivos = 0;
+    for (int i = 0; i < maxInimigos; i++) {
+        if (inimigos[i].ativo)
+            inimigosAtivos++;
+    }
+    return inimigosAtivos;
+}
+
+void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
+    int vida = 0;
+    float velocidade = 1.0f;
+
+    switch (faseAtual) {
+    case FASE_2: 
+        vida = 1; 
+        velocidade = 1.50f; 
+        break;
+    case FASE_3: 
+        vida = 2; 
+        velocidade = 2.00f; 
+        break;
+    default: 
+        break;
+    }
+
+    for (int i = 0; i < quantidade; ++i) {
+        
+        inimigos[i].vida = (int)(inimigos[i].vida + vida);
+        inimigos[i].velocidade *= velocidade;
     }
 }

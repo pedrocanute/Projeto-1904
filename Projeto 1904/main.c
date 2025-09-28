@@ -1,4 +1,11 @@
 #include "configuracoes.h"
+#include "personagem.h"
+#include "fases.h"
+#include "inimigo.h"
+#include "projetil.h"
+#include "input.h"
+#include "colisao.h"
+#include "cenario.h"
 
 int main() {
 
@@ -17,6 +24,7 @@ int main() {
     bool jogando = true;
     bool w = false, a = false, s = false, d = false, espaco = false, shift = false;
     ProjetilPosicao projetil = { 0 };
+    SistemaFases sistemaFase;
 
     // TIMER PARA SPAWN DE INIMIGOS
     float timer_spawn_inimigos = 0.0;
@@ -36,6 +44,8 @@ int main() {
 
     // ARRAY DE 20 INIMIGOS
     Inimigo inimigos[MAX_INIMIGOS];
+    inicializarSistemaFases(&sistemaFase, &inimigos[0]);
+
     inicializar_array_inimigos(inimigos, MAX_INIMIGOS, zumbi_direita, zumbi_esquerda, rato_direita, rato_esquerda, mosquito_direita, mosquito_esquerda, posicaoCamera);
 
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
@@ -110,36 +120,32 @@ int main() {
             }
         }
 
-        // CONTA INIMIGOS ATIVOS
-        int inimigos_restantes = 0;
-        for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (inimigos[i].ativo) 
-                inimigos_restantes++;
-        }
-
         // SISTEMA DE RESPAWN COM TIMER DE 5 SEGUNDOS
-        if (inimigos_restantes == 0) { // Não há inimigos ativos
-            if (spawn_ativo == false) {
-                // Inicia o timer
-                timer_spawn_inimigos = al_get_time();
-                spawn_ativo = true;
+        if (!verificarProgressoDaFase(&sistemaFase)) {
+            if (contarInimigosAtivos(inimigos, MAX_INIMIGOS) == 0) { // Não há inimigos ativos
+                if (!spawn_ativo) {
+                    // Inicia o timer
+                    timer_spawn_inimigos = al_get_time();
+                    spawn_ativo = true;
+                }
+                else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
+                    // 5 segundos passaram, respawn todos os inimigos
+                    inicializar_array_inimigos(inimigos, MAX_INIMIGOS, zumbi_direita, zumbi_esquerda, rato_direita, rato_esquerda, mosquito_direita, mosquito_esquerda, posicaoCamera);
+                    aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual);
+                    spawn_ativo = false;
+                }
             }
-            else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
-                // 5 segundos passaram, respawn todos os inimigos
-                inicializar_array_inimigos(inimigos, MAX_INIMIGOS, zumbi_direita, zumbi_esquerda, rato_direita, rato_esquerda, mosquito_direita, mosquito_esquerda, posicaoCamera);
+            else {
+                // Há inimigos ativos, desativa o timer
                 spawn_ativo = false;
             }
         }
         else {
-            // Há inimigos ativos, desativa o timer
+            avancarFase(&sistemaFase, inimigos);
             spawn_ativo = false;
         }
-
-        // FICA VERMELHO SE COLIDIR
-        if (colidiu)
-            cor = al_map_rgb(255, 0, 0);
-        else
-            cor = al_map_rgb(0, 0, 0);
+    
+        //CAMERA
 
         al_identity_transform(&camera);
         al_translate_transform(&camera, -posicaoCamera[0], -posicaoCamera[1]);
@@ -153,23 +159,36 @@ int main() {
         desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
         // ATIRAR
-        atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, projetilDireita, projetilEsquerda, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera);
+        atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, projetilDireita, projetilEsquerda, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera, &sistemaFase);
 
         // TEXTO INFORMATIVO COM TIMER
         char texto[100];
         if (spawn_ativo) {
             float tempo_restante = TEMPO_SPAWN - (al_get_time() - timer_spawn_inimigos);
-            if (tempo_restante > 0) {
+            if (tempo_restante > 0)
                 sprintf_s(texto, sizeof(texto), "PROJETO 1904 - NOVOS INIMIGOS EM: %.1f s", tempo_restante);
-            }
-            else {
+            else
                 sprintf_s(texto, sizeof(texto), "PROJETO 1904 - SPAWNING...");
-            }
         }
         else {
+            int inimigos_restantes = sistemaFase.metaEliminacoes - sistemaFase.inimigosMortos;
+            if (inimigos_restantes < 0) inimigos_restantes = 0;
             sprintf_s(texto, sizeof(texto), "PROJETO 1904 - INIMIGOS RESTANTES: %d", inimigos_restantes);
         }
+
+        // HUD 
+        ALLEGRO_TRANSFORM world_backup;
+        al_copy_transform(&world_backup, al_get_current_transform()); // salva a câmera
+
+        ALLEGRO_TRANSFORM hud;
+        al_identity_transform(&hud);    // zera  coords de tela
+        al_use_transform(&hud);
+
+        // desenha fixo no canto superior esquerdo da tela
         al_draw_text(font, al_map_rgb(255, 255, 255), 10, 10, 0, texto);
+
+        // restaura a câmera 
+        al_use_transform(&world_backup);
 
         al_flip_display();
     }
