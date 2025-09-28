@@ -26,6 +26,7 @@
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="menu.c" />
     <ClCompile Include="personagem.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -36,6 +37,7 @@
     <ClInclude Include="configuracoes.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="personagem.h" />
     <ClInclude Include="projetil.h" />
   </ItemGroup>
