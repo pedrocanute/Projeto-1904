@@ -36,6 +36,12 @@
     <ClCompile Include="cenario.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="colisao.c">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="fases.c">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
     <ClCompile Include="menu.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -57,6 +63,12 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="cenario.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="colisao.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="fases.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="menu.h">
