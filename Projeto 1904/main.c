@@ -17,6 +17,7 @@ int main() {
     al_init_primitives_addon();
     al_install_mouse(); 
 
+
     ALLEGRO_DISPLAY* janela = al_create_display(WIDTH, HEIGHT);
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
@@ -30,8 +31,13 @@ int main() {
     bool esc = false;
     float mouseX = 0.0f, mouseY = 0.0f;
 
-    bool jogando = true;
-    bool w = false, a = false, s = false, d = false, espaco = false, shift = false;
+    bool telaMenu = true;
+    bool configAberta = false;
+    bool jogando = false;
+    bool jogoPausado = false;
+    bool redesenhar = false;
+    bool w = false, a = false, s = false, d = false, espaco = false, shift = false, esc = false;
+    float mouseX = 0, mouseY = 0;
     ProjetilPosicao projetil = { 0 };
     SistemaFases sistemaFase;
 
@@ -39,6 +45,7 @@ int main() {
     float timer_spawn_inimigos = 0.0;
     bool spawn_ativo = false;
     const float TEMPO_SPAWN = 3.0;
+
 
     // CARREGAMENTO DOS SPRITES DOS INIMIGOS
     ALLEGRO_BITMAP* zumbi_direita = al_load_bitmap("ZumbiAndandoDireita.png");
@@ -54,7 +61,6 @@ int main() {
     // ARRAY DE INIMIGOS
     Inimigo inimigos[MAX_INIMIGOS];
     inicializarSistemaFases(&sistemaFase, &inimigos[0]);
-
     inicializar_array_inimigos(inimigos, MAX_INIMIGOS, zumbi_direita, zumbi_esquerda,rato_direita, rato_esquerda,mosquito_direita, mosquito_esquerda,posicaoCamera);
 
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
@@ -66,13 +72,14 @@ int main() {
     ALLEGRO_BITMAP* sprite_atirando_direita = al_load_bitmap("AtirandoDireita.png");
     ALLEGRO_BITMAP* sprite_atirando_esquerda = al_load_bitmap("AtirandoEsquerda.png");
 
-    // ANIMA«AO
+    // ANIMA√áAO
     int frame_atual = 0;
     int contador_frame = 0;
     int frames_por_sprite = 11;
+
     bool virado_direita = true;
-    int frame_tiro = 0;
-    int contador_frame_tiro = 0;
+    int  frame_tiro = 0;
+    int  contador_frame_tiro = 0;
 
     // PROJETIL
     ALLEGRO_BITMAP* projetilDireita = al_load_bitmap("imagens/VacinaProjetilDireita.png");
@@ -94,7 +101,7 @@ int main() {
     ALLEGRO_BITMAP* botaoVoltar = al_load_bitmap("imagens/voltar1.png");
     ALLEGRO_BITMAP* botaoVoltar2 = al_load_bitmap("imagens/voltar2.png");
 
-    // DIMENS’ES E COORDENADAS DOS BOT’ES (menu principal)
+    // DIMENS√ïES E COORDENADAS DOS BOT√ïES (menu principal)
     int botaoJogarLargura = al_get_bitmap_width(botaoJogar);
     int botaoJogarAltura = al_get_bitmap_height(botaoJogar);
     int botaoConfigLargura = al_get_bitmap_width(botaoConfig);
@@ -112,7 +119,6 @@ int main() {
     int botaoConfigX = 500, botaoConfigY = 620;
     int botaoSairX = 800, botaoSairY = 620;
     int botaoVoltarX = 520, botaoVoltarY = 500;
-   
 
     //-----------------//
 #pragma endregion
@@ -166,10 +172,9 @@ int main() {
         .abaConfigLargura = abaConfigLargura, .abaConfigAltura = abaConfigAltura,
         .botaoVoltarLargura = botaoVoltarLargura, .botaoVoltarAltura = botaoVoltarAltura
     };
-  
 
     //MENU PRINCIPAL
-    // Aqui o jogo sÛ comeÁa quando clicar em "Jogar" no menu.
+    // Aqui o jogo s√≥ come√ßa quando clicar em "Jogar" no menu.
     menu_principal(&flags, &io, &bmp, &lay);
     if (!jogando) {
         // Saiu pelo menu limpa e return
@@ -207,14 +212,14 @@ int main() {
     ALLEGRO_EVENT event;
 
     //LOOP PRINCIPAL 
+
     while (jogando) {
         al_wait_for_event(fila_eventos, &event);
 
-        // CONDICAO DE PARADA
+        // CONDI√á√ÉO DE PARADA
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             jogando = false;
         }
-
         // VERIFICACAO DE TECLAS
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
             verificar_Input(event, &w, &a, &s, &d, &espaco, &shift);
@@ -234,11 +239,11 @@ int main() {
             menu_pausa(&flags, &io, &bmp, &lay);
             if (!jogando) 
                 break; // saiu pelo "Sair" no pause
-            // Se voltou do pause, 'esc' j· foi zerado dentro do menu_pausa
+            // Se voltou do pause, 'esc' j√° foi zerado dentro do menu_pausa
         }
 
-        // MOVIMENTACAO E RESTRICAO DO PERSONAGEM
-        if (event.type == ALLEGRO_EVENT_TIMER) {
+        // MOVIMENTA√á√ÉO / ATUALIZA√á√ÉO ENQUANTO N√ÉO PAUSADO
+        if (event.type == ALLEGRO_EVENT_TIMER && esc == false) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
@@ -246,9 +251,12 @@ int main() {
             atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS,zumbi_direita, zumbi_esquerda,rato_direita, rato_esquerda,mosquito_direita, mosquito_esquerda,posicaoCamera);
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
-        }
 
+            redesenhar = true;
+        }
+      
         // VERIFICA COLISAO
+
         bool colidiu = false;
         for (int i = 0; i < MAX_INIMIGOS; i++) {
             if (colisao_jogador_inimigo(&inimigos[i], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
@@ -259,7 +267,7 @@ int main() {
 
         // SISTEMA DE RESPAWN COM TIMER
         if (!verificarProgressoDaFase(&sistemaFase)) {
-            if (contarInimigosAtivos(inimigos, MAX_INIMIGOS) == 0) { // N„o h· inimigos ativos
+            if (contarInimigosAtivos(inimigos, MAX_INIMIGOS) == 0) { // N√£o h√° inimigos ativos
                 if (!spawn_ativo) {
                     timer_spawn_inimigos = al_get_time(); // inicia
                     spawn_ativo = true;
@@ -284,8 +292,15 @@ int main() {
         al_translate_transform(&camera, -posicaoCamera[0], -posicaoCamera[1]);
         al_use_transform(&camera);
 
-        al_clear_to_color(cor);
-        desenhar_cenario(cenario1, cenario2, jogador.jogadorX, posicaoCamera);
+            menu_pausa(&flags, &io, &bmp, &lay);
+            if (!jogando) 
+                break; // saiu pelo "Sair" do pause
+        }
+        //  DESENHO 
+        if (redesenhar && al_is_event_queue_empty(fila_eventos)) {
+            al_identity_transform(&camera);
+            al_translate_transform(&camera, -posicaoCamera[0], -posicaoCamera[1]);
+            al_use_transform(&camera);
 
         // DESENHAR TODOS OS INIMIGOS ATIVOS
         desenhar_jogador(jogador, w, a, s, d, espaco,sprite_andando_direita, sprite_andando_esquerda,sprite_atirando_direita, sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
@@ -311,7 +326,7 @@ int main() {
 
         // HUD (fixo na tela)
         ALLEGRO_TRANSFORM world_backup;
-        al_copy_transform(&world_backup, al_get_current_transform()); // salva a c‚mera
+        al_copy_transform(&world_backup, al_get_current_transform()); // salva a c√¢mera
 
         ALLEGRO_TRANSFORM hud;
         al_identity_transform(&hud);
