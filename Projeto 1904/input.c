@@ -1,6 +1,6 @@
 #include "input.h"
 
-void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift) {
+void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
         case ALLEGRO_KEY_W:
@@ -21,6 +21,14 @@ void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bo
         case ALLEGRO_KEY_LSHIFT:
             *shift = true;
             break;
+        case ALLEGRO_KEY_ESCAPE:
+            if (*esc == false) {
+                *esc = true;
+            }
+            else if (*esc == true) {
+                *esc = false;
+            }
+        break;
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
