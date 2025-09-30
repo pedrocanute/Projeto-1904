@@ -25,7 +25,7 @@ int main() {
 #pragma region VARIAVEIS
 
     bool telaMenu = true;
-    bool configAberta = false;
+    bool regrasAberta = false;
     bool jogando = false;            // vira true ao clicar "Jogar"
     bool jogoPausado = false;
     bool redesenhar = false;
@@ -86,29 +86,29 @@ int main() {
     ALLEGRO_BITMAP* fundoMenu = al_load_bitmap("imagens/menu.png");
     ALLEGRO_BITMAP* botaoJogar = al_load_bitmap("imagens/jogar1.png");
     ALLEGRO_BITMAP* botaoJogar2 = al_load_bitmap("imagens/jogar2.png");
-    ALLEGRO_BITMAP* botaoConfig = al_load_bitmap("imagens/configuracoes1.png");
-    ALLEGRO_BITMAP* botaoConfig2 = al_load_bitmap("imagens/configuracoes2.png");
+    ALLEGRO_BITMAP* botaoRegras = al_load_bitmap("imagens/regras1.png");
+    ALLEGRO_BITMAP* botaoRegras2 = al_load_bitmap("imagens/regras2.png");
     ALLEGRO_BITMAP* botaoSair = al_load_bitmap("imagens/sair1.png");
     ALLEGRO_BITMAP* botaoSair2 = al_load_bitmap("imagens/sair2.png");
-    ALLEGRO_BITMAP* abaConfig = al_load_bitmap("imagens/abavazia.png");
+    ALLEGRO_BITMAP* abaRegras = al_load_bitmap("imagens/abavazia.png");
     ALLEGRO_BITMAP* botaoVoltar = al_load_bitmap("imagens/voltar1.png");
     ALLEGRO_BITMAP* botaoVoltar2 = al_load_bitmap("imagens/voltar2.png");
 
     int botaoJogarLargura = al_get_bitmap_width(botaoJogar);
     int botaoJogarAltura = al_get_bitmap_height(botaoJogar);
-    int botaoConfigLargura = al_get_bitmap_width(botaoConfig);
-    int botaoConfigAltura = al_get_bitmap_height(botaoConfig);
+    int botaoRegrasLargura = al_get_bitmap_width(botaoRegras);
+    int botaoRegrasAltura = al_get_bitmap_height(botaoRegras);
     int botaoSairLargura = al_get_bitmap_width(botaoSair);
     int botaoSairAltura = al_get_bitmap_height(botaoSair);
     int fundoMenuLargura = al_get_bitmap_width(fundoMenu);
     int fundoMenuAltura = al_get_bitmap_height(fundoMenu);
-    int abaConfigLargura = al_get_bitmap_width(abaConfig);
-    int abaConfigAltura = al_get_bitmap_height(abaConfig);
+    int abaRegrasLargura = al_get_bitmap_width(abaRegras);
+    int abaRegrasAltura = al_get_bitmap_height(abaRegras);
     int botaoVoltarLargura = al_get_bitmap_width(botaoVoltar);
     int botaoVoltarAltura = al_get_bitmap_height(botaoVoltar);
 
     int botaoJogarX = 200, botaoJogarY = 620;
-    int botaoConfigX = 500, botaoConfigY = 620;
+    int botaoRegrasX = 500, botaoRegrasY = 620;
     int botaoSairX = 800, botaoSairY = 620;
     int botaoVoltarX = 520, botaoVoltarY = 500;
 
@@ -126,15 +126,15 @@ int main() {
     al_start_timer(timer);
 
     // SISTEMA MENUS
-    MenuFlags flags = {
+    MenuEstados mes = {
         .telaMenu = &telaMenu,
         .jogando = &jogando,
-        .configAberta = &configAberta,
+        .regrasAberta = &regrasAberta,
         .esc = &esc,
         .jogoPausado = &jogoPausado
     };
 
-    MenuIO io = {
+    MenuEvents mev = {
         .fila_eventos = fila_eventos,
         .timer = timer,
         .camera = &camera,
@@ -142,42 +142,42 @@ int main() {
         .mouseY = &mouseY
     };
 
-    MenuBitmaps bmp = {
+    MenuImgs mi = {
         .fundoMenu = fundoMenu,
         .botaoJogar = botaoJogar, .botaoJogar2 = botaoJogar2,
-        .botaoConfig = botaoConfig, .botaoConfig2 = botaoConfig2,
+        .botaoRegras = botaoRegras, .botaoRegras2 = botaoRegras2,
         .botaoSair = botaoSair, .botaoSair2 = botaoSair2,
-        .abaConfig = abaConfig,
+        .abaRegras = abaRegras,
         .botaoVoltar = botaoVoltar, .botaoVoltar2 = botaoVoltar2
     };
 
-    MenuLayout lay = {
+    MenuBotoes bt = {
         .botaoJogarX = botaoJogarX, .botaoJogarY = botaoJogarY,
-        .botaoConfigX = botaoConfigX, .botaoConfigY = botaoConfigY,
+        .botaoRegrasX = botaoRegrasX, .botaoRegrasY = botaoRegrasY,
         .botaoSairX = botaoSairX, .botaoSairY = botaoSairY,
         .botaoVoltarX = botaoVoltarX, .botaoVoltarY = botaoVoltarY,
 
         .botaoJogarLargura = botaoJogarLargura, .botaoJogarAltura = botaoJogarAltura,
-        .botaoConfigLargura = botaoConfigLargura, .botaoConfigAltura = botaoConfigAltura,
+        .botaoRegrasLargura = botaoRegrasLargura, .botaoRegrasAltura = botaoRegrasAltura,
         .botaoSairLargura = botaoSairLargura, .botaoSairAltura = botaoSairAltura,
         .fundoMenuLargura = fundoMenuLargura, .fundoMenuAltura = fundoMenuAltura,
-        .abaConfigLargura = abaConfigLargura, .abaConfigAltura = abaConfigAltura,
+        .abaRegrasLargura = abaRegrasLargura, .abaRegrasAltura = abaRegrasAltura,
         .botaoVoltarLargura = botaoVoltarLargura, .botaoVoltarAltura = botaoVoltarAltura
     };
 
     // MENU PRINCIPAL
-    menu_principal(&flags, &io, &bmp, &lay);
+    menu_principal(&mes, &mev, &mi, &bt);
     if (!jogando) {
         // Saiu pelo menu
         al_destroy_font(font);
         al_destroy_bitmap(fundoMenu);
         al_destroy_bitmap(botaoJogar);
         al_destroy_bitmap(botaoJogar2);
-        al_destroy_bitmap(botaoConfig);
-        al_destroy_bitmap(botaoConfig2);
+        al_destroy_bitmap(botaoRegras);
+        al_destroy_bitmap(botaoRegras2);
         al_destroy_bitmap(botaoSair);
         al_destroy_bitmap(botaoSair2);
-        al_destroy_bitmap(abaConfig);
+        al_destroy_bitmap(abaRegras);
         al_destroy_bitmap(botaoVoltar);
         al_destroy_bitmap(botaoVoltar2);
         al_destroy_bitmap(sprite_andando_direita);
@@ -221,11 +221,11 @@ int main() {
 
         // PAUSE
         if (esc) {
-            lay.botaoJogarX = 525; lay.botaoJogarY = 260;
-            lay.botaoConfigX = 525; lay.botaoConfigY = 340;
-            lay.botaoSairX = 525; lay.botaoSairY = 420;
+            bt.botaoJogarX = 525; bt.botaoJogarY = 260;
+            bt.botaoRegrasX = 525; bt.botaoRegrasY = 340;
+            bt.botaoSairX = 525; bt.botaoSairY = 420;
 
-            menu_pausa(&flags, &io, &bmp, &lay);
+            menu_pausa(&mes, &mev, &mi, &bt);
             if (!jogando)
                 break;  // saiu pelo "Sair" no pause
             // se voltou, esc foi limpo dentro de menu_pausa
@@ -328,11 +328,11 @@ int main() {
     al_destroy_bitmap(fundoMenu);
     al_destroy_bitmap(botaoJogar);
     al_destroy_bitmap(botaoJogar2);
-    al_destroy_bitmap(botaoConfig);
-    al_destroy_bitmap(botaoConfig2);
+    al_destroy_bitmap(botaoRegras);
+    al_destroy_bitmap(botaoRegras2);
     al_destroy_bitmap(botaoSair);
     al_destroy_bitmap(botaoSair2);
-    al_destroy_bitmap(abaConfig);
+    al_destroy_bitmap(abaRegras);
     al_destroy_bitmap(botaoVoltar);
     al_destroy_bitmap(botaoVoltar2);
     al_destroy_bitmap(sprite_andando_direita);
