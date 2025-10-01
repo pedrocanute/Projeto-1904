@@ -142,7 +142,7 @@ int main() {
         .mouseY = &mouseY
     };
 
-    MenuImgs mi = {
+    MenuImgs menuImg = {
         .fundoMenu = fundoMenu,
         .botaoJogar = botaoJogar, .botaoJogar2 = botaoJogar2,
         .botaoRegras = botaoRegras, .botaoRegras2 = botaoRegras2,
@@ -166,7 +166,7 @@ int main() {
     };
 
     // MENU PRINCIPAL
-    menu_principal(&menuEstado, &menuEvent, &mi, &menuBotao);
+    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
     if (!jogando) {
         // Saiu pelo menu
         al_destroy_font(font);
@@ -225,7 +225,7 @@ int main() {
             menuBotao.botaoRegrasX = 525; menuBotao.botaoRegrasY = 340;
             menuBotao.botaoSairX = 525; menuBotao.botaoSairY = 420;
 
-            menu_pausa(&menuEstado, &menuEvent, &mi, &menuBotao);
+            menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao);
             if (!jogando)
                 break;  // saiu pelo "Sair" no pause
             // se voltou, esc foi limpo dentro de menu_pausa
