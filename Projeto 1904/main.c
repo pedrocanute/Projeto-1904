@@ -126,7 +126,7 @@ int main() {
     al_start_timer(timer);
 
     // SISTEMA MENUS
-    MenuEstados mes = {
+    MenuEstados menuEstado = {
         .telaMenu = &telaMenu,
         .jogando = &jogando,
         .regrasAberta = &regrasAberta,
@@ -134,7 +134,7 @@ int main() {
         .jogoPausado = &jogoPausado
     };
 
-    MenuEvents mev = {
+    MenuEvents menuEvent = {
         .fila_eventos = fila_eventos,
         .timer = timer,
         .camera = &camera,
@@ -151,7 +151,7 @@ int main() {
         .botaoVoltar = botaoVoltar, .botaoVoltar2 = botaoVoltar2
     };
 
-    MenuBotoes bt = {
+    MenuBotoes menuBotao = {
         .botaoJogarX = botaoJogarX, .botaoJogarY = botaoJogarY,
         .botaoRegrasX = botaoRegrasX, .botaoRegrasY = botaoRegrasY,
         .botaoSairX = botaoSairX, .botaoSairY = botaoSairY,
@@ -166,7 +166,7 @@ int main() {
     };
 
     // MENU PRINCIPAL
-    menu_principal(&mes, &mev, &mi, &bt);
+    menu_principal(&menuEstado, &menuEvent, &mi, &menuBotao);
     if (!jogando) {
         // Saiu pelo menu
         al_destroy_font(font);
@@ -221,11 +221,11 @@ int main() {
 
         // PAUSE
         if (esc) {
-            bt.botaoJogarX = 525; bt.botaoJogarY = 260;
-            bt.botaoRegrasX = 525; bt.botaoRegrasY = 340;
-            bt.botaoSairX = 525; bt.botaoSairY = 420;
+            menuBotao.botaoJogarX = 525; menuBotao.botaoJogarY = 260;
+            menuBotao.botaoRegrasX = 525; menuBotao.botaoRegrasY = 340;
+            menuBotao.botaoSairX = 525; menuBotao.botaoSairY = 420;
 
-            menu_pausa(&mes, &mev, &mi, &bt);
+            menu_pausa(&menuEstado, &menuEvent, &mi, &menuBotao);
             if (!jogando)
                 break;  // saiu pelo "Sair" no pause
             // se voltou, esc foi limpo dentro de menu_pausa

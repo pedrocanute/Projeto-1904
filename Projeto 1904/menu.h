@@ -46,8 +46,8 @@ typedef struct {
     int botaoVoltarLargura, botaoVoltarAltura;
 } MenuBotoes;
 
-void menu_principal(MenuEstados* mes, MenuEvents* mev, MenuImgs* mi, MenuBotoes* bt);
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImgs* menuImg, MenuBotoes* menuBotao);
 
-void menu_pausa(MenuEstados* mes, MenuEvents* mev, MenuImgs* mi, MenuBotoes* bt);
+void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImgs* menuImg, MenuBotoes* menuBotao);
 
 #endif 

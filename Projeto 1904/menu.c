@@ -1,205 +1,205 @@
 #include "menu.h"
 
-void menu_principal(MenuEstados* mes, MenuEvents* mev, MenuImgs* mi, MenuBotoes* bt) {
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImgs* menuImg, MenuBotoes* menuBotao) {
     ALLEGRO_EVENT event;
 
-    while (*mes->telaMenu) {
-        al_wait_for_event(mev->fila_eventos, &event);
+    while (*menuEstado->telaMenu) {
+        al_wait_for_event(menuEvent->fila_eventos, &event);
 
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            *mes->telaMenu = false;
-            *mes->jogando = false;
+            *menuEstado->telaMenu = false;
+            *menuEstado->jogando = false;
             break;
         }
 
         if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
-            *mev->mouseX = event.mouse.x;
-            *mev->mouseY = event.mouse.y;
+            *menuEvent->mouseX = event.mouse.x;
+            *menuEvent->mouseY = event.mouse.y;
         }
 
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
             // Jogar
-            if (*mev->mouseX >= bt->botaoJogarX && *mev->mouseX <= bt->botaoJogarX + bt->botaoJogarLargura && *mev->mouseY >= bt->botaoJogarY && *mev->mouseY <= bt->botaoJogarY + bt->botaoJogarAltura) {
-                *mes->telaMenu = false;
-                *mes->jogando = true;
+            if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= menuBotao->botaoJogarX + menuBotao->botaoJogarLargura && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= menuBotao->botaoJogarY + menuBotao->botaoJogarAltura) {
+                *menuEstado->telaMenu = false;
+                *menuEstado->jogando = true;
                 break;
             }
 
             // Regras
-            if ((*mev->mouseX >= bt->botaoRegrasX) && (*mev->mouseX <= bt->botaoRegrasX + bt->botaoRegrasLargura) && (*mev->mouseY >= bt->botaoRegrasY) && (*mev->mouseY <= bt->botaoRegrasY + bt->botaoRegrasAltura)) {
-                *mes->regrasAberta = true;
+            if ((*menuEvent->mouseX >= menuBotao->botaoRegrasX) && (*menuEvent->mouseX <= menuBotao->botaoRegrasX + menuBotao->botaoRegrasLargura) && (*menuEvent->mouseY >= menuBotao->botaoRegrasY) && (*menuEvent->mouseY <= menuBotao->botaoRegrasY + menuBotao->botaoRegrasAltura)) {
+                *menuEstado->regrasAberta = true;
 
-                while (*mes->regrasAberta) {
-                    al_wait_for_event(mev->fila_eventos, &event);
+                while (*menuEstado->regrasAberta) {
+                    al_wait_for_event(menuEvent->fila_eventos, &event);
 
                     if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-                        *mes->regrasAberta = false;
-                        *mes->telaMenu = false;
-                        *mes->jogando = false;
+                        *menuEstado->regrasAberta = false;
+                        *menuEstado->telaMenu = false;
+                        *menuEstado->jogando = false;
                         break;
                     }
 
                     if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
-                        *mev->mouseX = event.mouse.x;
-                        *mev->mouseY = event.mouse.y;
+                        *menuEvent->mouseX = event.mouse.x;
+                        *menuEvent->mouseY = event.mouse.y;
                     }
 
                     // Aba de regras
-                    al_draw_scaled_bitmap(mi->abaRegras, 0, 0, bt->abaRegrasLargura, bt->abaRegrasAltura, 0, 0, WIDTH, HEIGHT, 0);
+                    al_draw_scaled_bitmap(menuImg->abaRegras, 0, 0, menuBotao->abaRegrasLargura, menuBotao->abaRegrasAltura, 0, 0, WIDTH, HEIGHT, 0);
 
-                    if (*mev->mouseX >= bt->botaoVoltarX && *mev->mouseX <= bt->botaoVoltarX + bt->botaoVoltarLargura && *mev->mouseY >= bt->botaoVoltarY && *mev->mouseY <= bt->botaoVoltarY + bt->botaoVoltarAltura)
-                        al_draw_bitmap(mi->botaoVoltar2, bt->botaoVoltarX, bt->botaoVoltarY, 0);
+                    if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura)
+                        al_draw_bitmap(menuImg->botaoVoltar2, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
                     else
-                        al_draw_bitmap(mi->botaoVoltar, bt->botaoVoltarX, bt->botaoVoltarY, 0);
+                        al_draw_bitmap(menuImg->botaoVoltar, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
 
                     al_flip_display();
 
-                    if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && *mev->mouseX >= bt->botaoVoltarX && *mev->mouseX <= bt->botaoVoltarX + bt->botaoVoltarLargura && *mev->mouseY >= bt->botaoVoltarY && *mev->mouseY <= bt->botaoVoltarY + bt->botaoVoltarAltura) {
-                            *mes->regrasAberta = false;
+                    if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && *menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura) {
+                            *menuEstado->regrasAberta = false;
                     }
                 }
             }
 
             // Sair
-            if (*mev->mouseX >= bt->botaoSairX && *mev->mouseX <= bt->botaoSairX + bt->botaoSairLargura && *mev->mouseY >= bt->botaoSairY && *mev->mouseY <= bt->botaoSairY + bt->botaoSairAltura) {
-                *mes->telaMenu = false;
-                *mes->jogando = false;
+            if (*menuEvent->mouseX >= menuBotao->botaoSairX && *menuEvent->mouseX <= menuBotao->botaoSairX + menuBotao->botaoSairLargura && *menuEvent->mouseY >= menuBotao->botaoSairY && *menuEvent->mouseY <= menuBotao->botaoSairY + menuBotao->botaoSairAltura) {
+                *menuEstado->telaMenu = false;
+                *menuEstado->jogando = false;
                 break;
             }
         }
 
         // Desenha menu
-        al_draw_scaled_bitmap(mi->fundoMenu, 0, 0, bt->fundoMenuLargura, bt->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
-        if (*mev->mouseX >= bt->botaoJogarX && *mev->mouseX <= (bt->botaoJogarX + bt->botaoJogarLargura) && *mev->mouseY >= bt->botaoJogarY && *mev->mouseY <= (bt->botaoJogarY + bt->botaoJogarAltura)) {
-            al_draw_bitmap(mi->botaoJogar2, bt->botaoJogarX, bt->botaoJogarY, 0);
+        al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0, menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
+        if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= (menuBotao->botaoJogarX + menuBotao->botaoJogarLargura) && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= (menuBotao->botaoJogarY + menuBotao->botaoJogarAltura)) {
+            al_draw_bitmap(menuImg->botaoJogar2, menuBotao->botaoJogarX, menuBotao->botaoJogarY, 0);
         }
         else {
-            al_draw_bitmap(mi->botaoJogar, bt->botaoJogarX, bt->botaoJogarY, 0);
+            al_draw_bitmap(menuImg->botaoJogar, menuBotao->botaoJogarX, menuBotao->botaoJogarY, 0);
         }
-        if (*mev->mouseX >= bt->botaoRegrasX && *mev->mouseX <= (bt->botaoRegrasX + bt->botaoRegrasLargura) && *mev->mouseY >= bt->botaoRegrasY && *mev->mouseY <= (bt->botaoRegrasY + bt->botaoRegrasAltura)) {
-            al_draw_bitmap(mi->botaoRegras2, bt->botaoRegrasX, bt->botaoRegrasY, 0);
-        }
-        else {
-            al_draw_bitmap(mi->botaoRegras, bt->botaoRegrasX, bt->botaoRegrasY, 0);
-        }
-        if (*mev->mouseX >= bt->botaoSairX && *mev->mouseX <= (bt->botaoSairX + bt->botaoSairLargura) && *mev->mouseY >= bt->botaoSairY && *mev->mouseY <= (bt->botaoSairY + bt->botaoSairAltura)) {
-            al_draw_bitmap(mi->botaoSair2, bt->botaoSairX, bt->botaoSairY, 0);
+        if (*menuEvent->mouseX >= menuBotao->botaoRegrasX && *menuEvent->mouseX <= (menuBotao->botaoRegrasX + menuBotao->botaoRegrasLargura) && *menuEvent->mouseY >= menuBotao->botaoRegrasY && *menuEvent->mouseY <= (menuBotao->botaoRegrasY + menuBotao->botaoRegrasAltura)) {
+            al_draw_bitmap(menuImg->botaoRegras2, menuBotao->botaoRegrasX, menuBotao->botaoRegrasY, 0);
         }
         else {
-            al_draw_bitmap(mi->botaoSair, bt->botaoSairX, bt->botaoSairY, 0);
+            al_draw_bitmap(menuImg->botaoRegras, menuBotao->botaoRegrasX, menuBotao->botaoRegrasY, 0);
+        }
+        if (*menuEvent->mouseX >= menuBotao->botaoSairX && *menuEvent->mouseX <= (menuBotao->botaoSairX + menuBotao->botaoSairLargura) && *menuEvent->mouseY >= menuBotao->botaoSairY && *menuEvent->mouseY <= (menuBotao->botaoSairY + menuBotao->botaoSairAltura)) {
+            al_draw_bitmap(menuImg->botaoSair2, menuBotao->botaoSairX, menuBotao->botaoSairY, 0);
+        }
+        else {
+            al_draw_bitmap(menuImg->botaoSair, menuBotao->botaoSairX, menuBotao->botaoSairY, 0);
         }
         al_flip_display();
     }
 }
 
-void menu_pausa(MenuEstados* mes, MenuEvents* mev, MenuImgs* mi, MenuBotoes* bt) {
+void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImgs* menuImg, MenuBotoes* menuBotao) {
     
-    if (!*mes->esc) return;
+    if (!*menuEstado->esc) return;
 
-    al_stop_timer(mev->timer);
-    al_identity_transform(mev->camera);
-    al_use_transform(mev->camera);
+    al_stop_timer(menuEvent->timer);
+    al_identity_transform(menuEvent->camera);
+    al_use_transform(menuEvent->camera);
 
     ALLEGRO_EVENT event;
-    *mes->jogoPausado = true;
+    *menuEstado->jogoPausado = true;
 
-    while (*mes->jogoPausado) {
-        al_wait_for_event(mev->fila_eventos, &event);
+    while (*menuEstado->jogoPausado) {
+        al_wait_for_event(menuEvent->fila_eventos, &event);
 
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            *mes->jogando = false;
-            *mes->jogoPausado = false;
-            *mes->esc = false;
+            *menuEstado->jogando = false;
+            *menuEstado->jogoPausado = false;
+            *menuEstado->esc = false;
             break;
         }
 
         if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
-            *mev->mouseX = event.mouse.x;
-            *mev->mouseY = event.mouse.y;
+            *menuEvent->mouseX = event.mouse.x;
+            *menuEvent->mouseY = event.mouse.y;
         }
 
         // ESC para continuar
         if (event.type == ALLEGRO_EVENT_KEY_DOWN &&
             event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-            *mes->jogoPausado = false;
-            *mes->esc = false;
+            *menuEstado->jogoPausado = false;
+            *menuEstado->esc = false;
             break;
         }
 
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
             // Continuar
-            if (*mev->mouseX >= bt->botaoJogarX && *mev->mouseX <= bt->botaoJogarX + bt->botaoJogarLargura && *mev->mouseY >= bt->botaoJogarY && *mev->mouseY <= bt->botaoJogarY + bt->botaoJogarAltura) {
-                *mes->jogoPausado = false;
-                *mes->esc = false;
+            if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= menuBotao->botaoJogarX + menuBotao->botaoJogarLargura && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= menuBotao->botaoJogarY + menuBotao->botaoJogarAltura) {
+                *menuEstado->jogoPausado = false;
+                *menuEstado->esc = false;
                 break;
             }
 
             // Regras (sub-loop)
-            if (*mev->mouseX >= bt->botaoRegrasX && *mev->mouseX <= bt->botaoRegrasX + bt->botaoRegrasLargura && *mev->mouseY >= bt->botaoRegrasY && *mev->mouseY <= bt->botaoRegrasY + bt->botaoRegrasAltura) {
+            if (*menuEvent->mouseX >= menuBotao->botaoRegrasX && *menuEvent->mouseX <= menuBotao->botaoRegrasX + menuBotao->botaoRegrasLargura && *menuEvent->mouseY >= menuBotao->botaoRegrasY && *menuEvent->mouseY <= menuBotao->botaoRegrasY + menuBotao->botaoRegrasAltura) {
                 bool regrasAbertaLocal = true;
                 while (regrasAbertaLocal) {
-                    al_wait_for_event(mev->fila_eventos, &event);
+                    al_wait_for_event(menuEvent->fila_eventos, &event);
 
                     if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-                        *mes->jogando = false;
-                        *mes->jogoPausado = false;
-                        *mes->esc = false;
+                        *menuEstado->jogando = false;
+                        *menuEstado->jogoPausado = false;
+                        *menuEstado->esc = false;
                         regrasAbertaLocal = false;
                         break;
                     }
 
                     if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
-                        *mev->mouseX = event.mouse.x;
-                        *mev->mouseY = event.mouse.y;
+                        *menuEvent->mouseX = event.mouse.x;
+                        *menuEvent->mouseY = event.mouse.y;
                     }
 
-                    al_draw_scaled_bitmap(mi->abaRegras, 0, 0, bt->abaRegrasLargura, bt->abaRegrasAltura, 0, 0, WIDTH, HEIGHT, 0);
+                    al_draw_scaled_bitmap(menuImg->abaRegras, 0, 0, menuBotao->abaRegrasLargura, menuBotao->abaRegrasAltura, 0, 0, WIDTH, HEIGHT, 0);
 
-                    if (*mev->mouseX >= bt->botaoVoltarX && *mev->mouseX <= bt->botaoVoltarX + bt->botaoVoltarLargura && *mev->mouseY >= bt->botaoVoltarY && *mev->mouseY <= bt->botaoVoltarY + bt->botaoVoltarAltura)
-                        al_draw_bitmap(mi->botaoVoltar2, bt->botaoVoltarX, bt->botaoVoltarY, 0);
+                    if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura)
+                        al_draw_bitmap(menuImg->botaoVoltar2, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
                     else
-                        al_draw_bitmap(mi->botaoVoltar, bt->botaoVoltarX, bt->botaoVoltarY, 0);
+                        al_draw_bitmap(menuImg->botaoVoltar, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
 
                         al_flip_display();
 
-                    if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && *mev->mouseX >= bt->botaoVoltarX && *mev->mouseX <= bt->botaoVoltarX + bt->botaoVoltarLargura && *mev->mouseY >= bt->botaoVoltarY && *mev->mouseY <= bt->botaoVoltarY + bt->botaoVoltarAltura) {
+                    if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && *menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura) {
                             regrasAbertaLocal = false;
                     }
                 }
             }
 
             // Sair
-            if (*mev->mouseX >= bt->botaoSairX && *mev->mouseX <= bt->botaoSairX + bt->botaoSairLargura && *mev->mouseY >= bt->botaoSairY && *mev->mouseY <= bt->botaoSairY + bt->botaoSairAltura) {
-                *mes->jogando = false;
-                *mes->jogoPausado = false;
-                *mes->esc = false;
+            if (*menuEvent->mouseX >= menuBotao->botaoSairX && *menuEvent->mouseX <= menuBotao->botaoSairX + menuBotao->botaoSairLargura && *menuEvent->mouseY >= menuBotao->botaoSairY && *menuEvent->mouseY <= menuBotao->botaoSairY + menuBotao->botaoSairAltura) {
+                *menuEstado->jogando = false;
+                *menuEstado->jogoPausado = false;
+                *menuEstado->esc = false;
                 break;
             }
         }
 
         // UI do pause com hover
-        if (*mev->mouseX >= bt->botaoJogarX && *mev->mouseX <= (bt->botaoJogarX + bt->botaoJogarLargura) && *mev->mouseY >= bt->botaoJogarY && *mev->mouseY <= (bt->botaoJogarY + bt->botaoJogarAltura)) {
-            al_draw_bitmap(mi->botaoJogar2, bt->botaoJogarX, bt->botaoJogarY, 0);
+        if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= (menuBotao->botaoJogarX + menuBotao->botaoJogarLargura) && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= (menuBotao->botaoJogarY + menuBotao->botaoJogarAltura)) {
+            al_draw_bitmap(menuImg->botaoJogar2, menuBotao->botaoJogarX, menuBotao->botaoJogarY, 0);
         }
         else {
-            al_draw_bitmap(mi->botaoJogar, bt->botaoJogarX, bt->botaoJogarY, 0);
+            al_draw_bitmap(menuImg->botaoJogar, menuBotao->botaoJogarX, menuBotao->botaoJogarY, 0);
         }
-        if (*mev->mouseX >= bt->botaoRegrasX && *mev->mouseX <= (bt->botaoRegrasX + bt->botaoRegrasLargura) && *mev->mouseY >= bt->botaoRegrasY && *mev->mouseY <= (bt->botaoRegrasY + bt->botaoRegrasAltura)) {
-            al_draw_bitmap(mi->botaoRegras2, bt->botaoRegrasX, bt->botaoRegrasY, 0);
-        }
-        else {
-            al_draw_bitmap(mi->botaoRegras, bt->botaoRegrasX, bt->botaoRegrasY, 0);
-        }
-        if (*mev->mouseX >= bt->botaoSairX && *mev->mouseX <= (bt->botaoSairX + bt->botaoSairLargura) && *mev->mouseY >= bt->botaoSairY && *mev->mouseY <= (bt->botaoSairY + bt->botaoSairAltura)) {
-            al_draw_bitmap(mi->botaoSair2, bt->botaoSairX, bt->botaoSairY, 0);
+        if (*menuEvent->mouseX >= menuBotao->botaoRegrasX && *menuEvent->mouseX <= (menuBotao->botaoRegrasX + menuBotao->botaoRegrasLargura) && *menuEvent->mouseY >= menuBotao->botaoRegrasY && *menuEvent->mouseY <= (menuBotao->botaoRegrasY + menuBotao->botaoRegrasAltura)) {
+            al_draw_bitmap(menuImg->botaoRegras2, menuBotao->botaoRegrasX, menuBotao->botaoRegrasY, 0);
         }
         else {
-            al_draw_bitmap(mi->botaoSair, bt->botaoSairX, bt->botaoSairY, 0);
+            al_draw_bitmap(menuImg->botaoRegras, menuBotao->botaoRegrasX, menuBotao->botaoRegrasY, 0);
+        }
+        if (*menuEvent->mouseX >= menuBotao->botaoSairX && *menuEvent->mouseX <= (menuBotao->botaoSairX + menuBotao->botaoSairLargura) && *menuEvent->mouseY >= menuBotao->botaoSairY && *menuEvent->mouseY <= (menuBotao->botaoSairY + menuBotao->botaoSairAltura)) {
+            al_draw_bitmap(menuImg->botaoSair2, menuBotao->botaoSairX, menuBotao->botaoSairY, 0);
+        }
+        else {
+            al_draw_bitmap(menuImg->botaoSair, menuBotao->botaoSairX, menuBotao->botaoSairY, 0);
         }
         al_flip_display();
     }
 
-    if (*mes->jogando && !*mes->jogoPausado) {
-        al_start_timer(mev->timer);
+    if (*menuEstado->jogando && !*menuEstado->jogoPausado) {
+        al_start_timer(menuEvent->timer);
     }
 }
