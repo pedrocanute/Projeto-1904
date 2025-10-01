@@ -22,13 +22,8 @@ void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bo
             *shift = true;
             break;
         case ALLEGRO_KEY_ESCAPE:
-            if (*esc == false) {
-                *esc = true;
-            }
-            else if (*esc == true) {
-                *esc = false;
-            }
-        break;
+            *esc == true;
+            break;
         }
     }
     else if (event.type == ALLEGRO_EVENT_KEY_UP) {
@@ -50,6 +45,9 @@ void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bo
             break;
         case ALLEGRO_KEY_LSHIFT:
             *shift = false;
+            break;
+        case ALLEGRO_KEY_ESCAPE:
+            *esc == false;
             break;
         }
     }

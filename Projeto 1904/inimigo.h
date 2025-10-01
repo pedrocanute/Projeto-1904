@@ -40,7 +40,7 @@ void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMA
 void desenhar_todos_inimigos(Inimigo* inimigos, int quantidade);
 
 // ATUALIZA DE ACORDO COM A CAMERA
-void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera);
+void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade);
 
 int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 

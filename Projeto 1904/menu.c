@@ -26,7 +26,7 @@ void menu_principal(MenuEstados* mes, MenuEvents* mev, MenuImgs* mi, MenuBotoes*
             }
 
             // Regras
-            if (*mev->mouseX >= bt->botaoRegrasX && *mev->mouseX <= bt->botaoRegrasX + bt->botaoRegrasLargura && *mev->mouseY >= bt->botaoRegrasY && *mev->mouseY <= bt->botaoRegrasY + bt->botaoRegrasAltura) {
+            if ((*mev->mouseX >= bt->botaoRegrasX) && (*mev->mouseX <= bt->botaoRegrasX + bt->botaoRegrasLargura) && (*mev->mouseY >= bt->botaoRegrasY) && (*mev->mouseY <= bt->botaoRegrasY + bt->botaoRegrasAltura)) {
                 *mes->regrasAberta = true;
 
                 while (*mes->regrasAberta) {

@@ -45,7 +45,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
 
 // SPAWNA INIMIGOS COM BASE NA CAMERA
 void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
-
+    
     float camera_direita = posicaoCamera[0] + 1280;
     float spawn_x_min = camera_direita + 50;
     float spawn_x_max = camera_direita + 300;
@@ -53,8 +53,8 @@ void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLE
     float spawn_y_min = (720 / 2) + 52;
     float spawn_y_max = 720 - 100;
 
-    float x = spawn_x_min + (float)(rand() % (int)(spawn_x_max - spawn_x_min));
-    float y = spawn_y_min + (float)(rand() % (int)(spawn_y_max - spawn_y_min));
+    float x = spawn_x_min + (float)(rand() % (int)(spawn_x_max - spawn_x_min)); //(float) converte toda a operação da funcao rand (que tem tipo 
+    float y = spawn_y_min + (float)(rand() % (int)(spawn_y_max - spawn_y_min)); //int) em float
 
     TipoInimigo tipo = (TipoInimigo)(rand() % 3);
 
@@ -72,20 +72,16 @@ void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLE
 }
 
 void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
-
-    srand((unsigned int)time(NULL));
-
+    srand(time(NULL));
     for (int i = 0; i < quantidade; i++) {
         respawn_inimigo_na_camera(&inimigos[i], zumbi_dir, zumbi_esq, rato_dir, rato_esq, mosquito_dir, mosquito_esq, posicaoCamera);
     }
 }
 
-void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
-
-    (void)zumbi_dir; (void)zumbi_esq; (void)rato_dir; (void)rato_esq; (void)mosquito_dir; (void)mosquito_esq; (void)posicaoCamera;
+void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade) {
 
     for (int i = 0; i < quantidade; i++) {
-        if (!inimigos[i].ativo) 
+        if (inimigos[i].ativo == false) 
             continue;
 
         inimigos[i].botX -= inimigos[i].velocidade;
@@ -97,7 +93,7 @@ void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BIT
 }
 
 void desenhar_inimigo(Inimigo* inimigo, bool em_movimento) {
-    if (!inimigo->ativo) return;
+    if (inimigo->ativo == false) return;
 
     ALLEGRO_BITMAP* sprite_atual = inimigo->sprite_esquerda;
 
@@ -151,7 +147,7 @@ void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
 
     for (int i = 0; i < quantidade; ++i) {
         
-        inimigos[i].vida = (int)(inimigos[i].vida + vida);
+        inimigos[i].vida = inimigos[i].vida + vida;
         inimigos[i].velocidade *= velocidade;
     }
 }

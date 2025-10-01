@@ -236,7 +236,7 @@ int main() {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
-            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS,zumbi_direita, zumbi_esquerda,rato_direita, rato_esquerda,mosquito_direita, mosquito_esquerda,posicaoCamera);
+            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS);
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
             redesenhar = true;
