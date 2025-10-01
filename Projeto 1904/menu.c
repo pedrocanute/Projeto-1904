@@ -1,6 +1,6 @@
 #include "menu.h"
 
-void menu_principal(MenuEstados* mes, MenuEvents* mev, MenuImgs* mi, MenuBotoes* bt, bool redesenhar) {
+void menu_principal(MenuEstados* mes, MenuEvents* mev, MenuImgs* mi, MenuBotoes* bt) {
     ALLEGRO_EVENT event;
 
     while (*mes->telaMenu) {

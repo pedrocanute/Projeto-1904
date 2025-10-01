@@ -22,7 +22,7 @@ void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bo
             *shift = true;
             break;
         case ALLEGRO_KEY_ESCAPE:
-            *esc == true;
+            *esc = true;
             break;
         }
     }
@@ -47,7 +47,7 @@ void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bo
             *shift = false;
             break;
         case ALLEGRO_KEY_ESCAPE:
-            *esc == false;
+            *esc = false;
             break;
         }
     }
