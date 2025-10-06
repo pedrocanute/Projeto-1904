@@ -78,7 +78,10 @@ int main() {
     //TIMER CARAVANA / BARRA INFECÇÃO
     float timer_regen_infeccao = 0.0f;
     const float TEMPO_REGEN_INFECCAO = 5.0f;
-    //bool regen_infeccao_ativo = false;
+
+    //INTANGIBILIDADE
+    float timer_intangibilidade = 0.0f;
+    const float TEMPO_INTANGIBILIDADE = 1.0f;
 
     // ANIMAÇÃO
     int  frame_atual = 0;
@@ -267,24 +270,27 @@ int main() {
         }
         cor = colidiu ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
 
-        //Colisão de inimigo com caravana
+        //Colisão de inimigo com caravana / Intangibilidade
         bool colisaoCaravana = false;
+        bool intangibilidadeAtiva = false;
         for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.jogadorX + 80, caravana.jogadorY + 400) && barraInfeccao.infeccaoLargura < 400) {
-                colisaoCaravana = true;
-                barraInfeccao.infeccaoLargura++;
-                timer_regen_infeccao = al_get_time();
-                break;
+            if(!intangibilidadeAtiva && al_get_time() - timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
+                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.jogadorX + 80, caravana.jogadorY + 400) && barraInfeccao.infeccaoLargura < 400) {
+                    colisaoCaravana = true;
+                    barraInfeccao.infeccaoLargura += 10;
+                    timer_regen_infeccao = al_get_time();
+                    timer_intangibilidade = al_get_time();
+                    intangibilidadeAtiva = true;
+                    break;
+                }
             }
         }
         corCaravana = colisaoCaravana ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
 
         //Regeneração de Vida
         // !!!!!!!!!Compara se não há colisão e se a caravana levou dano!!!!!!!!!
-        if (!colisaoCaravana) {
-            if (al_get_time() - timer_regen_infeccao >= TEMPO_REGEN_INFECCAO && barraInfeccao.infeccaoLargura > barraInfeccao.infeccaoX) {
-                barraInfeccao.infeccaoLargura--;
-            }
+        if (!colisaoCaravana && al_get_time() - timer_regen_infeccao >= TEMPO_REGEN_INFECCAO && barraInfeccao.infeccaoLargura > barraInfeccao.infeccaoX) {
+            barraInfeccao.infeccaoLargura--;
         }
 
         // RESPAWN POR FASE
