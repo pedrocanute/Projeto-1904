@@ -5,6 +5,7 @@
 #include "personagem.h"
 #include "inimigo.h"
 #include "projetil.h"
+#include "caravana.h"
 
 // Teste AABB genérico entre dois retângulos
 bool colisao_aabb(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2);
@@ -16,6 +17,6 @@ bool colisao_jogador_inimigo(const Inimigo* bot, const Jogador* jogador, float l
 bool colisao_projetil_inimigo(float projX, float projY, int projW, int projH, const Inimigo* inimigo);
 
 // Colisão entre um inimigo e a caravana
-bool colisao_inimigo_caravana(const Inimigo* bot, const Jogador* caravana, float caravanaLargura, float caravanaAltura);
+bool colisao_inimigo_caravana(const Inimigo* bot, const Caravana* caravana, float caravanaLargura, float caravanaAltura);
 #endif
 

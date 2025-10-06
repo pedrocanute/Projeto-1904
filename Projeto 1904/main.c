@@ -8,6 +8,7 @@
 #include "cenario.h"
 #include "menu.h"
 #include "infeccao.h"
+#include "caravana.h"
 
 int main() {
 
@@ -69,7 +70,7 @@ int main() {
     ALLEGRO_BITMAP* sprite_atirando_esquerda = al_load_bitmap("AtirandoEsquerda.png");
 
     // CARAVANA
-    Jogador caravana = { 0.0f, 412.0f, true, false };
+    Caravana caravana = { 0.0f, 412.0f, caravana.caravanaX + 80, caravana.caravanaY + 320};
 
     // BARRA INFECÇÃO
     Infeccao barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
@@ -275,7 +276,7 @@ int main() {
         bool intangibilidadeAtiva = false;
         for (int i = 0; i < MAX_INIMIGOS; i++) {
             if(!intangibilidadeAtiva && al_get_time() - timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
-                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.jogadorX + 80, caravana.jogadorY + 400) && barraInfeccao.infeccaoLargura < 400) {
+                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravaLargura, caravana.caravaAltura) && barraInfeccao.infeccaoLargura < 400) {
                     colisaoCaravana = true;
                     barraInfeccao.infeccaoLargura += 10;
                     timer_regen_infeccao = al_get_time();
@@ -332,7 +333,7 @@ int main() {
             desenhar_barra_infeccao(barraInfeccao.infeccaoX, barraInfeccao.infeccaoY, barraInfeccao.infeccaoLargura, barraInfeccao.infeccaoAltura);
 
             // caravana
-            desenhar_caravana(&caravana, caravana.jogadorX, caravana.jogadorY , caravana.jogadorX + 80, caravana.jogadorY + 320, corCaravana);
+            desenhar_caravana(caravana.caravanaX, caravana.caravanaY , caravana.caravaLargura, caravana.caravaAltura, corCaravana);
 
             // jogador e inimigos
             desenhar_jogador(jogador, w, a, s, d, espaco,sprite_andando_direita, sprite_andando_esquerda,sprite_atirando_direita, sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);

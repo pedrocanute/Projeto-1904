@@ -21,6 +21,4 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
 
 void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador);
 
-void desenhar_caravana(Jogador* Caravana, float caravanaX, float caravanaY, float caravanaLargura, float caravanaAltura, ALLEGRO_COLOR corCaravana);
-
 #endif

@@ -22,6 +22,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="caravana.c" />
     <ClCompile Include="cenario.c" />
     <ClCompile Include="colisao.c" />
     <ClCompile Include="fases.c" />
@@ -36,6 +37,7 @@
     <ClCompile Include="projetil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="caravana.h" />
     <ClInclude Include="cenario.h" />
     <ClInclude Include="colisao.h" />
     <ClInclude Include="configuracoes.h" />
