@@ -25,6 +25,7 @@
     <ClCompile Include="cenario.c" />
     <ClCompile Include="colisao.c" />
     <ClCompile Include="fases.c" />
+    <ClCompile Include="infeccao.c" />
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="main.c" />
@@ -39,6 +40,7 @@
     <ClInclude Include="colisao.h" />
     <ClInclude Include="configuracoes.h" />
     <ClInclude Include="fases.h" />
+    <ClInclude Include="infeccao.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="menu.h" />

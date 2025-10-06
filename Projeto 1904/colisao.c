@@ -25,3 +25,9 @@ bool colisao_projetil_inimigo(float projX, float projY, int projW, int projH, co
 
     return colisao_aabb(projX, projY, (float)projW, (float)projH, inimigo->botX, inimigo->botY, inimigo->larguraBot, inimigo->alturaBot);
 }
+
+bool colisao_inimigo_caravana(const Inimigo* bot, const Jogador* caravana, float caravanaLargura, float caravanaAltura) {
+    if (!bot || !caravana || !bot->ativo) return false;
+
+    return colisao_aabb(bot->botX, bot->botY, bot->larguraBot, bot->alturaBot, caravana->jogadorX, caravana->jogadorY, caravanaLargura, caravanaAltura);
+}

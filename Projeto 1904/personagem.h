@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <allegro5/allegro.h>
 
+#include <allegro5/allegro_primitives.h>
+
 typedef struct {
     float jogadorX, jogadorY;
     bool paraDireita, paraEsquerda;
@@ -18,5 +20,7 @@ void restringirPosicao(Jogador* p, float maximoX, float maximoY, float larguraJo
 void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espaco, ALLEGRO_BITMAP* sprite_direita, ALLEGRO_BITMAP* sprite_esquerda, ALLEGRO_BITMAP* sprite_atirando_direita, ALLEGRO_BITMAP* sprite_atirando_esquerda, int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita, int* frame_tiro, int* contador_frame_tiro);  
 
 void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador);
+
+void desenhar_caravana(Jogador Caravana, float caravanaX, float caravanaY, float caravanaLargura, float caravanaAltura, ALLEGRO_COLOR corCaravana);
 
 #endif

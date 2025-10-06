@@ -15,5 +15,7 @@ bool colisao_jogador_inimigo(const Inimigo* bot, const Jogador* jogador, float l
 // Colisão entre um projétil (retângulo) e um inimigo (retângulo do sprite)
 bool colisao_projetil_inimigo(float projX, float projY, int projW, int projH, const Inimigo* inimigo);
 
+// Colisão entre um inimigo e a caravana
+bool colisao_inimigo_caravana(const Inimigo* bot, const Jogador* caravana, float caravanaLargura, float caravanaAltura);
 #endif
 

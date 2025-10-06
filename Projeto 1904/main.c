@@ -7,6 +7,7 @@
 #include "colisao.h"
 #include "cenario.h"
 #include "menu.h"
+#include "infeccao.h"
 
 int main() {
 
@@ -58,6 +59,7 @@ int main() {
     inicializar_array_inimigos(inimigos, MAX_INIMIGOS,zumbi_direita, zumbi_esquerda,rato_direita, rato_esquerda,mosquito_direita, mosquito_esquerda,posicaoCamera);
 
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
+    ALLEGRO_COLOR corCaravana = al_map_rgb(0, 0, 0);
 
     // JOGADOR
     Jogador jogador = { 120.0f, 520.0f, true, false };
@@ -65,6 +67,18 @@ int main() {
     ALLEGRO_BITMAP* sprite_andando_esquerda = al_load_bitmap("AndandoEsquerda.png");
     ALLEGRO_BITMAP* sprite_atirando_direita = al_load_bitmap("AtirandoDireita.png");
     ALLEGRO_BITMAP* sprite_atirando_esquerda = al_load_bitmap("AtirandoEsquerda.png");
+
+    // CARAVANA
+    Jogador caravana = { 0.0f, 350.0f, true, false };
+
+    // BARRA INFECÇÃO
+    Infeccao barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
+    Infeccao barraInfeccao = { 75.0f, 50.0f, 75.0f, 100.0f };
+
+    //TIMER CARAVANA / BARRA INFECÇÃO
+    float timer_regen_infeccao = 0.0f;
+    const float TEMPO_REGEN_INFECCAO = 5.0f;
+    //bool regen_infeccao_ativo = false;
 
     // ANIMAÇÃO
     int  frame_atual = 0;
@@ -243,6 +257,7 @@ int main() {
         }
 
         // COLISÃO
+        // Colisão de jogador com inimigo
         bool colidiu = false;
         for (int i = 0; i < MAX_INIMIGOS; i++) {
             if (colisao_jogador_inimigo(&inimigos[i], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
@@ -251,6 +266,26 @@ int main() {
             }
         }
         cor = colidiu ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
+
+        //Colisão de inimigo com caravana
+        bool colisaoCaravana = false;
+        for (int i = 0; i < MAX_INIMIGOS; i++) {
+            if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.jogadorX + 80, caravana.jogadorY + 400) && barraInfeccao.infeccaoLargura < 400) {
+                colisaoCaravana = true;
+                barraInfeccao.infeccaoLargura++;
+                timer_regen_infeccao = al_get_time();
+                break;
+            }
+        }
+        corCaravana = colisaoCaravana ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
+
+        //Regeneração de Vida
+        // !!!!!!!!!Compara se não há colisão e se a caravana levou dano!!!!!!!!!
+        if (!colisaoCaravana) {
+            if (al_get_time() - timer_regen_infeccao >= TEMPO_REGEN_INFECCAO && barraInfeccao.infeccaoLargura > barraInfeccao.infeccaoX) {
+                barraInfeccao.infeccaoLargura--;
+            }
+        }
 
         // RESPAWN POR FASE
         if (!verificarProgressoDaFase(&sistemaFase)) {
@@ -285,6 +320,13 @@ int main() {
 
             // cenário primeiro
             desenhar_cenario(cenario1, cenario2, jogador.jogadorX, posicaoCamera);
+
+            // Infecção
+            desenhar_barra(barraFundo.infeccaoX, barraFundo.infeccaoY, barraFundo.infeccaoLargura, barraFundo.infeccaoAltura);
+            desenhar_barra_infeccao(barraInfeccao.infeccaoX, barraInfeccao.infeccaoY, barraInfeccao.infeccaoLargura, barraInfeccao.infeccaoAltura);
+
+            // caravana
+            desenhar_caravana(caravana, caravana.jogadorX, caravana.jogadorY, caravana.jogadorX + 80, caravana.jogadorY + 400, corCaravana);
 
             // jogador e inimigos
             desenhar_jogador(jogador, w, a, s, d, espaco,sprite_andando_direita, sprite_andando_esquerda,sprite_atirando_direita, sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
