@@ -69,7 +69,7 @@ int main() {
     ALLEGRO_BITMAP* sprite_atirando_esquerda = al_load_bitmap("AtirandoEsquerda.png");
 
     // CARAVANA
-    Jogador caravana = { 0.0f, 350.0f, true, false };
+    Jogador caravana = { 0.0f, 412.0f, true, false };
 
     // BARRA INFECÇÃO
     Infeccao barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
@@ -332,7 +332,7 @@ int main() {
             desenhar_barra_infeccao(barraInfeccao.infeccaoX, barraInfeccao.infeccaoY, barraInfeccao.infeccaoLargura, barraInfeccao.infeccaoAltura);
 
             // caravana
-            desenhar_caravana(caravana, caravana.jogadorX, caravana.jogadorY, caravana.jogadorX + 80, caravana.jogadorY + 400, corCaravana);
+            desenhar_caravana(&caravana, caravana.jogadorX, caravana.jogadorY , caravana.jogadorX + 80, caravana.jogadorY + 320, corCaravana);
 
             // jogador e inimigos
             desenhar_jogador(jogador, w, a, s, d, espaco,sprite_andando_direita, sprite_andando_esquerda,sprite_atirando_direita, sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
