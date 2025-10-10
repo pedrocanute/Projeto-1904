@@ -44,12 +44,8 @@ int main() {
     const float TEMPO_SPAWN = 3.0f;
 
     // CARREGAMENTO DOS SPRITES DOS INIMIGOS
-    ALLEGRO_BITMAP* zumbi_direita = al_load_bitmap("ZumbiAndandoDireita.png");
-    ALLEGRO_BITMAP* zumbi_esquerda = al_load_bitmap("ZumbiAndandoEsquerda.png");
-    ALLEGRO_BITMAP* rato_direita = al_load_bitmap("RatoAndandoDireita.png");
-    ALLEGRO_BITMAP* rato_esquerda = al_load_bitmap("RatoAndandoEsquerda.png");
-    ALLEGRO_BITMAP* mosquito_direita = al_load_bitmap("MosquitoDireita.png");
-    ALLEGRO_BITMAP* mosquito_esquerda = al_load_bitmap("MosquitoEsquerda.png");
+    Bitmaps bitmap;
+    carregar_bitmaps(&bitmap);
 
     // CAMERA
     float posicaoCamera[2] = { 0, 0 };
@@ -57,17 +53,13 @@ int main() {
     // ARRAY DE INIMIGOS
     Inimigo inimigos[MAX_INIMIGOS];
     inicializarSistemaFases(&sistemaFase, &inimigos[0]);
-    inicializar_array_inimigos(inimigos, MAX_INIMIGOS,zumbi_direita, zumbi_esquerda,rato_direita, rato_esquerda,mosquito_direita, mosquito_esquerda,posicaoCamera);
+    inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda,posicaoCamera);
 
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
     ALLEGRO_COLOR corCaravana = al_map_rgb(0, 0, 0);
 
     // JOGADOR
     Jogador jogador = { 120.0f, 520.0f, true, false };
-    ALLEGRO_BITMAP* sprite_andando_direita = al_load_bitmap("AndandoDireita.png");
-    ALLEGRO_BITMAP* sprite_andando_esquerda = al_load_bitmap("AndandoEsquerda.png");
-    ALLEGRO_BITMAP* sprite_atirando_direita = al_load_bitmap("AtirandoDireita.png");
-    ALLEGRO_BITMAP* sprite_atirando_esquerda = al_load_bitmap("AtirandoEsquerda.png");
 
     // CARAVANA
     Caravana caravana = { 0.0f, 412.0f, caravana.caravanaX + 80, caravana.caravanaY + 320};
@@ -92,43 +84,26 @@ int main() {
     int  frame_tiro = 0;
     int  contador_frame_tiro = 0;
 
-    // PROJETIL
-    ALLEGRO_BITMAP* projetilDireita = al_load_bitmap("imagens/VacinaProjetilDireita.png");
-    ALLEGRO_BITMAP* projetilEsquerda = al_load_bitmap("imagens/VacinaProjetilEsquerda.png");
-
-    // CENARIO
-    ALLEGRO_BITMAP* cenario1 = al_load_bitmap("Mapa01.png");
-    ALLEGRO_BITMAP* cenario2 = al_load_bitmap("Mapa02.png");
-
-    // MENU (bitmaps e layout)
-    ALLEGRO_BITMAP* fundoMenu = al_load_bitmap("imagens/menu.png");
-    ALLEGRO_BITMAP* botaoJogar = al_load_bitmap("imagens/jogar1.png");
-    ALLEGRO_BITMAP* botaoJogar2 = al_load_bitmap("imagens/jogar2.png");
-    ALLEGRO_BITMAP* botaoConfig = al_load_bitmap("imagens/configuracoes1.png");
-    ALLEGRO_BITMAP* botaoConfig2 = al_load_bitmap("imagens/configuracoes2.png");
-    ALLEGRO_BITMAP* botaoSair = al_load_bitmap("imagens/sair1.png");
-    ALLEGRO_BITMAP* botaoSair2 = al_load_bitmap("imagens/sair2.png");
-    ALLEGRO_BITMAP* abaConfig = al_load_bitmap("imagens/abavazia.png");
-    ALLEGRO_BITMAP* botaoVoltar = al_load_bitmap("imagens/voltar1.png");
-    ALLEGRO_BITMAP* botaoVoltar2 = al_load_bitmap("imagens/voltar2.png");
-
-    int botaoJogarLargura = al_get_bitmap_width(botaoJogar);
-    int botaoJogarAltura = al_get_bitmap_height(botaoJogar);
-    int botaoConfigLargura = al_get_bitmap_width(botaoConfig);
-    int botaoConfigAltura = al_get_bitmap_height(botaoConfig);
-    int botaoSairLargura = al_get_bitmap_width(botaoSair);
-    int botaoSairAltura = al_get_bitmap_height(botaoSair);
-    int fundoMenuLargura = al_get_bitmap_width(fundoMenu);
-    int fundoMenuAltura = al_get_bitmap_height(fundoMenu);
-    int abaConfigLargura = al_get_bitmap_width(abaConfig);
-    int abaConfigAltura = al_get_bitmap_height(abaConfig);
-    int botaoVoltarLargura = al_get_bitmap_width(botaoVoltar);
-    int botaoVoltarAltura = al_get_bitmap_height(botaoVoltar);
+    int botaoJogarLargura = al_get_bitmap_width(bitmap.botaoJogar);
+    int botaoJogarAltura = al_get_bitmap_height(bitmap.botaoJogar);
+    int botaoRegrasLargura = al_get_bitmap_width(bitmap.botaoRegras);
+    int botaoRegrasAltura = al_get_bitmap_height(bitmap.botaoRegras);
+    int botaoSairLargura = al_get_bitmap_width(bitmap.botaoSair);
+    int botaoSairAltura = al_get_bitmap_height(bitmap.botaoSair);
+    int fundoMenuLargura = al_get_bitmap_width(bitmap.fundoMenu);
+    int fundoMenuAltura = al_get_bitmap_height(bitmap.fundoMenu);
+    int abaRegrasLargura = al_get_bitmap_width(bitmap.abaRegras);
+    int abaRegrasAltura = al_get_bitmap_height(bitmap.abaRegras);
+    int botaoVoltarLargura = al_get_bitmap_width(bitmap.botaoVoltar);
+    int botaoVoltarAltura = al_get_bitmap_height(bitmap.botaoVoltar);
 
     int botaoJogarX = 200, botaoJogarY = 620;
     int botaoConfigX = 500, botaoConfigY = 620;
     int botaoSairX = 800, botaoSairY = 620;
     int botaoVoltarX = 520, botaoVoltarY = 500;
+
+    bool boss_spawnado = false;
+    bool fase_boss_ativa = false;
 
 #pragma endregion
 
@@ -161,12 +136,12 @@ int main() {
     };
 
     MenuBitmaps bmp = {
-        .fundoMenu = fundoMenu,
-        .botaoJogar = botaoJogar, .botaoJogar2 = botaoJogar2,
-        .botaoConfig = botaoConfig, .botaoConfig2 = botaoConfig2,
-        .botaoSair = botaoSair, .botaoSair2 = botaoSair2,
-        .abaConfig = abaConfig,
-        .botaoVoltar = botaoVoltar, .botaoVoltar2 = botaoVoltar2
+        .fundoMenu = bitmap.fundoMenu,
+        .botaoJogar = bitmap.botaoJogar, .botaoJogar2 = bitmap.botaoJogar2,
+        .botaoConfig = bitmap.botaoRegras, .botaoConfig2 = bitmap.botaoRegras2,
+        .botaoSair = bitmap.botaoSair, .botaoSair2 = bitmap.botaoSair2,
+        .abaConfig = bitmap.abaRegras,
+        .botaoVoltar = bitmap.botaoVoltar, .botaoVoltar2 = bitmap.botaoVoltar2
     };
 
     MenuLayout lay = {
@@ -176,10 +151,10 @@ int main() {
         .botaoVoltarX = botaoVoltarX, .botaoVoltarY = botaoVoltarY,
 
         .botaoJogarLargura = botaoJogarLargura, .botaoJogarAltura = botaoJogarAltura,
-        .botaoConfigLargura = botaoConfigLargura, .botaoConfigAltura = botaoConfigAltura,
+        .botaoConfigLargura = botaoRegrasLargura, .botaoConfigAltura = botaoRegrasAltura,
         .botaoSairLargura = botaoSairLargura, .botaoSairAltura = botaoSairAltura,
         .fundoMenuLargura = fundoMenuLargura, .fundoMenuAltura = fundoMenuAltura,
-        .abaConfigLargura = abaConfigLargura, .abaConfigAltura = abaConfigAltura,
+        .abaConfigLargura = abaRegrasLargura, .abaConfigAltura = abaRegrasAltura,
         .botaoVoltarLargura = botaoVoltarLargura, .botaoVoltarAltura = botaoVoltarAltura
     };
 
@@ -188,30 +163,7 @@ int main() {
     if (!jogando) {
         // Saiu pelo menu
         al_destroy_font(font);
-        al_destroy_bitmap(fundoMenu);
-        al_destroy_bitmap(botaoJogar);
-        al_destroy_bitmap(botaoJogar2);
-        al_destroy_bitmap(botaoConfig);
-        al_destroy_bitmap(botaoConfig2);
-        al_destroy_bitmap(botaoSair);
-        al_destroy_bitmap(botaoSair2);
-        al_destroy_bitmap(abaConfig);
-        al_destroy_bitmap(botaoVoltar);
-        al_destroy_bitmap(botaoVoltar2);
-        al_destroy_bitmap(sprite_andando_direita);
-        al_destroy_bitmap(sprite_andando_esquerda);
-        al_destroy_bitmap(cenario1);
-        al_destroy_bitmap(cenario2);
-        al_destroy_bitmap(projetilDireita);
-        al_destroy_bitmap(projetilEsquerda);
-        al_destroy_bitmap(zumbi_direita);
-        al_destroy_bitmap(zumbi_esquerda);
-        al_destroy_bitmap(sprite_atirando_direita);
-        al_destroy_bitmap(sprite_atirando_esquerda);
-        al_destroy_bitmap(rato_direita);
-        al_destroy_bitmap(rato_esquerda);
-        al_destroy_bitmap(mosquito_direita);
-        al_destroy_bitmap(mosquito_esquerda);
+        destruir_bitmaps(&bitmap);
         al_destroy_display(janela);
         al_destroy_event_queue(fila_eventos);
         al_destroy_timer(timer);
@@ -254,7 +206,10 @@ int main() {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
-            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS,zumbi_direita, zumbi_esquerda,rato_direita, rato_esquerda,mosquito_direita, mosquito_esquerda,posicaoCamera);
+            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS);
+            if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
+                atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
+            }
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
             redesenhar = true;
@@ -295,25 +250,55 @@ int main() {
         }
 
         // RESPAWN POR FASE
-        if (!verificarProgressoDaFase(&sistemaFase)) {
-            if (contarInimigosAtivos(inimigos, MAX_INIMIGOS) == 0) {
-                if (!spawn_ativo) {
-                    timer_spawn_inimigos = al_get_time();
-                    spawn_ativo = true;
+        if (!fase_boss_ativa) {
+            // Ciclo normal de hordas
+            if (!verificarProgressoDaFase(&sistemaFase)) {
+                if (contarInimigosAtivos(inimigos, MAX_INIMIGOS) == 0) {
+                    if (!spawn_ativo) {
+                        timer_spawn_inimigos = al_get_time(); // usa relógio do Allegro
+                        spawn_ativo = true;
+                    }
+                    else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
+                        inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
+                        aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual);
+                        spawn_ativo = false;
+                    }
                 }
-                else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
-                    inicializar_array_inimigos(inimigos, MAX_INIMIGOS,zumbi_direita, zumbi_esquerda,rato_direita, rato_esquerda,mosquito_direita, mosquito_esquerda,posicaoCamera);
-                    aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual);
+                else {
                     spawn_ativo = false;
                 }
             }
             else {
-                spawn_ativo = false;
+                // Meta da fase atingida: spawna boss uma única vez e entra em fase_boss_ativa
+                if (!boss_spawnado) {
+                    int idx_boss = -1;
+                    for (int i = 0; i < MAX_INIMIGOS; ++i) {
+                        if (!inimigos[i].ativo) { idx_boss = i; break; }
+                    }
+                    if (idx_boss < 0) idx_boss = 0;
+
+                    spawnar_boss(&inimigos[idx_boss], bitmap.boss_variola_direita, bitmap.boss_variola_esquerda, posicaoCamera);
+                    boss_spawnado = true;
+                    fase_boss_ativa = true;
+                    spawn_ativo = false; // pausa spawns comuns
+                }
             }
         }
         else {
-            avancarFase(&sistemaFase, inimigos);
-            spawn_ativo = false;
+            // Durante o boss: pausar novos spawns comuns e aguardar morte do boss
+            bool bossVivo = false;
+            for (int i = 0; i < MAX_INIMIGOS; ++i) {
+                if (inimigos[i].ativo && inimigos[i].tipo == TIPO_BOSS) {
+                    bossVivo = true; break;
+                }
+            }
+            if (!bossVivo) {
+                // Boss derrotado: avança fase e reseta estado para próximo ciclo de hordas
+                avancarFase(&sistemaFase, inimigos);
+                fase_boss_ativa = false;
+                boss_spawnado = false;
+                spawn_ativo = false;
+            }
         }
 
         // CAMERA
@@ -326,7 +311,7 @@ int main() {
             al_clear_to_color(cor);
 
             // cenário primeiro
-            desenhar_cenario(cenario1, cenario2, jogador.jogadorX, posicaoCamera);
+            desenhar_cenario(bitmap.cenario1, bitmap.cenario2, jogador.jogadorX, posicaoCamera);
 
             // Infecção
             desenhar_barra(barraFundo.infeccaoX, barraFundo.infeccaoY, barraFundo.infeccaoLargura, barraFundo.infeccaoAltura);
@@ -336,11 +321,11 @@ int main() {
             desenhar_caravana(caravana.caravanaX, caravana.caravanaY , caravana.caravaLargura, caravana.caravaAltura, corCaravana);
 
             // jogador e inimigos
-            desenhar_jogador(jogador, w, a, s, d, espaco,sprite_andando_direita, sprite_andando_esquerda,sprite_atirando_direita, sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
+            desenhar_jogador(jogador, w, a, s, d, espaco, bitmap.sprite_andando_direita, bitmap.sprite_andando_esquerda, bitmap.sprite_atirando_direita, bitmap.sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
             desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
             // tiros
-            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS,projetilDireita, projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase);
+            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase);
 
             // HUD (fixo na tela)
             char texto[100];
@@ -373,31 +358,7 @@ int main() {
     // LIMPEZA
     al_destroy_font(font);
 
-    // bitmaps menu
-    al_destroy_bitmap(fundoMenu);
-    al_destroy_bitmap(botaoJogar);
-    al_destroy_bitmap(botaoJogar2);
-    al_destroy_bitmap(botaoConfig);
-    al_destroy_bitmap(botaoConfig2);
-    al_destroy_bitmap(botaoSair);
-    al_destroy_bitmap(botaoSair2);
-    al_destroy_bitmap(abaConfig);
-    al_destroy_bitmap(botaoVoltar);
-    al_destroy_bitmap(botaoVoltar2);
-    al_destroy_bitmap(sprite_andando_direita);
-    al_destroy_bitmap(sprite_andando_esquerda);
-    al_destroy_bitmap(cenario1);
-    al_destroy_bitmap(cenario2);
-    al_destroy_bitmap(projetilDireita);
-    al_destroy_bitmap(projetilEsquerda);
-    al_destroy_bitmap(zumbi_direita);
-    al_destroy_bitmap(zumbi_esquerda);
-    al_destroy_bitmap(sprite_atirando_direita);
-    al_destroy_bitmap(sprite_atirando_esquerda);
-    al_destroy_bitmap(rato_direita);
-    al_destroy_bitmap(rato_esquerda);
-    al_destroy_bitmap(mosquito_direita);
-    al_destroy_bitmap(mosquito_esquerda);
+    destruir_bitmaps(&bitmap);
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);
     al_destroy_timer(timer);

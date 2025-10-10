@@ -25,6 +25,7 @@
     <ClCompile Include="caravana.c" />
     <ClCompile Include="cenario.c" />
     <ClCompile Include="colisao.c" />
+    <ClCompile Include="configuracoes.c" />
     <ClCompile Include="fases.c" />
     <ClCompile Include="infeccao.c" />
     <ClCompile Include="inimigo.c" />
