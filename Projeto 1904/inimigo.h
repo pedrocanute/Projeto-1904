@@ -3,13 +3,15 @@
 
 #include <stdbool.h>
 #include <allegro5/allegro.h>
+#include "personagem.h"
 
 #define MAX_INIMIGOS 20
 
 typedef enum {
     TIPO_ZUMBI,
     TIPO_RATO,
-    TIPO_MOSQUITO
+    TIPO_MOSQUITO,
+    TIPO_BOSS
 } TipoInimigo;
 
 typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que essa struct existe
@@ -45,5 +47,9 @@ void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade);
 int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 
 void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual);
+
+void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera);
+
+void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada);
 
 #endif

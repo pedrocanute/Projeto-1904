@@ -40,6 +40,13 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->frames_por_sprite = 6;
         inimigo->velocidade = 2.9f;
         break;
+    case TIPO_BOSS:  
+        inimigo->larguraBot = 220.0f;   
+        inimigo->alturaBot = 220.0f;
+        inimigo->frames_por_sprite = 15;
+        inimigo->velocidade = 2.0f;     
+        inimigo->vida = 50;             
+        break;
     }
 }
 
@@ -83,6 +90,8 @@ void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade) {
     for (int i = 0; i < quantidade; i++) {
         if (inimigos[i].ativo == false) 
             continue;
+        if (inimigos[i].tipo == TIPO_BOSS)
+            continue;
 
         inimigos[i].botX -= inimigos[i].velocidade;
 
@@ -95,23 +104,36 @@ void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade) {
 void desenhar_inimigo(Inimigo* inimigo, bool em_movimento) {
     if (inimigo->ativo == false) return;
 
-    ALLEGRO_BITMAP* sprite_atual = inimigo->sprite_esquerda;
+    // Escolhe sprite pela orientação
+    ALLEGRO_BITMAP* sprite_atual = inimigo->virado_direita ? inimigo->sprite_direita : inimigo->sprite_esquerda;
+
+    int num_colunas;
+    if (inimigo->tipo == TIPO_BOSS) { //Verifica se o inimigo eh o Boss ou inimigo normal (Boss tem 3 colunas na spritesheet ao inves de 2)
+        num_colunas = 3; 
+    }
+    else {
+        num_colunas = 2;
+    }
 
     if (em_movimento) {
         inimigo->contador_frame++;
         if (inimigo->contador_frame >= inimigo->frames_por_sprite) {
-            inimigo->frame_atual = (inimigo->frame_atual + 1) % 2;
+            inimigo->frame_atual = (inimigo->frame_atual + 1) % num_colunas;
             inimigo->contador_frame = 0;
         }
     }
 
-    int largura_frame = al_get_bitmap_width(sprite_atual) / 2;
+    int largura_total = al_get_bitmap_width(sprite_atual);
     int altura_frame = al_get_bitmap_height(sprite_atual);
+    int largura_frame = largura_total / num_colunas;
+
     int sx = inimigo->frame_atual * largura_frame;
     int sy = 0;
 
-    al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame, inimigo->botX, inimigo->botY, 0);
+    al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
+        inimigo->botX, inimigo->botY, 0);
 }
+
 
 void desenhar_todos_inimigos(Inimigo* inimigos, int quantidade) {
     for (int i = 0; i < quantidade; i++) {
@@ -150,4 +172,53 @@ void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
         inimigos[i].vida = inimigos[i].vida + vida;
         inimigos[i].velocidade *= velocidade;
     }
+}
+
+void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera) {
+
+    // Boss spawna mais à frente da câmera
+    float camera_direita = posicaoCamera[0] + 1280;
+    float spawn_x = camera_direita + 500;  // Mais distante que inimigos normais
+
+    // Boss spawna no centro vertical da tela
+    float spawn_y = (720 / 2) + 52;
+
+    inicializar_inimigo(inimigo, TIPO_BOSS, spawn_x, spawn_y, boss_dir, boss_esq);
+}
+
+void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada) {
+    if (!boss || !boss->ativo || boss->tipo != TIPO_BOSS) return;
+
+    if (boss->botY + boss->alturaBot >= 720)
+        boss->botY  = 720 - boss->alturaBot;
+   
+    float distanciaX = jogador->jogadorX - boss->botX;
+    float distanciaY = jogador->jogadorY - boss->botY;
+
+    // Vetor de distancia
+    float distanciaTotal = sqrtf(distanciaX * distanciaX + distanciaY * distanciaY);
+
+    // Se já está muito perto, para de avancar (evita tremedeira)
+    if (distanciaTotal <= distanciaParada) {
+        boss->em_movimento = false;
+        return;
+    }
+
+    // Normaliza direção (evita divisão por zero) - RECOMENDACAO DO GPT
+    float direcaoX = 0.0f;
+    float direcaoY = 0.0f;
+    if (distanciaTotal > 0.0001f) {
+        direcaoX = distanciaX / distanciaTotal;
+        direcaoY = distanciaY / distanciaTotal;
+    }
+
+    // Move em direção ao jogador
+    float velocidadeAtual = boss->velocidade;
+    boss->botX += direcaoX * velocidadeAtual;
+    boss->botY += direcaoY * velocidadeAtual;
+
+    // Atualiza estado para animação e orientação do sprite
+    boss->em_movimento = true;
+    boss->virado_direita = (direcaoX >= 0.0f);
+
 }

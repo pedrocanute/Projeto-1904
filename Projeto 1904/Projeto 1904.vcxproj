@@ -24,6 +24,7 @@
   <ItemGroup>
     <ClCompile Include="cenario.c" />
     <ClCompile Include="colisao.c" />
+    <ClCompile Include="configuracoes.c" />
     <ClCompile Include="fases.c" />
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="input.c" />
