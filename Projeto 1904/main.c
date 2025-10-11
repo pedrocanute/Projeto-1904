@@ -67,6 +67,8 @@ int main() {
     // BARRA INFECÇÃO
     Infeccao barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
     Infeccao barraInfeccao = { 75.0f, 50.0f, 75.0f, 100.0f };
+    float *infeccaoAtual = &barraInfeccao.infeccaoLargura;
+    float infeccaoMaxima = barraFundo.infeccaoLargura;
 
     //TIMER CARAVANA / BARRA INFECÇÃO
     float timer_regen_infeccao = 0.0f;
@@ -96,6 +98,8 @@ int main() {
     int abaRegrasAltura = al_get_bitmap_height(bitmap.abaRegras);
     int botaoVoltarLargura = al_get_bitmap_width(bitmap.botaoVoltar);
     int botaoVoltarAltura = al_get_bitmap_height(bitmap.botaoVoltar);
+    int telaGameOverLargura = al_get_bitmap_width(bitmap.telaGameOver);
+    int telaGameOverAltura = al_get_bitmap_height(bitmap.telaGameOver);
 
     int botaoJogarX = 200, botaoJogarY = 620;
     int botaoConfigX = 500, botaoConfigY = 620;
@@ -156,6 +160,12 @@ int main() {
         .fundoMenuLargura = fundoMenuLargura, .fundoMenuAltura = fundoMenuAltura,
         .abaConfigLargura = abaRegrasLargura, .abaConfigAltura = abaRegrasAltura,
         .botaoVoltarLargura = botaoVoltarLargura, .botaoVoltarAltura = botaoVoltarAltura
+    };
+
+    GameOver GameOver = {
+        .telaGameOver = bitmap.telaGameOver,
+        .telaGameOverLargura = telaGameOverLargura,
+        .telaGameOverAltura = telaGameOverAltura
     };
 
     // MENU PRINCIPAL
@@ -326,6 +336,9 @@ int main() {
 
             // tiros
             atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase);
+
+            // Game Over
+            desenhar_tela_gameOver(&GameOver, infeccaoAtual, infeccaoMaxima);
 
             // HUD (fixo na tela)
             char texto[100];

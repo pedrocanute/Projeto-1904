@@ -54,6 +54,8 @@ typedef struct {
     ALLEGRO_BITMAP* abaRegras;
     ALLEGRO_BITMAP* botaoVoltar;
     ALLEGRO_BITMAP* botaoVoltar2;
+    // Game Over
+    ALLEGRO_BITMAP* telaGameOver;
 } Bitmaps;
 
 bool carregar_bitmaps(Bitmaps* bitmap);
