@@ -5,15 +5,17 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include "configuracoes.h"
+#include "infeccao.h"
 
 
 typedef struct {
     bool* telaMenu;
     bool* jogando;
-    bool* configAberta;
+    bool* regrasAberta;
     bool* esc;
     bool* jogoPausado;
-} MenuFlags;
+    bool* fimDeJogo;
+} MenuEstados;
 
 typedef struct {
     ALLEGRO_EVENT_QUEUE* fila_eventos;
@@ -21,32 +23,46 @@ typedef struct {
     ALLEGRO_TRANSFORM* camera;
     float* mouseX;
     float* mouseY;
-} MenuIO;
+} MenuEvents;
 
 typedef struct {
     ALLEGRO_BITMAP* fundoMenu;
     ALLEGRO_BITMAP* botaoJogar;   ALLEGRO_BITMAP* botaoJogar2;
-    ALLEGRO_BITMAP* botaoConfig;  ALLEGRO_BITMAP* botaoConfig2;
+    ALLEGRO_BITMAP* botaoRegras;  ALLEGRO_BITMAP* botaoRegras2;
     ALLEGRO_BITMAP* botaoSair;    ALLEGRO_BITMAP* botaoSair2;
-    ALLEGRO_BITMAP* abaConfig;
+    ALLEGRO_BITMAP* abaRegras;
     ALLEGRO_BITMAP* botaoVoltar;  ALLEGRO_BITMAP* botaoVoltar2;
-} MenuBitmaps;
+} MenuImagens;
 
 typedef struct {
     int botaoJogarX, botaoJogarY;
-    int botaoConfigX, botaoConfigY;
+    int botaoRegrasX, botaoRegrasY;
     int botaoSairX, botaoSairY;
     int botaoVoltarX, botaoVoltarY;
     int botaoJogarLargura, botaoJogarAltura;
-    int botaoConfigLargura, botaoConfigAltura;
+    int botaoRegrasLargura, botaoRegrasAltura;
     int botaoSairLargura, botaoSairAltura;
     int fundoMenuLargura, fundoMenuAltura;
-    int abaConfigLargura, abaConfigAltura;
+    int abaRegrasLargura, abaRegrasAltura;
     int botaoVoltarLargura, botaoVoltarAltura;
-} MenuLayout;
+} MenuBotoes;
 
-void menu_principal(MenuFlags* flags, const MenuIO* io, const MenuBitmaps* bmp, const MenuLayout* lay);
+// Tela game over
+typedef struct {
+    ALLEGRO_BITMAP* telaGameOver;
+    ALLEGRO_BITMAP* botaoJogarNovamente;  ALLEGRO_BITMAP* botaoJogarNovamente2;
+    ALLEGRO_BITMAP* botaoSairDoJogo;  ALLEGRO_BITMAP* botaoSairDoJogo2;
+    int botaoJogarNovamenteX, botaoJogarNovamenteY;
+    int botaoSairDoJogoX, botaoSairDoJogoY;
+    int botaoJogarNovamenteLargura, botaoJogarNovamenteAltura;
+    int botaoSairDoJogoLargura, botaoSairDoJogoAltura;
+    int telaGameOverLargura, telaGameOverAltura;
+} GameOver;
 
-void menu_pausa(MenuFlags* flags, const MenuIO* io, const MenuBitmaps* bmp, const MenuLayout* lay);
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);
+
+void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);
+
+void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
 #endif 

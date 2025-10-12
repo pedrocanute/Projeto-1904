@@ -4,19 +4,15 @@
 #include <stdbool.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
-#include "configuracoes.h"
 
 typedef struct {
     float infeccaoX, infeccaoY, infeccaoLargura, infeccaoAltura;
 } Infeccao;
 
-// Tela game over
 typedef struct {
-    int telaGameOverLargura, telaGameOverAltura;
-    ALLEGRO_BITMAP* telaGameOver;
-} GameOver;
-
-void desenhar_tela_gameOver(GameOver* gameover, float *infeccaoAtual, float infeccaoMaxima);
+    float* infeccaoAtual;
+    float infeccaoMaxima;
+} InfeccaoEstagio;
 
 // Função barra de fundo
 void desenhar_barra(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura);

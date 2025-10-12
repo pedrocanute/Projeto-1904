@@ -20,10 +20,3 @@ void desenhar_barra(float infeccaoX, float infeccaoY, float infeccaoLargura, flo
 void desenhar_barra_infeccao(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura) {
     al_draw_filled_rectangle(infeccaoX, infeccaoY, infeccaoLargura, infeccaoAltura, al_map_rgb(0, 255, 0));
 };
-
-// Desenhar tela de game over ao atingir o limite de infecção
-void desenhar_tela_gameOver(GameOver* gameover, float *infeccaoAtual, float infeccaoMaxima) {
-    if (*infeccaoAtual >= infeccaoMaxima) {
-        al_draw_scaled_bitmap(gameover->telaGameOver, 0, 0, gameover->telaGameOverLargura, gameover->telaGameOverAltura, 0, 0, WIDTH, HEIGHT, 0);
-    }
-}
