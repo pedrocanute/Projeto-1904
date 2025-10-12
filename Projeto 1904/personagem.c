@@ -55,9 +55,9 @@ void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocid
     }
 }
 
-void restringirPosicao(Jogador* p, float WIDTH, float HEIGHT, float larguraJogador, float alturaJogador) {
-    if (p->jogadorX < 0) 
-        p->jogadorX = 0;
+void restringirPosicao(Jogador* p, Caravana* caravana, float WIDTH, float HEIGHT, float larguraJogador, float alturaJogador) {
+    if (p->jogadorX < caravana->caravanaX + caravana->caravanaLargura) 
+        p->jogadorX = caravana->caravanaX + caravana->caravanaLargura;
     if (p->jogadorY < 0) 
         p->jogadorY = 0;
 

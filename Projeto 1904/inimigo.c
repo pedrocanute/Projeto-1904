@@ -85,7 +85,7 @@ void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMA
     }
 }
 
-void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade) {
+void atualizar_movimento_inimigos(Caravana* caravana,Inimigo* inimigos, int quantidade) {
 
     for (int i = 0; i < quantidade; i++) {
         if (inimigos[i].ativo == false)
@@ -95,8 +95,8 @@ void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade) {
 
         inimigos[i].botX -= inimigos[i].velocidade;
 
-        if (inimigos[i].botX < 0) {
-            inimigos[i].botX = 0;
+        if (inimigos[i].botX < caravana->caravanaX) {
+            inimigos[i].botX = caravana->caravanaX;
         }
     }
 }

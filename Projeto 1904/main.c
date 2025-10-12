@@ -62,7 +62,7 @@ int main() {
     Jogador jogador = { 120.0f, 520.0f, true, false };
 
     // CARAVANA
-    Caravana caravana = { 0.0f, 412.0f, caravana.caravanaX + 80, caravana.caravanaY + 320};
+    Caravana caravana = { 0.0f, 412.0f, 80.0f, 732.0f, 1.0f};
 
     // BARRA INFECÇÃO
     Infeccao barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
@@ -204,15 +204,17 @@ int main() {
         // ATUALIZAÇÃO DE JOGO (quando não pausado)
         if (event.type == ALLEGRO_EVENT_TIMER && esc == false) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
-            restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
+            restringirPosicao(&jogador, &caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
-            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS);
+            atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
             if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
                 atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
             }
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
             redesenhar = true;
+
+            atualizar_movimento_caravana(&caravana);
         }
 
         // COLISÃO
@@ -231,7 +233,7 @@ int main() {
         bool intangibilidadeAtiva = false;
         for (int i = 0; i < MAX_INIMIGOS; i++) {
             if(!intangibilidadeAtiva && al_get_time() - timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
-                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravaLargura, caravana.caravaAltura) && barraInfeccao.infeccaoLargura < 400) {
+                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravanaLargura, caravana.caravanaAltura) && barraInfeccao.infeccaoLargura < 400) {
                     colisaoCaravana = true;
                     barraInfeccao.infeccaoLargura += 10;
                     timer_regen_infeccao = al_get_time();
@@ -314,11 +316,11 @@ int main() {
             desenhar_cenario(bitmap.cenario1, bitmap.cenario2, jogador.jogadorX, posicaoCamera);
 
             // Infecção
-            desenhar_barra(barraFundo.infeccaoX, barraFundo.infeccaoY, barraFundo.infeccaoLargura, barraFundo.infeccaoAltura);
-            desenhar_barra_infeccao(barraInfeccao.infeccaoX, barraInfeccao.infeccaoY, barraInfeccao.infeccaoLargura, barraInfeccao.infeccaoAltura);
+            desenhar_barra(barraFundo.infeccaoX, barraFundo.infeccaoY, barraFundo.infeccaoLargura, barraFundo.infeccaoAltura, posicaoCamera);
+            desenhar_barra_infeccao(barraInfeccao.infeccaoX, barraInfeccao.infeccaoY, barraInfeccao.infeccaoLargura, barraInfeccao.infeccaoAltura, posicaoCamera);
 
             // caravana
-            desenhar_caravana(caravana.caravanaX, caravana.caravanaY , caravana.caravaLargura, caravana.caravaAltura, corCaravana);
+            desenhar_caravana(caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
 
             // jogador e inimigos
             desenhar_jogador(jogador, w, a, s, d, espaco, bitmap.sprite_andando_direita, bitmap.sprite_andando_esquerda, bitmap.sprite_atirando_direita, bitmap.sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);

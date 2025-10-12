@@ -42,7 +42,7 @@ void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMA
 void desenhar_todos_inimigos(Inimigo* inimigos, int quantidade);
 
 // ATUALIZA DE ACORDO COM A CAMERA
-void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade);
+void atualizar_movimento_inimigos(Caravana* caravana, Inimigo* inimigos, int quantidade);
 
 int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 

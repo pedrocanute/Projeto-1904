@@ -10,10 +10,10 @@ typedef struct {
 } Infeccao;
 
 // Função barra de fundo
-void desenhar_barra(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura);
+void desenhar_barra(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura, float* posicaoCAmera);
 
 // Função barra de infecção
-void desenhar_barra_infeccao(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura);
+void desenhar_barra_infeccao(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura, float* posicaoCamera);
 /*
 // Funções jogador
 void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocidade, int* frames_por_sprite);
