@@ -14,7 +14,7 @@ typedef struct {
     float caravanaVelocidade;
 } Caravana;
 
-void desenhar_caravana(float caravanaX, float caravanaY, float caravanaLargura, float caravanaAltura, ALLEGRO_COLOR corCaravana);
+void desenhar_caravana(ALLEGRO_BITMAP* sprite_soldado, float caravanaX, float caravanaY, float caravanaLargura, float caravanaAltura, ALLEGRO_COLOR corCaravana);
 
 void atualizar_movimento_caravana(Caravana* caravana);
 #endif

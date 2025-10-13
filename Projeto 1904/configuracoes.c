@@ -24,6 +24,8 @@ bool carregar_bitmaps(Bitmaps* bitmap) {
     bitmap->sprite_atirando_direita = carregar("imagens/AtirandoDireita.png");
     bitmap->sprite_atirando_esquerda = carregar("imagens/AtirandoEsquerda.png");
 
+    bitmap->soldado = carregar("imagens/SoldadoAndando.png");
+
     bitmap->projetilDireita = carregar("imagens/VacinaProjetilDireita.png");
     bitmap->projetilEsquerda = carregar("imagens/VacinaProjetilEsquerda.png");
 
@@ -65,6 +67,7 @@ void destruir_bitmaps(Bitmaps* bitmap) {
     destruir_um(&bitmap->sprite_atirando_esquerda);
     destruir_um(&bitmap->projetilDireita);
     destruir_um(&bitmap->projetilEsquerda);
+    destruir_um(&bitmap->soldado);
     destruir_um(&bitmap->cenario1);
     destruir_um(&bitmap->cenario2);
     destruir_um(&bitmap->fundoMenu);

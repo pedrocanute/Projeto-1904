@@ -62,7 +62,7 @@ int main() {
     Jogador jogador = { 120.0f, 520.0f, true, false };
 
     // CARAVANA
-    Caravana caravana = { 0.0f, 412.0f, 80.0f, 732.0f, 1.0f };
+    Caravana caravana = { 0.0f, 305.0f, 80.0f, 732.0f, 1.0f };
 
     // BARRA INFECÇÃO
     Barra barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
@@ -215,7 +215,6 @@ int main() {
             atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
             if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
                 atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
-                
                 // Posiciona a barra de vida do boss
                 barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2; // Centralize a barra de vida em relação ao boss
                 barraVidaBoss.barraY = inimigos[0].botY - 30;
@@ -235,19 +234,11 @@ int main() {
             atualizar_movimento_caravana(&caravana);
         }
 
-        // COLISÃO
-        // Colisão de jogador com inimigo
-        bool colidiu = false;
-        for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (colisao_jogador_inimigo(&inimigos[i], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
-                colidiu = true;
-                break;
-            }
-        }
-        cor = colidiu ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
-
         //Colisão de inimigo com caravana / Intangibilidade
         bool colisaoCaravana = false;
+        float dano_na_caravana = 0.0f;
+        ALLEGRO_COLOR corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco;
+
         for (int i = 0; i < MAX_INIMIGOS; i++) {
             if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravanaLargura, caravana.caravanaAltura) && barraInfeccao.barraLargura < 400) {
                 float tempoAtual = al_get_time();
@@ -256,10 +247,19 @@ int main() {
                     barraInfeccao.barraLargura += inimigos[i].dano;
                     timer_regen_infeccao = tempoAtual;
                     inimigos[i].timer_intangibilidade = tempoAtual;
+
+                    dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
+                    
+                    if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
+                        corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                    }
+                    else {
+                        corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                    }
                 }
             }
         }
-        corCaravana = colisaoCaravana ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
+       
 
         //Regeneração de Vida
         // !!!!!!!!!Compara se não há colisão e se a caravana levou dano!!!!!!!!!
@@ -347,7 +347,7 @@ int main() {
                 desenhar_barra_vida_boss(barraVidaBoss.barraX, barraVidaBoss.barraY, barraVidaBoss.barraLargura, barraVidaBoss.barraAltura);
             };
             // caravana
-            desenhar_caravana(caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
+            desenhar_caravana(bitmap.soldado, caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
 
             // jogador e inimigos
             desenhar_jogador(jogador, w, a, s, d, espaco, bitmap.sprite_andando_direita, bitmap.sprite_andando_esquerda, bitmap.sprite_atirando_direita, bitmap.sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
