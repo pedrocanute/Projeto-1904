@@ -1,24 +1,22 @@
 #include "projetil.h"
-#include "inimigo.h"
+#include "fases.h"
 
-void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera) {
+void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss) {
 
     const float projetilTimer = al_get_time();
 
     // CRIAR PROJÉTEIS
     if (espaco && projetilTimer >= pp->proxProjetil) {
         for (int i = 0; i < 50; i++) {
-            if (pp->projetilAtivo[i] == false) {
+            if (!pp->projetilAtivo[i]) {
                 pp->projetilX[i] = jogador.jogadorX;
                 pp->projetilY[i] = jogador.jogadorY + (alturaJogador / 2) - (projetilAltura / 2);
                 pp->projetilAtivo[i] = true;
 
-                if (jogador.paraDireita) {
+                if (jogador.paraDireita)      
                     pp->projetilDirecao[i] = +projetilVelocidade;
-                }
-                else if (jogador.paraEsquerda) {
+                else if (jogador.paraEsquerda) 
                     pp->projetilDirecao[i] = -projetilVelocidade;
-                }
 
                 pp->proxProjetil = projetilTimer + projetilCadencia;
                 break;
@@ -32,29 +30,31 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
             pp->projetilX[i] += pp->projetilDirecao[i];
 
             // DESENHAR PROJÉTIL
-            if (pp->projetilDirecao[i] > 0) {
+            if (pp->projetilDirecao[i] > 0)  
                 al_draw_bitmap(projetilDireita, pp->projetilX[i], pp->projetilY[i], 0);
-            }
-            else {
+            else 
                 al_draw_bitmap(projetilEsquerda, pp->projetilX[i], pp->projetilY[i], 0);
-            }
 
-            // VERIFICAR COLISÃO COM TODOS OS INIMIGOS
+            // VERIFICAR COLISÃO COM TODOS OS INIMIGOS 
             bool colidiu = false;
             for (int j = 0; j < numInimigos; j++) {
                 if (!inimigos[j].ativo) continue;
 
-                if (pp->projetilX[i] + projetilLargura >= inimigos[j].botX && pp->projetilY[i] + projetilAltura >= inimigos[j].botY && pp->projetilX[i] <= inimigos[j].botX + inimigos[j].larguraBot && pp->projetilY[i] <= inimigos[j].botY + inimigos[j].alturaBot) {
-
-                    // SISTEMA DE VIDA
+                if (colisao_projetil_inimigo(pp->projetilX[i], pp->projetilY[i], projetilLargura, projetilAltura, &inimigos[j])) {
+                    // SISTEMA DE VIDA E “MORTE” 
                     inimigos[j].vida--;
-
-                    // Só mata se a vida chegar a 0
                     if (inimigos[j].vida <= 0) {
+                        
                         inimigos[j].ativo = false;
+                        sistemaFase->inimigosMortos++;
                     }
 
-                    pp->projetilAtivo[i] = false; // Projétil desaparece
+                    // Atualize a barra de vida do boss apenas se o inimigo for o boss
+                    if (inimigos[j].tipo == TIPO_BOSS) {
+                        barraVidaBoss->barraVida -= 6;
+                    }
+
+                    pp->projetilAtivo[i] = false;
                     colidiu = true;
                     break;
                 }
@@ -63,7 +63,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
             if (colidiu) {
                 pp->projetilAtivo[i] = false;
             }
-            // VERIFICA LIMITES DA CAMERA
+            // VERIFICA LIMITES DA CÂMERA
             else if (pp->projetilX[i] < posicaoCamera[0] - 100 || pp->projetilX[i] > posicaoCamera[0] + width + 100) {
                 pp->projetilAtivo[i] = false;
             }

@@ -22,20 +22,31 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="caravana.c" />
     <ClCompile Include="cenario.c" />
+    <ClCompile Include="colisao.c" />
+    <ClCompile Include="configuracoes.c" />
+    <ClCompile Include="fases.c" />
+    <ClCompile Include="infeccao.c" />
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="menu.c" />
     <ClCompile Include="personagem.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="projetil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="caravana.h" />
     <ClInclude Include="cenario.h" />
+    <ClInclude Include="colisao.h" />
     <ClInclude Include="configuracoes.h" />
+    <ClInclude Include="fases.h" />
+    <ClInclude Include="infeccao.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="personagem.h" />
     <ClInclude Include="projetil.h" />
   </ItemGroup>
