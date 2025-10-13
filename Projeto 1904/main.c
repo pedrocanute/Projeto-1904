@@ -68,9 +68,6 @@ int main() {
     Barra barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
     Barra barraInfeccao = { 75.0f, 50.0f, 75.0f, 100.0f };
 
-    // BARRA VIDA PERSONAGEM
-    Barra barraVidaPersonagem = { 75.0f, 50.0f, 400.0f, 100.0f };
-
     // BARRA VIDA BOSS
     BarraBoss barraVidaBossFundo = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     BarraBoss barraVidaBoss = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -216,7 +213,9 @@ int main() {
             if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
                 atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
                 // Posiciona a barra de vida do boss
-                barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2; // Centralize a barra de vida em relação ao boss
+
+                // BARRA DE VIDA DO BOSS
+                barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2; // Centraliza a barra de vida em relação ao boss
                 barraVidaBoss.barraY = inimigos[0].botY - 30;
                 barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida; 
                 barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
@@ -230,31 +229,56 @@ int main() {
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, caravana.caravanaX, caravana.caravanaVelocidade);
             redesenhar = true;
-
-            atualizar_movimento_caravana(&caravana);
+            if (!fase_boss_ativa) {
+                atualizar_movimento_caravana(&caravana);
+            }
         }
 
-        //Colisão de inimigo com caravana / Intangibilidade
+        //Colisão de inimigo com caravana / Intangibilidade / colisão boss com personagem
         bool colisaoCaravana = false;
         float dano_na_caravana = 0.0f;
         ALLEGRO_COLOR corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco;
 
-        for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravanaLargura, caravana.caravanaAltura) && barraInfeccao.barraLargura < 400) {
-                float tempoAtual = al_get_time();
-                if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
-                    colisaoCaravana = true;
-                    barraInfeccao.barraLargura += inimigos[i].dano;
-                    timer_regen_infeccao = tempoAtual;
-                    inimigos[i].timer_intangibilidade = tempoAtual;
+        if (fase_boss_ativa) {
+            for (int i = 0; i < MAX_INIMIGOS; i++) {
+                if (colisao_jogador_inimigo(&inimigos[0], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
+                    float tempoAtual = al_get_time();
+                    if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
+                        colisaoCaravana = true;
+                        barraInfeccao.barraLargura += inimigos[i].dano;
+                        timer_regen_infeccao = tempoAtual;
+                        inimigos[i].timer_intangibilidade = tempoAtual;
 
-                    dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
-                    
-                    if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
-                        corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                        dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
+
+                        if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
+                            corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                        }
+                        else {
+                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                        }
                     }
-                    else {
-                        corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                }
+            }
+        }
+        else{
+            for (int i = 0; i < MAX_INIMIGOS; i++) {
+                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravanaLargura, caravana.caravanaAltura) && barraInfeccao.barraLargura < 400) {
+                    float tempoAtual = al_get_time();
+                    if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
+                        colisaoCaravana = true;
+                        barraInfeccao.barraLargura += inimigos[i].dano;
+                        timer_regen_infeccao = tempoAtual;
+                        inimigos[i].timer_intangibilidade = tempoAtual;
+
+                        dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
+
+                        if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
+                            corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                        }
+                        else {
+                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                        }
                     }
                 }
             }
@@ -335,11 +359,6 @@ int main() {
             // Infecção
             desenhar_barra(barraFundo.barraX + posicaoCamera[0], barraFundo.barraY, barraFundo.barraLargura + posicaoCamera[0], barraFundo.barraAltura);
             desenhar_barra_infeccao(barraInfeccao.barraX, barraInfeccao.barraY, barraInfeccao.barraLargura, barraInfeccao.barraAltura, posicaoCamera);
-
-            // BARRA DE VIDA DO PERSONAGEM
-            if (fase_boss_ativa) {
-                desenhar_barra_vida_personagem(barraVidaPersonagem.barraX, barraVidaPersonagem.barraY, barraVidaPersonagem.barraLargura, barraVidaPersonagem.barraAltura, posicaoCamera);
-            };
 
             // BARRA DE VIDA DO BOSS
             if (fase_boss_ativa) {
