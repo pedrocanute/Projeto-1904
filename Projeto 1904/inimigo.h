@@ -30,6 +30,10 @@ typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que es
     ALLEGRO_BITMAP* sprite_esquerda;
 
     float velocidade;
+
+    // Variáveis de dano
+    float dano;
+    float timer_intangibilidade;
 } Inimigo;
 
 void desenhar_inimigo(Inimigo* inimigo, bool em_movimento);

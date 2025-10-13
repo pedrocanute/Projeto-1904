@@ -141,9 +141,9 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
     }
 }
 
-void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador) {
+void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador, float caravanaX, float caravanaVelocidade) {
     posicaoCamera[0] = jogador.jogadorX - (larguraTela / 2) + (larguraJogador / 2);
 
-    if (posicaoCamera[0] < 0)
-        posicaoCamera[0] = 0;
+    if (posicaoCamera[0] < caravanaX + caravanaVelocidade)
+        posicaoCamera[0] = caravanaX + caravanaVelocidade;
 }

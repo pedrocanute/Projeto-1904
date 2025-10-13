@@ -73,8 +73,7 @@ int main() {
     const float TEMPO_REGEN_INFECCAO = 5.0f;
 
     //INTANGIBILIDADE
-    float timer_intangibilidade = 0.0f;
-    const float TEMPO_INTANGIBILIDADE = 1.0f;
+    const float TEMPO_INTANGIBILIDADE = 0.7f;
 
     // ANIMAÇÃO
     int  frame_atual = 0;
@@ -211,7 +210,7 @@ int main() {
                 atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
             }
 
-            camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
+            camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, caravana.caravanaX, caravana.caravanaVelocidade);
             redesenhar = true;
 
             atualizar_movimento_caravana(&caravana);
@@ -230,16 +229,14 @@ int main() {
 
         //Colisão de inimigo com caravana / Intangibilidade
         bool colisaoCaravana = false;
-        bool intangibilidadeAtiva = false;
         for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if(!intangibilidadeAtiva && al_get_time() - timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
-                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravanaLargura, caravana.caravanaAltura) && barraInfeccao.infeccaoLargura < 400) {
+            if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravanaLargura, caravana.caravanaAltura) && barraInfeccao.infeccaoLargura < 400) {
+                float tempoAtual = al_get_time();
+                if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
                     colisaoCaravana = true;
-                    barraInfeccao.infeccaoLargura += 10;
-                    timer_regen_infeccao = al_get_time();
-                    timer_intangibilidade = al_get_time();
-                    intangibilidadeAtiva = true;
-                    break;
+                    barraInfeccao.infeccaoLargura += inimigos[i].dano;
+                    timer_regen_infeccao = tempoAtual;
+                    inimigos[i].timer_intangibilidade = tempoAtual;
                 }
             }
         }

@@ -21,6 +21,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
     inimigo->em_movimento = true;
     inimigo->ativo = true;
     inimigo->vida = 1;
+    inimigo->timer_intangibilidade = 0.0f;
 
     // ATRIBUTOS DOS INIMIGOS
     switch (tipo) {
@@ -28,17 +29,20 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->larguraBot = 60.0f;
         inimigo->alturaBot = 80.0f;
         inimigo->velocidade = 2.5f;
+        inimigo->dano = 5.0f;
         break;
     case TIPO_RATO:
         inimigo->larguraBot = 60.0f;
         inimigo->alturaBot = 50.0f;
         inimigo->velocidade = 2.8f;
+        inimigo->dano = 3.0f;
         break;
     case TIPO_MOSQUITO:
         inimigo->larguraBot = 80.0f;
         inimigo->alturaBot = 80.0f;
         inimigo->frames_por_sprite = 6;
         inimigo->velocidade = 2.9f;
+        inimigo->dano = 2.0f;
         break;
     case TIPO_BOSS:
         inimigo->larguraBot = 220.0f;
@@ -46,6 +50,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->frames_por_sprite = 15;
         inimigo->velocidade = 2.0f;
         inimigo->vida = 50;
+        inimigo->dano = 10;
         break;
     }
 }
@@ -153,15 +158,18 @@ int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos) {
 void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
     int vida = 0;
     float velocidade = 1.0f;
+    float dano = 0;
 
     switch (faseAtual) {
     case FASE_2:
         vida = 1;
         velocidade = 1.50f;
+        dano = 2;
         break;
     case FASE_3:
         vida = 2;
         velocidade = 2.00f;
+        dano = 3;
         break;
     default:
         break;
@@ -171,6 +179,7 @@ void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
 
         inimigos[i].vida = inimigos[i].vida + vida;
         inimigos[i].velocidade *= velocidade;
+        inimigos[i].dano *= dano;
     }
 }
 
