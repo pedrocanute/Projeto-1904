@@ -1,7 +1,7 @@
 #include "projetil.h"
 #include "fases.h"
 
-void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase) {
+void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, ALLEGRO_BITMAP* projetilDireita, ALLEGRO_BITMAP* projetilEsquerda, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss) {
 
     const float projetilTimer = al_get_time();
 
@@ -49,6 +49,10 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                         sistemaFase->inimigosMortos++;
                     }
 
+                    // Atualize a barra de vida do boss apenas se o inimigo for o boss
+                    if (inimigos[j].tipo == TIPO_BOSS) {
+                        barraVidaBoss->barraVida -= 6;
+                    }
 
                     pp->projetilAtivo[i] = false;
                     colidiu = true;

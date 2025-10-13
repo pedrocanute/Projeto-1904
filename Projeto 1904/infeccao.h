@@ -9,6 +9,10 @@ typedef struct {
     float barraX, barraY, barraLargura, barraAltura;
 } Barra;
 
+typedef struct {
+    float barraX, barraY, barraLargura, barraAltura, barraVida;
+} BarraBoss;
+
 // FUNÇÃO FUNDO DA BARRA DO PERSONAGEM / CARAVANA
 void desenhar_barra(float barraX, float barraY, float barraLargura, float barraAltura);
 
@@ -16,7 +20,7 @@ void desenhar_barra(float barraX, float barraY, float barraLargura, float barraA
 void desenhar_barra_infeccao(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura, float* posicaoCamera);
 
 // FUNÇÃO BARRA DE VIDA DO PERSONAGEM
-//void desenhar_barra_vida_personagem(float vidaX, float vidaY, float vidaLargura, float vidaAltura);
+void desenhar_barra_vida_personagem(float vidaX, float vidaY, float vidaLargura, float vidaAltura, float* posicaoCamera);
 
 // FUNÇÃO FUNDO DA BARRA DE VIDA DO BOSS
 void desenhar_fundo_barra_vida_boss(float vidaX, float vidaY, float vidaLargura, float vidaAltura);

@@ -69,12 +69,11 @@ int main() {
     Barra barraInfeccao = { 75.0f, 50.0f, 75.0f, 100.0f };
 
     // BARRA VIDA PERSONAGEM
+    Barra barraVidaPersonagem = { 75.0f, 50.0f, 400.0f, 100.0f };
 
     // BARRA VIDA BOSS
-    float barraVidaBossLargura = 300;
-    float barraVidaBossAltura = 25;
-    Barra barraVidaBossFundo = { 0.0f, 0.0f, 0.0f, 0.0f };
-    Barra barraVidaBoss = {0.0f, 0.0f, 0.0f, 0.0f};
+    BarraBoss barraVidaBossFundo = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    BarraBoss barraVidaBoss = {0.0f, 0.0f, 0.0f, 0.0f};
 
     //TIMER CARAVANA / BARRA INFECÇÃO
     float timer_regen_infeccao = 0.0f;
@@ -216,17 +215,18 @@ int main() {
             atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
             if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
                 atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
+                
                 // Posiciona a barra de vida do boss
-                barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - barraVidaBossLargura) / 2; // Centralize a barra de vida em relação ao boss
+                barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2; // Centralize a barra de vida em relação ao boss
                 barraVidaBoss.barraY = inimigos[0].botY - 30;
-                barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBossLargura; 
-                barraVidaBoss.barraAltura = barraVidaBoss.barraY + barraVidaBossAltura;
+                barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida; 
+                barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
 
                 // Posiciona o FUNDO da barra de vida do boss
-                barraVidaBossFundo.barraX = inimigos[0].botX + (inimigos[0].larguraBot - barraVidaBossLargura) / 2;
+                barraVidaBossFundo.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2;
                 barraVidaBossFundo.barraY = inimigos[0].botY - 30;
-                barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + barraVidaBossLargura;
-                barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + barraVidaBossAltura;
+                barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + 300;
+                barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + 25;
             }; 
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, caravana.caravanaX, caravana.caravanaVelocidade);
@@ -299,6 +299,7 @@ int main() {
                     boss_spawnado = true;
                     fase_boss_ativa = true;
                     spawn_ativo = false; // pausa spawns comuns
+                    barraVidaBoss.barraVida = 300.0f;
                 }
             }
         }
@@ -335,11 +336,16 @@ int main() {
             desenhar_barra(barraFundo.barraX + posicaoCamera[0], barraFundo.barraY, barraFundo.barraLargura + posicaoCamera[0], barraFundo.barraAltura);
             desenhar_barra_infeccao(barraInfeccao.barraX, barraInfeccao.barraY, barraInfeccao.barraLargura, barraInfeccao.barraAltura, posicaoCamera);
 
+            // BARRA DE VIDA DO PERSONAGEM
+            if (fase_boss_ativa) {
+                desenhar_barra_vida_personagem(barraVidaPersonagem.barraX, barraVidaPersonagem.barraY, barraVidaPersonagem.barraLargura, barraVidaPersonagem.barraAltura, posicaoCamera);
+            };
+
             // BARRA DE VIDA DO BOSS
             if (fase_boss_ativa) {
                 desenhar_fundo_barra_vida_boss(barraVidaBossFundo.barraX, barraVidaBossFundo.barraY, barraVidaBossFundo.barraLargura, barraVidaBossFundo.barraAltura);
                 desenhar_barra_vida_boss(barraVidaBoss.barraX, barraVidaBoss.barraY, barraVidaBoss.barraLargura, barraVidaBoss.barraAltura);
-            }
+            };
             // caravana
             desenhar_caravana(caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
 
@@ -348,7 +354,7 @@ int main() {
             desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
             // tiros
-            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase);
+            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase, &barraVidaBoss);
 
             // HUD (fixo na tela)
             char texto[100];
