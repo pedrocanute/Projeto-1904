@@ -32,7 +32,7 @@ int main() {
     bool jogoPausado = false;
     bool redesenhar = false;
 
-    bool w = false, a = false, s = false, d = false, espaco = false, shift = false, esc = false;
+    bool w = false, a = false, s = false, d = false, espaco = false, shift = false, esc = false, num1 = false, num2 = false, num3 = false;
     float mouseX = 0.0f, mouseY = 0.0f;
 
     ProjetilPosicao projetil = { 0 };
@@ -60,7 +60,21 @@ int main() {
 
     // JOGADOR
     Jogador jogador = { 120.0f, 520.0f, true, false };
-
+    SpritesJogador spritesJogador = {
+    .sprite_andando_direita = bitmap.sprite_andando_direita,
+    .sprite_andando_esquerda = bitmap.sprite_andando_esquerda,
+    .sprite_atirando_direita = bitmap.sprite_atirando_direita,
+    .sprite_atirando_esquerda = bitmap.sprite_atirando_esquerda,
+    .sprite_andando_direita_vassoura = bitmap.sprite_andando_direita_vassoura,
+    .sprite_andando_esquerda_vassoura = bitmap.sprite_andando_esquerda_vassoura,
+    .atacando_vassoura_direita = bitmap.atacando_vassoura_direita,
+    .atacando_vassoura_esquerda = bitmap.atacando_vassoura_esquerda,
+    .sprite_andando_direita_veneno = bitmap.sprite_andando_direita_veneno,
+    .sprite_andando_esquerda_veneno = bitmap.sprite_andando_esquerda_veneno,
+    .atacando_veneno_direita = bitmap.atacando_veneno_direita,
+    .atacando_veneno_esquerda = bitmap.atacando_veneno_esquerda
+    };
+    projetil.tipo = ARMA_VACINA;
     // CARAVANA
     Caravana caravana = { 0.0f, 305.0f, 80.0f, 732.0f, 1.0f };
 
@@ -186,9 +200,21 @@ int main() {
 
         // TECLADO
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
-            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc);
+            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc, &num1, &num2, &num3);
             if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 esc = true;
+            }
+
+            if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+                if (event.keyboard.keycode == ALLEGRO_KEY_1) {
+                    trocar_arma(&projetil, ARMA_VASSOURA);
+                }
+                else if (event.keyboard.keycode == ALLEGRO_KEY_2) {
+                    trocar_arma(&projetil, ARMA_VENENO);
+                }
+                else if (event.keyboard.keycode == ALLEGRO_KEY_3) {
+                    trocar_arma(&projetil, ARMA_VACINA);
+                }
             }
         }
 
@@ -369,7 +395,8 @@ int main() {
             desenhar_caravana(bitmap.soldado, caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
 
             // jogador e inimigos
-            desenhar_jogador(jogador, w, a, s, d, espaco, bitmap.sprite_andando_direita, bitmap.sprite_andando_esquerda, bitmap.sprite_atirando_direita, bitmap.sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
+            desenhar_jogador(jogador, w, a, s, d, espaco,&spritesJogador, projetil.tipo,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
+            desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
             desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
             // tiros

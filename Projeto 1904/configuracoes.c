@@ -21,11 +21,19 @@ bool carregar_bitmaps(Bitmaps* bitmap) {
 
     bitmap->sprite_andando_direita = carregar("imagens/AndandoDireita.png");
     bitmap->sprite_andando_esquerda = carregar("imagens/AndandoEsquerda.png");
+    bitmap->sprite_andando_direita_vassoura = carregar("imagens/AndandoDireitaVassoura.png");
+    bitmap->sprite_andando_esquerda_vassoura = carregar("imagens/AndandoEsquerdaVassoura.png");
+    bitmap->sprite_andando_direita_veneno = carregar("imagens/AndandoDireitaVeneno.png");
+    bitmap->sprite_andando_esquerda_veneno = carregar("imagens/AndandoEsquerdaVeneno.png");
     bitmap->sprite_atirando_direita = carregar("imagens/AtirandoDireita.png");
     bitmap->sprite_atirando_esquerda = carregar("imagens/AtirandoEsquerda.png");
 
     bitmap->soldado = carregar("imagens/SoldadoAndando.png");
 
+    bitmap->atacando_vassoura_direita = carregar("imagens/AtacandoVassouraDireita.png");
+    bitmap->atacando_vassoura_esquerda = carregar("imagens/AtacandoVassouraEsquerda.png");
+    bitmap->atacando_veneno_direita = carregar("imagens/AtacandoVenenoDireita.png");
+    bitmap->atacando_veneno_esquerda = carregar("imagens/AtacandoVenenoEsquerda.png");
     bitmap->projetilDireita = carregar("imagens/VacinaProjetilDireita.png");
     bitmap->projetilEsquerda = carregar("imagens/VacinaProjetilEsquerda.png");
 
@@ -65,8 +73,16 @@ void destruir_bitmaps(Bitmaps* bitmap) {
     destruir_um(&bitmap->sprite_andando_esquerda);
     destruir_um(&bitmap->sprite_atirando_direita);
     destruir_um(&bitmap->sprite_atirando_esquerda);
+    destruir_um(&bitmap->sprite_andando_direita_vassoura);
+    destruir_um(&bitmap->sprite_andando_esquerda_vassoura);
+    destruir_um(&bitmap->sprite_andando_direita_veneno);
+    destruir_um(&bitmap->sprite_andando_esquerda_veneno);
     destruir_um(&bitmap->projetilDireita);
     destruir_um(&bitmap->projetilEsquerda);
+    destruir_um(&bitmap->atacando_vassoura_direita);
+    destruir_um(&bitmap->atacando_vassoura_esquerda);
+    destruir_um(&bitmap->atacando_veneno_direita);
+    destruir_um(&bitmap->atacando_veneno_esquerda);
     destruir_um(&bitmap->soldado);
     destruir_um(&bitmap->cenario1);
     destruir_um(&bitmap->cenario2);

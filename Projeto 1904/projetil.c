@@ -70,3 +70,45 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
         }
     }
 }
+
+void inicializar_armas(ProjetilPosicao* arma, Arma tipo_arma, float x, float y, ALLEGRO_BITMAP* sprite_esq, ALLEGRO_BITMAP* sprite_dir) {
+    
+    arma->tipo = tipo_arma;
+    arma->proxProjetil = 0.0f;
+
+    for (int i = 0; i < 50; i++) {
+        arma->projetilAtivo[i] = false;
+        arma->projetilX[i] = 0.0f;
+        arma->projetilY[i] = 0.0f;
+        arma->projetilDirecao[i] = 0.0f;
+    }
+}
+
+void trocar_arma(ProjetilPosicao* pp, Arma nova_arma) {
+    pp->tipo = nova_arma;
+}
+
+void configuracoes_armas(Arma tipo, float* velocidade, float* cadencia, float* dano) {
+
+    switch (tipo) {
+    case ARMA_VASSOURA:
+        *cadencia = 1.0f;
+        *dano = 1.0f;
+        break;
+    case ARMA_VENENO:
+        *velocidade = 4.0f;
+        *cadencia = 1.0f;
+        *dano = 1.0f;
+        break;
+    case ARMA_VACINA:
+        *velocidade = 15.5f;
+        *cadencia = 0.2f;
+        *dano = 1.0f;
+        break;
+    default:
+        *velocidade = 8.0f;
+        *cadencia = 0.3f;
+        *dano = 1.0f;
+        break;
+    }
+}
