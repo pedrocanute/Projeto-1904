@@ -6,6 +6,9 @@
 #include <allegro5/allegro_image.h>
 #include "configuracoes.h"
 #include "infeccao.h"
+#include "fases.h"
+#include "input.h"
+#include "cenario.h"
 
 
 typedef struct {
@@ -15,6 +18,7 @@ typedef struct {
     bool* esc;
     bool* jogoPausado;
     bool* fimDeJogo;
+    bool* telaDialogo;
 } MenuEstados;
 
 typedef struct {
@@ -59,10 +63,25 @@ typedef struct {
     int telaGameOverLargura, telaGameOverAltura;
 } GameOver;
 
+// Em menu.h
+
+typedef struct {
+    ALLEGRO_BITMAP* oswaldo;
+    ALLEGRO_BITMAP* caixaDialogo;
+    int caixaDialogoX, caixaDialogoY;
+    int caixaDialogoLargura, caixaDialogoAltura;
+    int oswaldoLargura, oswaldoAltura;
+    bool* dialogo1;
+    bool* dialogo2;
+    bool* dialogo3;
+} Dialogo;
+
 void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);
 
 void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);
 
 void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
+
+void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
 #endif 

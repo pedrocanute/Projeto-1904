@@ -224,8 +224,8 @@ void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEven
 
         // Clicar no X pra sair
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            *menuEstado->fimDeJogo = false;
             *menuEstado->jogando = false;
+            *menuEstado->fimDeJogo = false;
             break;
         }
 
@@ -246,6 +246,7 @@ void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEven
             // Clicou em Sair do Jogo, sai do jogo
             if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX && *menuEvent->mouseX <= gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura && *menuEvent->mouseY >= gameover->botaoSairDoJogoY && *menuEvent->mouseY <= gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura) {
                 *menuEstado->jogando = false;
+                *menuEstado->fimDeJogo = false;
                 break;
             }
         }
@@ -267,5 +268,66 @@ void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEven
         al_flip_display();
 
         al_stop_timer(menuEvent->timer);
+    }
+}
+
+void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* menuEvent, MenuEstados* menuEstado) {
+
+    // Diálogo acompanha a tela
+    al_identity_transform(menuEvent->camera);
+    al_use_transform(menuEvent->camera);
+
+    // Se o jogo foi reiniciado (estamos na fase 1 mas o diálogo 2 já foi visto),
+    // reseta os flags para que os diálogos apareçam novamente.
+    if (fase->faseAtual == 1 && *dialogo->dialogo2) {
+        *dialogo->dialogo1 = false;
+        *dialogo->dialogo2 = false;
+        *dialogo->dialogo3 = false;
+    }
+
+    bool iniciarDialogo = false;
+
+    if (fase->faseAtual == 1 && !*dialogo->dialogo1) iniciarDialogo = true;
+    if (fase->faseAtual == 2 && !*dialogo->dialogo2) iniciarDialogo = true;
+    if (fase->faseAtual == 3 && !*dialogo->dialogo3) iniciarDialogo = true;
+
+    // Se não há diálogo para mostrar, a função termina imediatamente e o jogo continua.
+    if (!iniciarDialogo) {
+        return;
+    }
+
+    // Se um diálogo precisa ser exibido, a função assume o controle.
+    al_stop_timer(menuEvent->timer);
+
+    ALLEGRO_EVENT event;
+
+    bool dialogoAtivo = true;
+
+    while (dialogoAtivo) {
+        al_wait_for_event(menuEvent->fila_eventos, &event);
+
+        if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_SPACE) {
+            dialogoAtivo = false;
+        }
+
+        if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            *menuEstado->jogando = false;
+            dialogoAtivo = false;
+        }
+
+        // Desenha a tela de diálogo
+        al_draw_scaled_bitmap(dialogo->oswaldo, 0, 0, dialogo->oswaldoLargura, dialogo->oswaldoAltura, 0, 0, WIDTH, HEIGHT, 0);
+        al_draw_bitmap(dialogo->caixaDialogo, dialogo->caixaDialogoX, dialogo->caixaDialogoY, 0);
+        al_flip_display();
+    }
+
+    // Marca o diálogo como concluído usando o ponteiro, para não aparecer de novo.
+    if (fase->faseAtual == 1) *dialogo->dialogo1 = true;
+    if (fase->faseAtual == 2) *dialogo->dialogo2 = true;
+    if (fase->faseAtual == 3) *dialogo->dialogo3 = true;
+
+    // Devolve o controle para o jogo, se ele não foi fechado.
+    if (*menuEstado->jogando) {
+        al_start_timer(menuEvent->timer);
     }
 }

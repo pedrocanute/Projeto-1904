@@ -45,6 +45,8 @@ bool carregar_bitmaps(Bitmaps* bitmap) {
     bitmap->botaoJogarNovamente2 = carregar("imagens/botaoJogarNovamente2.png");
     bitmap->botaoSairDoJogo = carregar("imagens/botaoSairDoJogo.png");
     bitmap->botaoSairDoJogo2 = carregar("imagens/botaoSairDoJogo2.png");
+    bitmap->oswaldo = carregar("imagens/oswaldo.png");
+    bitmap->caixaDialogo = carregar("imagens/caixaDialogo.png");
 
     return bitmap->sprite_andando_direita && bitmap->sprite_andando_esquerda
         && bitmap->cenario1 && bitmap->fundoMenu;
@@ -87,4 +89,6 @@ void destruir_bitmaps(Bitmaps* bitmap) {
     destruir_um(&bitmap->botaoJogarNovamente2);
     destruir_um(&bitmap->botaoSairDoJogo);
     destruir_um(&bitmap->botaoSairDoJogo2);
+    destruir_um(&bitmap->oswaldo);
+    destruir_um(&bitmap->caixaDialogo);
 }

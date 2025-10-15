@@ -31,6 +31,7 @@ int main() {
     bool jogando = false;            // vira true ao clicar "Jogar"
     bool jogoPausado = false;
     bool fimDeJogo = false;
+    bool dialogo1 = false, dialogo2 = false, dialogo3 = false;
     bool redesenhar = false;
 
     bool w = false, a = false, s = false, d = false, espaco = false, shift = false, esc = false;
@@ -104,6 +105,10 @@ int main() {
     int botaoJogarNovamenteAltura = al_get_bitmap_height(bitmap.botaoJogarNovamente);
     int botaoSairDoJogoLargura = al_get_bitmap_width(bitmap.botaoSairDoJogo);
     int botaoSairDoJogoAltura = al_get_bitmap_height(bitmap.botaoSairDoJogo);
+    int oswaldoLargura = al_get_bitmap_width(bitmap.oswaldo);
+    int oswaldoAltura = al_get_bitmap_height(bitmap.oswaldo);
+    int caixaDialogoLargura = al_get_bitmap_width(bitmap.caixaDialogo);
+    int caixaDialogoAltura = al_get_bitmap_height(bitmap.caixaDialogo);
 
     int botaoJogarX = 200, botaoJogarY = 620;
     int botaoRegrasX = 500, botaoRegrasY = 620;
@@ -111,6 +116,7 @@ int main() {
     int botaoVoltarX = 520, botaoVoltarY = 500;
     int botaoJogarNovamenteX = 295, botaoJogarNovamenteY = 560;
     int botaoSairDoJogoX = 645, botaoSairDoJogoY = 560;
+    int caixaDialogoX = 10, caixaDialogoY = 540;
 
     bool boss_spawnado = false;
     bool fase_boss_ativa = false;
@@ -135,7 +141,7 @@ int main() {
         .regrasAberta = &regrasAberta,
         .esc = &esc,
         .jogoPausado = &jogoPausado,
-        .fimDeJogo = &fimDeJogo
+        .fimDeJogo = &fimDeJogo,
     };
 
     MenuEvents menuEvent = {
@@ -184,6 +190,20 @@ int main() {
         .botaoSairDoJogoLargura = botaoSairDoJogoLargura, .botaoSairDoJogoAltura = botaoSairDoJogoAltura
     };
 
+    Dialogo dialogo = {
+    .oswaldo = bitmap.oswaldo,
+    .caixaDialogo = bitmap.caixaDialogo,
+
+    .oswaldoLargura = oswaldoLargura,
+    .oswaldoAltura = oswaldoAltura,
+    .caixaDialogoLargura = caixaDialogoLargura, .caixaDialogoAltura = caixaDialogoAltura,
+    .caixaDialogoX = caixaDialogoX, .caixaDialogoY = caixaDialogoY,
+
+    .dialogo1 = &dialogo1,
+    .dialogo2 = &dialogo2,
+    .dialogo3 = &dialogo3
+    };
+
     // MENU PRINCIPAL
     menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
     if (!jogando) {
@@ -200,6 +220,7 @@ int main() {
 
     // LOOP PRINCIPAL
     while (jogando) {
+        desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
         al_wait_for_event(fila_eventos, &event);
 
         // CONDIÇÃO DE PARADA
@@ -352,6 +373,9 @@ int main() {
 
             // tiros
             atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase);
+
+            // Diálogo
+            desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
 
             // Game Over
             desenhar_tela_gameOver(&gameOver, &estagio, &menuEvent, &menuEstado);
