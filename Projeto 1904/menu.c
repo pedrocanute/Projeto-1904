@@ -236,12 +236,7 @@ void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEven
         }
 
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-            // Clicou em Jogar Novamente, volta o jogo
-            if (*menuEvent->mouseX >= gameover->botaoJogarNovamenteX && *menuEvent->mouseX <= gameover->botaoJogarNovamenteX + gameover->botaoJogarNovamenteLargura && *menuEvent->mouseY >= gameover->botaoJogarNovamenteY && *menuEvent->mouseY <= gameover->botaoJogarNovamenteY + gameover->botaoJogarNovamenteAltura) {
-                main();
-                *menuEstado->fimDeJogo = false;
-                break;
-            }
+           
 
             // Clicou em Sair do Jogo, sai do jogo
             if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX && *menuEvent->mouseX <= gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura && *menuEvent->mouseY >= gameover->botaoSairDoJogoY && *menuEvent->mouseY <= gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura) {
@@ -253,12 +248,7 @@ void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEven
 
         // Desenha a tela de Game Over e os botões
         al_draw_scaled_bitmap(gameover->telaGameOver, 0, 0, gameover->telaGameOverLargura, gameover->telaGameOverAltura, 0, 0, WIDTH, HEIGHT, 0);
-        if (*menuEvent->mouseX >= gameover->botaoJogarNovamenteX && *menuEvent->mouseX <= (gameover->botaoJogarNovamenteX + gameover->botaoJogarNovamenteLargura) && *menuEvent->mouseY >= gameover->botaoJogarNovamenteY && *menuEvent->mouseY <= (gameover->botaoJogarNovamenteY + gameover->botaoJogarNovamenteAltura)) {
-            al_draw_bitmap(gameover->botaoJogarNovamente2, gameover->botaoJogarNovamenteX, gameover->botaoJogarNovamenteY, 0);
-        }
-        else {
-            al_draw_bitmap(gameover->botaoJogarNovamente, gameover->botaoJogarNovamenteX, gameover->botaoJogarNovamenteY, 0);
-        }
+        
         if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX && *menuEvent->mouseX <= (gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura) && *menuEvent->mouseY >= gameover->botaoSairDoJogoY && *menuEvent->mouseY <= (gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura)) {
             al_draw_bitmap(gameover->botaoSairDoJogo2, gameover->botaoSairDoJogoX, gameover->botaoSairDoJogoY, 0);
         }

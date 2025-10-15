@@ -101,8 +101,6 @@ int main() {
     int botaoVoltarAltura = al_get_bitmap_height(bitmap.botaoVoltar);
     int telaGameOverLargura = al_get_bitmap_width(bitmap.telaGameOver);
     int telaGameOverAltura = al_get_bitmap_height(bitmap.telaGameOver);
-    int botaoJogarNovamenteLargura = al_get_bitmap_width(bitmap.botaoJogarNovamente);
-    int botaoJogarNovamenteAltura = al_get_bitmap_height(bitmap.botaoJogarNovamente);
     int botaoSairDoJogoLargura = al_get_bitmap_width(bitmap.botaoSairDoJogo);
     int botaoSairDoJogoAltura = al_get_bitmap_height(bitmap.botaoSairDoJogo);
     int oswaldoLargura = al_get_bitmap_width(bitmap.oswaldo);
@@ -114,8 +112,7 @@ int main() {
     int botaoRegrasX = 500, botaoRegrasY = 620;
     int botaoSairX = 800, botaoSairY = 620;
     int botaoVoltarX = 520, botaoVoltarY = 500;
-    int botaoJogarNovamenteX = 295, botaoJogarNovamenteY = 560;
-    int botaoSairDoJogoX = 645, botaoSairDoJogoY = 560;
+    int botaoSairDoJogoX = 445, botaoSairDoJogoY = 560;
     int caixaDialogoX = 10, caixaDialogoY = 540;
 
     bool boss_spawnado = false;
@@ -177,16 +174,12 @@ int main() {
 
     GameOver gameOver = {
         .telaGameOver = bitmap.telaGameOver,
-        .botaoJogarNovamente = bitmap.botaoJogarNovamente,
-        .botaoJogarNovamente2 = bitmap.botaoJogarNovamente2,
         .botaoSairDoJogo = bitmap.botaoSairDoJogo,
         .botaoSairDoJogo2 = bitmap.botaoSairDoJogo2,
 
         .telaGameOverLargura = telaGameOverLargura,
         .telaGameOverAltura = telaGameOverAltura,
-        .botaoJogarNovamenteX = botaoJogarNovamenteX, .botaoJogarNovamenteY = botaoJogarNovamenteY,
-        .botaoSairDoJogoX = botaoSairDoJogoX, .botaoSairDoJogoY = botaoSairDoJogoY,
-        .botaoJogarNovamenteLargura = botaoJogarNovamenteLargura, .botaoJogarNovamenteAltura = botaoJogarNovamenteAltura,
+        .botaoSairDoJogoX = botaoSairDoJogoX, .botaoSairDoJogoY = botaoSairDoJogoY,        
         .botaoSairDoJogoLargura = botaoSairDoJogoLargura, .botaoSairDoJogoAltura = botaoSairDoJogoAltura
     };
 

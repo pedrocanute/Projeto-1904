@@ -11,7 +11,7 @@
 #include "configuracoes.h"
 #include "colisao.h"
 
-typedef struct SistemaFases SistemaFases; //ESTA P0RR4 É UM FORWARD DECLARATION, PERDI QUASE 5HRS TENTANDO ARRUMAR ESTA MERD4 DE DEPENDENCIA CIRCULAR >:/
+typedef struct SistemaFases SistemaFases; 
 
 typedef struct {
     float projetilX[50], projetilY[50], projetilDirecao[50];
