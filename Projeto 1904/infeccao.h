@@ -4,32 +4,25 @@
 #include <stdbool.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+#include "inimigo.h"
 
 typedef struct {
-    float infeccaoX, infeccaoY, infeccaoLargura, infeccaoAltura;
-} Infeccao;
+    float barraX, barraY, barraLargura, barraAltura;
+} Barra;
 
 typedef struct {
-    float* infeccaoAtual;
-    float infeccaoMaxima;
-} InfeccaoEstagio;
+    float barraX, barraY, barraLargura, barraAltura, barraVida;
+} BarraBoss;
 
-// Fun��o barra de fundo
-void desenhar_barra(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura);
+// FUNÇÃO FUNDO DA BARRA DO PERSONAGEM / CARAVANA
+void desenhar_barra(float barraX, float barraY, float barraLargura, float barraAltura);
 
-// Fun��o barra de infec��o
-void desenhar_barra_infeccao(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura);
-/*
-// Fun��es jogador
-void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocidade, int* frames_por_sprite);
+// FUNÇÃO BARRA DE INFECÇÃO
+void desenhar_barra_infeccao(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura, float* posicaoCamera);
 
-void restringirPosicao(Jogador* p, float maximoX, float maximoY, float larguraJogador, float alturaJogador);
+// FUNÇÃO FUNDO DA BARRA DE VIDA DO BOSS
+void desenhar_fundo_barra_vida_boss(float vidaX, float vidaY, float vidaLargura, float vidaAltura);
 
-// DESENHA JOGADOR COM BASE NO MOVIMENTO E FUNCAO ATIRAR
-void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espaco, ALLEGRO_BITMAP* sprite_direita, ALLEGRO_BITMAP* sprite_esquerda, ALLEGRO_BITMAP* sprite_atirando_direita, ALLEGRO_BITMAP* sprite_atirando_esquerda, int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita, int* frame_tiro, int* contador_frame_tiro);
-
-void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador);
-
-void desenhar_caravana(Jogador Caravana, float caravanaX, float caravanaY, float caravanaLargura, float caravanaAltura, ALLEGRO_COLOR corCaravana);
-*/
+// FUNÇÃO BARRA DE VIDA DO BOSS
+void desenhar_barra_vida_boss(float vidaX, float vidaY, float vidaLargura, float vidaAltura);
 #endif

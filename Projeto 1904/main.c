@@ -55,7 +55,7 @@ int main() {
     // ARRAY DE INIMIGOS
     Inimigo inimigos[MAX_INIMIGOS];
     inicializarSistemaFases(&sistemaFase, &inimigos[0]);
-    inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda,posicaoCamera);
+    inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
 
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
     ALLEGRO_COLOR corCaravana = al_map_rgb(0, 0, 0);
@@ -64,20 +64,22 @@ int main() {
     Jogador jogador = { 120.0f, 520.0f, true, false };
 
     // CARAVANA
-    Caravana caravana = { 0.0f, 412.0f, caravana.caravanaX + 80, caravana.caravanaY + 320};
+    Caravana caravana = { 0.0f, 305.0f, 80.0f, 732.0f, 1.0f };
 
     // BARRA INFECÇÃO
-    Infeccao barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
-    Infeccao barraInfeccao = { 75.0f, 50.0f, 75.0f, 100.0f };
-    InfeccaoEstagio estagio = { &barraInfeccao.infeccaoLargura, barraFundo.infeccaoLargura };
+    Barra barraFundo = { 75.0f, 50.0f, 400.0f, 100.0f };
+    Barra barraInfeccao = { 75.0f, 50.0f, 75.0f, 100.0f };
+
+    // BARRA VIDA BOSS
+    BarraBoss barraVidaBossFundo = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    BarraBoss barraVidaBoss = {0.0f, 0.0f, 0.0f, 0.0f};
 
     //TIMER CARAVANA / BARRA INFECÇÃO
     float timer_regen_infeccao = 0.0f;
     const float TEMPO_REGEN_INFECCAO = 5.0f;
 
     //INTANGIBILIDADE
-    float timer_intangibilidade = 0.0f;
-    const float TEMPO_INTANGIBILIDADE = 1.0f;
+    const float TEMPO_INTANGIBILIDADE = 0.7f;
 
     // ANIMAÇÃO
     int  frame_atual = 0;
@@ -244,49 +246,88 @@ int main() {
         // ATUALIZAÇÃO DE JOGO (quando não pausado)
         if (event.type == ALLEGRO_EVENT_TIMER && esc == false) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
-            restringirPosicao(&jogador, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
+            restringirPosicao(&jogador, &caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
-            atualizar_movimento_inimigos(inimigos, MAX_INIMIGOS);
+            atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
             if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
                 atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
-            }
+                // Posiciona a barra de vida do boss
 
-            camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR);
+                // BARRA DE VIDA DO BOSS
+                barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2; // Centraliza a barra de vida em relação ao boss
+                barraVidaBoss.barraY = inimigos[0].botY - 30;
+                barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida; 
+                barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
+
+                // Posiciona o FUNDO da barra de vida do boss
+                barraVidaBossFundo.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2;
+                barraVidaBossFundo.barraY = inimigos[0].botY - 30;
+                barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + 300;
+                barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + 25;
+            }; 
+
+            camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, caravana.caravanaX, caravana.caravanaVelocidade);
             redesenhar = true;
-        }
-
-        // COLISÃO
-        // Colisão de jogador com inimigo
-        bool colidiu = false;
-        for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (colisao_jogador_inimigo(&inimigos[i], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
-                colidiu = true;
-                break;
+            if (!fase_boss_ativa) {
+                atualizar_movimento_caravana(&caravana);
             }
         }
-        cor = colidiu ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
 
-        //Colisão de inimigo com caravana / Intangibilidade
+        //Colisão de inimigo com caravana / Intangibilidade / colisão boss com personagem
         bool colisaoCaravana = false;
-        bool intangibilidadeAtiva = false;
-        for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if(!intangibilidadeAtiva && al_get_time() - timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
-                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravaLargura, caravana.caravaAltura) && barraInfeccao.infeccaoLargura < 400) {
-                    colisaoCaravana = true;
-                    barraInfeccao.infeccaoLargura += 10;
-                    timer_regen_infeccao = al_get_time();
-                    timer_intangibilidade = al_get_time();
-                    intangibilidadeAtiva = true;
-                    break;
+        float dano_na_caravana = 0.0f;
+        ALLEGRO_COLOR corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco;
+
+        if (fase_boss_ativa) {
+            for (int i = 0; i < MAX_INIMIGOS; i++) {
+                if (colisao_jogador_inimigo(&inimigos[0], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
+                    float tempoAtual = al_get_time();
+                    if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
+                        colisaoCaravana = true;
+                        barraInfeccao.barraLargura += inimigos[i].dano;
+                        timer_regen_infeccao = tempoAtual;
+                        inimigos[i].timer_intangibilidade = tempoAtual;
+
+                        dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
+
+                        if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
+                            corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                        }
+                        else {
+                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                        }
+                    }
                 }
             }
         }
-        corCaravana = colisaoCaravana ? al_map_rgb(255, 0, 0) : al_map_rgb(0, 0, 0);
+        else{
+            for (int i = 0; i < MAX_INIMIGOS; i++) {
+                if (colisao_inimigo_caravana(&inimigos[i], &caravana, caravana.caravanaLargura, caravana.caravanaAltura) && barraInfeccao.barraLargura < 400) {
+                    float tempoAtual = al_get_time();
+                    if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
+                        colisaoCaravana = true;
+                        barraInfeccao.barraLargura += inimigos[i].dano;
+                        timer_regen_infeccao = tempoAtual;
+                        inimigos[i].timer_intangibilidade = tempoAtual;
+
+                        dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
+
+                        if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
+                            corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                        }
+                        else {
+                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                        }
+                    }
+                }
+            }
+        }
+       
 
         //Regeneração de Vida
         // !!!!!!!!!Compara se não há colisão e se a caravana levou dano!!!!!!!!!
-        if (!colisaoCaravana && al_get_time() - timer_regen_infeccao >= TEMPO_REGEN_INFECCAO && barraInfeccao.infeccaoLargura > barraInfeccao.infeccaoX) {
-            barraInfeccao.infeccaoLargura--;
+        if (!colisaoCaravana && al_get_time() - timer_regen_infeccao >= TEMPO_REGEN_INFECCAO && barraInfeccao.barraLargura > barraInfeccao.barraX) {
+            barraInfeccao.barraLargura--;
         }
 
         // RESPAWN POR FASE
@@ -321,6 +362,7 @@ int main() {
                     boss_spawnado = true;
                     fase_boss_ativa = true;
                     spawn_ativo = false; // pausa spawns comuns
+                    barraVidaBoss.barraVida = 300.0f;
                 }
             }
         }
@@ -354,18 +396,23 @@ int main() {
             desenhar_cenario(bitmap.cenario1, bitmap.cenario2, jogador.jogadorX, posicaoCamera);
 
             // Infecção
-            desenhar_barra(barraFundo.infeccaoX, barraFundo.infeccaoY, barraFundo.infeccaoLargura, barraFundo.infeccaoAltura);
-            desenhar_barra_infeccao(barraInfeccao.infeccaoX, barraInfeccao.infeccaoY, barraInfeccao.infeccaoLargura, barraInfeccao.infeccaoAltura);
+            desenhar_barra(barraFundo.barraX + posicaoCamera[0], barraFundo.barraY, barraFundo.barraLargura + posicaoCamera[0], barraFundo.barraAltura);
+            desenhar_barra_infeccao(barraInfeccao.barraX, barraInfeccao.barraY, barraInfeccao.barraLargura, barraInfeccao.barraAltura, posicaoCamera);
 
+            // BARRA DE VIDA DO BOSS
+            if (fase_boss_ativa) {
+                desenhar_fundo_barra_vida_boss(barraVidaBossFundo.barraX, barraVidaBossFundo.barraY, barraVidaBossFundo.barraLargura, barraVidaBossFundo.barraAltura);
+                desenhar_barra_vida_boss(barraVidaBoss.barraX, barraVidaBoss.barraY, barraVidaBoss.barraLargura, barraVidaBoss.barraAltura);
+            };
             // caravana
-            desenhar_caravana(caravana.caravanaX, caravana.caravanaY , caravana.caravaLargura, caravana.caravaAltura, corCaravana);
+            desenhar_caravana(bitmap.soldado, caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
 
             // jogador e inimigos
             desenhar_jogador(jogador, w, a, s, d, espaco, bitmap.sprite_andando_direita, bitmap.sprite_andando_esquerda, bitmap.sprite_atirando_direita, bitmap.sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
             desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
             // tiros
-            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase);
+            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase, &barraVidaBoss);
 
             // Diálogo
             desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);

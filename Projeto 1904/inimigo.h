@@ -30,6 +30,10 @@ typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que es
     ALLEGRO_BITMAP* sprite_esquerda;
 
     float velocidade;
+
+    // Variáveis de dano
+    float dano;
+    float timer_intangibilidade;
 } Inimigo;
 
 void desenhar_inimigo(Inimigo* inimigo, bool em_movimento);
@@ -42,7 +46,7 @@ void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMA
 void desenhar_todos_inimigos(Inimigo* inimigos, int quantidade);
 
 // ATUALIZA DE ACORDO COM A CAMERA
-void atualizar_movimento_inimigos(Inimigo* inimigos, int quantidade);
+void atualizar_movimento_inimigos(Caravana* caravana, Inimigo* inimigos, int quantidade);
 
 int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 

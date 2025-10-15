@@ -32,6 +32,8 @@ typedef struct {
     ALLEGRO_BITMAP* mosquito_esquerda;
     ALLEGRO_BITMAP* boss_variola_esquerda;
     ALLEGRO_BITMAP* boss_variola_direita;
+    //Caravana
+    ALLEGRO_BITMAP* soldado;
     // Jogador
     ALLEGRO_BITMAP* sprite_andando_direita;
     ALLEGRO_BITMAP* sprite_andando_esquerda;
