@@ -28,7 +28,7 @@ int main() {
 
     bool telaMenu = true;
     bool regrasAberta = false;
-    bool jogando = false;            // vira true ao clicar "Jogar"
+    bool jogando = false;            
     bool jogoPausado = false;
     bool fimDeJogo = false;
     bool dialogo1 = false, dialogo2 = false, dialogo3 = false;
@@ -211,11 +211,11 @@ int main() {
         return 0;
     }
 
+    desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
     ALLEGRO_EVENT event;
 
     // LOOP PRINCIPAL
     while (jogando) {
-        desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
         al_wait_for_event(fila_eventos, &event);
 
         // CONDIÇÃO DE PARADA
@@ -316,7 +316,7 @@ int main() {
                             corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
                         }
                         else {
-                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro nao altera a cor da sprite original
                         }
                     }
                 }
@@ -328,6 +328,27 @@ int main() {
         // !!!!!!!!!Compara se não há colisão e se a caravana levou dano!!!!!!!!!
         if (!colisaoCaravana && al_get_time() - timer_regen_infeccao >= TEMPO_REGEN_INFECCAO && barraInfeccao.barraLargura > barraInfeccao.barraX) {
             barraInfeccao.barraLargura--;
+        }
+
+        // VERIFICAÇÃO DE GAME OVER 
+        // Verifica se a barra de infecção atingiu o máximo
+        if (barraInfeccao.barraLargura >= 400.0f) {
+            fimDeJogo = true;
+
+            // Para o timer do jogo
+            al_stop_timer(timer);
+
+            // Reseta a transformação da câmera para a tela de game over
+            al_identity_transform(&camera);
+            al_use_transform(&camera);
+
+            // Chama a tela de game over
+            desenhar_tela_gameOver(&gameOver, &barraInfeccao, &menuEvent, &menuEstado);
+
+            if (!jogando) {
+                break;
+            }
+
         }
 
         // RESPAWN POR FASE
@@ -418,7 +439,7 @@ int main() {
             desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
 
             // Game Over
-            desenhar_tela_gameOver(&gameOver, &estagio, &menuEvent, &menuEstado);
+            desenhar_tela_gameOver(&gameOver, &barraInfeccao, &menuEvent, &menuEstado);
 
             // HUD (fixo na tela)
             char texto[100];

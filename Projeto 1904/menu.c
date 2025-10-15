@@ -213,11 +213,6 @@ void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEven
 
     ALLEGRO_EVENT event;
 
-    // Para o jogo e chama a tela de game over
-    if (*infec->infeccaoAtual >= infec->infeccaoMaxima) {
-        *menuEstado->fimDeJogo = true;
-    }
-
     // Tela de Game Over
     while (*menuEstado->fimDeJogo) {
         al_wait_for_event(menuEvent->fila_eventos, &event);

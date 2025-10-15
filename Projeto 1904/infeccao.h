@@ -11,6 +11,11 @@ typedef struct {
 } Barra;
 
 typedef struct {
+    float infeccaoAtual;
+    float infeccaoMaxima;
+} InfeccaoEstagio;
+
+typedef struct {
     float barraX, barraY, barraLargura, barraAltura, barraVida;
 } BarraBoss;
 

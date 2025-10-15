@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_font.h>
 #include "configuracoes.h"
 #include "infeccao.h"
 #include "fases.h"
@@ -80,7 +81,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
 
 void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);
 
-void desenhar_tela_gameOver(GameOver* gameover, InfeccaoEstagio* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
+void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
 void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
