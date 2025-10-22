@@ -27,9 +27,11 @@ int main() {
 #pragma region VARIAVEIS
 
     bool telaMenu = true;
-    bool configAberta = false;
-    bool jogando = false;            // vira true ao clicar "Jogar"
+    bool regrasAberta = false;
+    bool jogando = false;            
     bool jogoPausado = false;
+    bool fimDeJogo = false;
+    bool dialogo1 = false, dialogo2 = false, dialogo3 = false;
     bool redesenhar = false;
 
     bool w = false, a = false, s = false, d = false, espaco = false, shift = false, esc = false, num1 = false, num2 = false, num3 = false;
@@ -113,11 +115,21 @@ int main() {
     int abaRegrasAltura = al_get_bitmap_height(bitmap.abaRegras);
     int botaoVoltarLargura = al_get_bitmap_width(bitmap.botaoVoltar);
     int botaoVoltarAltura = al_get_bitmap_height(bitmap.botaoVoltar);
+    int telaGameOverLargura = al_get_bitmap_width(bitmap.telaGameOver);
+    int telaGameOverAltura = al_get_bitmap_height(bitmap.telaGameOver);
+    int botaoSairDoJogoLargura = al_get_bitmap_width(bitmap.botaoSairDoJogo);
+    int botaoSairDoJogoAltura = al_get_bitmap_height(bitmap.botaoSairDoJogo);
+    int oswaldoLargura = al_get_bitmap_width(bitmap.oswaldo);
+    int oswaldoAltura = al_get_bitmap_height(bitmap.oswaldo);
+    int caixaDialogoLargura = al_get_bitmap_width(bitmap.caixaDialogo);
+    int caixaDialogoAltura = al_get_bitmap_height(bitmap.caixaDialogo);
 
     int botaoJogarX = 200, botaoJogarY = 620;
-    int botaoConfigX = 500, botaoConfigY = 620;
+    int botaoRegrasX = 500, botaoRegrasY = 620;
     int botaoSairX = 800, botaoSairY = 620;
     int botaoVoltarX = 520, botaoVoltarY = 500;
+    int botaoSairDoJogoX = 445, botaoSairDoJogoY = 560;
+    int caixaDialogoX = 10, caixaDialogoY = 540;
 
     bool boss_spawnado = false;
     bool fase_boss_ativa = false;
@@ -136,15 +148,16 @@ int main() {
     al_start_timer(timer);
 
     // SISTEMA MENUS
-    MenuFlags flags = {
+    MenuEstados menuEstado = {
         .telaMenu = &telaMenu,
         .jogando = &jogando,
-        .configAberta = &configAberta,
+        .regrasAberta = &regrasAberta,
         .esc = &esc,
-        .jogoPausado = &jogoPausado
+        .jogoPausado = &jogoPausado,
+        .fimDeJogo = &fimDeJogo,
     };
 
-    MenuIO io = {
+    MenuEvents menuEvent = {
         .fila_eventos = fila_eventos,
         .timer = timer,
         .camera = &camera,
@@ -152,31 +165,56 @@ int main() {
         .mouseY = &mouseY
     };
 
-    MenuBitmaps bmp = {
+    MenuImagens menuImg = {
         .fundoMenu = bitmap.fundoMenu,
         .botaoJogar = bitmap.botaoJogar, .botaoJogar2 = bitmap.botaoJogar2,
-        .botaoConfig = bitmap.botaoRegras, .botaoConfig2 = bitmap.botaoRegras2,
+        .botaoRegras = bitmap.botaoRegras, .botaoRegras2 = bitmap.botaoRegras2,
         .botaoSair = bitmap.botaoSair, .botaoSair2 = bitmap.botaoSair2,
-        .abaConfig = bitmap.abaRegras,
+        .abaRegras = bitmap.abaRegras,
         .botaoVoltar = bitmap.botaoVoltar, .botaoVoltar2 = bitmap.botaoVoltar2
     };
 
-    MenuLayout lay = {
+    MenuBotoes menuBotao = {
         .botaoJogarX = botaoJogarX, .botaoJogarY = botaoJogarY,
-        .botaoConfigX = botaoConfigX, .botaoConfigY = botaoConfigY,
+        .botaoRegrasX = botaoRegrasX, .botaoRegrasY = botaoRegrasY,
         .botaoSairX = botaoSairX, .botaoSairY = botaoSairY,
         .botaoVoltarX = botaoVoltarX, .botaoVoltarY = botaoVoltarY,
 
         .botaoJogarLargura = botaoJogarLargura, .botaoJogarAltura = botaoJogarAltura,
-        .botaoConfigLargura = botaoRegrasLargura, .botaoConfigAltura = botaoRegrasAltura,
+        .botaoRegrasLargura = botaoRegrasLargura, .botaoRegrasAltura = botaoRegrasAltura,
         .botaoSairLargura = botaoSairLargura, .botaoSairAltura = botaoSairAltura,
         .fundoMenuLargura = fundoMenuLargura, .fundoMenuAltura = fundoMenuAltura,
-        .abaConfigLargura = abaRegrasLargura, .abaConfigAltura = abaRegrasAltura,
+        .abaRegrasLargura = abaRegrasLargura, .abaRegrasAltura = abaRegrasAltura,
         .botaoVoltarLargura = botaoVoltarLargura, .botaoVoltarAltura = botaoVoltarAltura
     };
 
+    GameOver gameOver = {
+        .telaGameOver = bitmap.telaGameOver,
+        .botaoSairDoJogo = bitmap.botaoSairDoJogo,
+        .botaoSairDoJogo2 = bitmap.botaoSairDoJogo2,
+
+        .telaGameOverLargura = telaGameOverLargura,
+        .telaGameOverAltura = telaGameOverAltura,
+        .botaoSairDoJogoX = botaoSairDoJogoX, .botaoSairDoJogoY = botaoSairDoJogoY,        
+        .botaoSairDoJogoLargura = botaoSairDoJogoLargura, .botaoSairDoJogoAltura = botaoSairDoJogoAltura
+    };
+
+    Dialogo dialogo = {
+    .oswaldo = bitmap.oswaldo,
+    .caixaDialogo = bitmap.caixaDialogo,
+
+    .oswaldoLargura = oswaldoLargura,
+    .oswaldoAltura = oswaldoAltura,
+    .caixaDialogoLargura = caixaDialogoLargura, .caixaDialogoAltura = caixaDialogoAltura,
+    .caixaDialogoX = caixaDialogoX, .caixaDialogoY = caixaDialogoY,
+
+    .dialogo1 = &dialogo1,
+    .dialogo2 = &dialogo2,
+    .dialogo3 = &dialogo3
+    };
+
     // MENU PRINCIPAL
-    menu_principal(&flags, &io, &bmp, &lay);
+    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
     if (!jogando) {
         // Saiu pelo menu
         al_destroy_font(font);
@@ -187,6 +225,7 @@ int main() {
         return 0;
     }
 
+    desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
     ALLEGRO_EVENT event;
 
     // LOOP PRINCIPAL
@@ -220,11 +259,11 @@ int main() {
 
         // PAUSE
         if (esc) {
-            lay.botaoJogarX = 525; lay.botaoJogarY = 260;
-            lay.botaoConfigX = 525; lay.botaoConfigY = 340;
-            lay.botaoSairX = 525; lay.botaoSairY = 420;
+            menuBotao.botaoJogarX = 525; menuBotao.botaoJogarY = 260;
+            menuBotao.botaoRegrasX = 525; menuBotao.botaoRegrasY = 340;
+            menuBotao.botaoSairX = 525; menuBotao.botaoSairY = 420;
 
-            menu_pausa(&flags, &io, &bmp, &lay);
+            menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao);
             if (!jogando)
                 break;  // saiu pelo "Sair" no pause
             // se voltou, esc foi limpo dentro de menu_pausa
@@ -312,7 +351,7 @@ int main() {
                             corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
                         }
                         else {
-                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro nao altera a cor da sprite original
                         }
                     }
                 }
@@ -324,6 +363,27 @@ int main() {
         // !!!!!!!!!Compara se não há colisão e se a caravana levou dano!!!!!!!!!
         if (!colisaoCaravana && al_get_time() - timer_regen_infeccao >= TEMPO_REGEN_INFECCAO && barraInfeccao.barraLargura > barraInfeccao.barraX) {
             barraInfeccao.barraLargura--;
+        }
+
+        // VERIFICAÇÃO DE GAME OVER 
+        // Verifica se a barra de infecção atingiu o máximo
+        if (barraInfeccao.barraLargura >= 400.0f) {
+            fimDeJogo = true;
+
+            // Para o timer do jogo
+            al_stop_timer(timer);
+
+            // Reseta a transformação da câmera para a tela de game over
+            al_identity_transform(&camera);
+            al_use_transform(&camera);
+
+            // Chama a tela de game over
+            desenhar_tela_gameOver(&gameOver, &barraInfeccao, &menuEvent, &menuEstado);
+
+            if (!jogando) {
+                break;
+            }
+
         }
 
         // RESPAWN POR FASE
@@ -419,6 +479,12 @@ int main() {
 
             // tiros
             atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, &bitmap, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera, &sistemaFase, &barraVidaBoss);
+
+            // Diálogo
+            desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
+
+            // Game Over
+            desenhar_tela_gameOver(&gameOver, &barraInfeccao, &menuEvent, &menuEstado);
 
             // HUD (fixo na tela)
             char texto[100];

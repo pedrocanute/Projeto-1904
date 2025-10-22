@@ -11,18 +11,23 @@ typedef struct {
 } Barra;
 
 typedef struct {
+    float infeccaoAtual;
+    float infeccaoMaxima;
+} InfeccaoEstagio;
+
+typedef struct {
     float barraX, barraY, barraLargura, barraAltura, barraVida;
 } BarraBoss;
 
-// FUNÇÃO FUNDO DA BARRA DO PERSONAGEM / CARAVANA
+// FUNÃ‡ÃƒO FUNDO DA BARRA DO PERSONAGEM / CARAVANA
 void desenhar_barra(float barraX, float barraY, float barraLargura, float barraAltura);
 
-// FUNÇÃO BARRA DE INFECÇÃO
+// FUNÃ‡ÃƒO BARRA DE INFECÃ‡ÃƒO
 void desenhar_barra_infeccao(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura, float* posicaoCamera);
 
-// FUNÇÃO FUNDO DA BARRA DE VIDA DO BOSS
+// FUNÃ‡ÃƒO FUNDO DA BARRA DE VIDA DO BOSS
 void desenhar_fundo_barra_vida_boss(float vidaX, float vidaY, float vidaLargura, float vidaAltura);
 
-// FUNÇÃO BARRA DE VIDA DO BOSS
+// FUNÃ‡ÃƒO BARRA DE VIDA DO BOSS
 void desenhar_barra_vida_boss(float vidaX, float vidaY, float vidaLargura, float vidaAltura);
 #endif
