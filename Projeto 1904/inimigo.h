@@ -11,7 +11,8 @@ typedef enum {
     TIPO_ZUMBI,
     TIPO_RATO,
     TIPO_MOSQUITO,
-    TIPO_BOSS
+    TIPO_BOSS,
+    TIPO_BOSS_RATO
 } TipoInimigo;
 
 typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que essa struct existe
@@ -53,6 +54,8 @@ int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual);
 
 void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera);
+
+void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera);
 
 void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada);
 

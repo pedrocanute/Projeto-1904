@@ -52,6 +52,16 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->vida = 50;
         inimigo->dano = 10;
         break;
+    case TIPO_BOSS_RATO:
+        // Rato normal tem 60x50, então 3x = 180x150
+        inimigo->larguraBot = 180.0f;  // 60 * 3
+        inimigo->alturaBot = 150.0f;   // 50 * 3
+        inimigo->frames_por_sprite = 11;  // Mesma animação do rato normal
+        inimigo->velocidade = 1.5f;     // Mais lento que rato normal
+        inimigo->vida = 30;             // Vida de boss
+        inimigo->dano = 15;             // Dano alto
+        break;
+    
     }
 }
 
@@ -95,7 +105,7 @@ void atualizar_movimento_inimigos(Caravana* caravana,Inimigo* inimigos, int quan
     for (int i = 0; i < quantidade; i++) {
         if (inimigos[i].ativo == false)
             continue;
-        if (inimigos[i].tipo == TIPO_BOSS)
+        if (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)
             continue;
 
         inimigos[i].botX -= inimigos[i].velocidade;
@@ -135,8 +145,14 @@ void desenhar_inimigo(Inimigo* inimigo, bool em_movimento) {
     int sx = inimigo->frame_atual * largura_frame;
     int sy = 0;
 
-    al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
-        inimigo->botX, inimigo->botY, 0);
+    if (inimigo->tipo == TIPO_BOSS_RATO) {
+        al_draw_scaled_bitmap(sprite_atual, sx, sy, largura_frame, altura_frame, inimigo->botX, inimigo->botY, largura_frame * 3, altura_frame * 4, 0);
+    }
+    else {
+
+    al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,inimigo->botX, inimigo->botY, 0);
+    }
+
 }
 
 
@@ -195,8 +211,16 @@ void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* bo
     inicializar_inimigo(inimigo, TIPO_BOSS, spawn_x, spawn_y, boss_dir, boss_esq);
 }
 
+void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera) {
+    float camera_direita = posicaoCamera[0] + 1280;
+    float spawnX = camera_direita + 500;
+    float spawnY = (720 / 2) - 100;
+
+    inicializar_inimigo(inimigo, TIPO_BOSS_RATO, spawnX, spawnY, ratodir, ratoesq);
+}
+
 void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada) {
-    if (!boss || !boss->ativo || boss->tipo != TIPO_BOSS) return;
+    if (!boss || !boss->ativo || (boss->tipo != TIPO_BOSS && boss->tipo != TIPO_BOSS_RATO)) return;
 
     if (boss->botY + boss->alturaBot >= 720)
         boss->botY = 720 - boss->alturaBot;

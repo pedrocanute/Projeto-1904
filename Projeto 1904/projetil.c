@@ -156,7 +156,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                     }
 
                     // Atualize a barra de vida do boss apenas se o inimigo for o boss
-                    if (inimigos[j].tipo == TIPO_BOSS) {
+                    if (inimigos[j].tipo == TIPO_BOSS || inimigos[j].tipo == TIPO_BOSS_RATO) {
                         barraVidaBoss->barraVida -= 6;
                     }
 
@@ -296,7 +296,7 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
                     sistemaFase->inimigosMortos++;
                 }
 
-                if (inimigos[j].tipo == TIPO_BOSS) {
+                if (inimigos[j].tipo == TIPO_BOSS_RATO) {
                     barraVidaBoss->barraVida -= 6;
                 }
 

@@ -236,22 +236,29 @@ int main() {
             restringirPosicao(&jogador, &caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
             atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
-            if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
-                atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
-                // Posiciona a barra de vida do boss
+            
+            for (int i = 0; i < MAX_INIMIGOS; i++) {
+                
+                if (inimigos[i].ativo &&
+                    (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)) {
 
-                // BARRA DE VIDA DO BOSS
-                barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2; // Centraliza a barra de vida em relação ao boss
-                barraVidaBoss.barraY = inimigos[0].botY - 30;
-                barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida; 
-                barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
+                    atualizar_boss_perseguindo(&inimigos[i], &jogador, 120.0f);
 
-                // Posiciona o FUNDO da barra de vida do boss
-                barraVidaBossFundo.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2;
-                barraVidaBossFundo.barraY = inimigos[0].botY - 30;
-                barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + 300;
-                barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + 25;
-            }; 
+                    // Posiciona barra de vida do boss
+                    barraVidaBoss.barraX = inimigos[i].botX + (inimigos[i].larguraBot - 300) / 2;
+                    barraVidaBoss.barraY = inimigos[i].botY - 30;
+                    barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida;
+                    barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
+
+                    // Fundo da barra
+                    barraVidaBossFundo.barraX = inimigos[i].botX + (inimigos[i].larguraBot - 300) / 2;
+                    barraVidaBossFundo.barraY = inimigos[i].botY - 30;
+                    barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + 300;
+                    barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + 25;
+
+                    break;
+                }
+            }
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, caravana.caravanaX, caravana.caravanaVelocidade);
             redesenhar = true;
@@ -267,21 +274,23 @@ int main() {
 
         if (fase_boss_ativa) {
             for (int i = 0; i < MAX_INIMIGOS; i++) {
-                if (colisao_jogador_inimigo(&inimigos[0], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
-                    float tempoAtual = al_get_time();
-                    if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
-                        colisaoCaravana = true;
-                        barraInfeccao.barraLargura += inimigos[i].dano;
-                        timer_regen_infeccao = tempoAtual;
-                        inimigos[i].timer_intangibilidade = tempoAtual;
+                if (inimigos[i].ativo && (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)) {
+                    if (colisao_jogador_inimigo(&inimigos[0], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
+                        float tempoAtual = al_get_time();
+                        if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
+                            colisaoCaravana = true;
+                            barraInfeccao.barraLargura += inimigos[i].dano;
+                            timer_regen_infeccao = tempoAtual;
+                            inimigos[i].timer_intangibilidade = tempoAtual;
 
-                        dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
+                            dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
 
-                        if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
-                            corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
-                        }
-                        else {
-                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                            if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
+                                corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                            }
+                            else {
+                                corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                            }
                         }
                     }
                 }
@@ -341,15 +350,24 @@ int main() {
                 if (!boss_spawnado) {
                     int idx_boss = -1;
                     for (int i = 0; i < MAX_INIMIGOS; ++i) {
-                        if (!inimigos[i].ativo) { idx_boss = i; break; }
+                        if (!inimigos[i].ativo) { 
+                            idx_boss = i; 
+                            break; 
+                        }
                     }
-                    if (idx_boss < 0) idx_boss = 0;
+                    if (idx_boss >= 0) {
 
-                    spawnar_boss(&inimigos[idx_boss], bitmap.boss_variola_direita, bitmap.boss_variola_esquerda, posicaoCamera);
-                    boss_spawnado = true;
-                    fase_boss_ativa = true;
-                    spawn_ativo = false; // pausa spawns comuns
+                        if (sistemaFase.faseAtual == 1) {
+                            spawnar_boss_rato(&inimigos[idx_boss], bitmap.rato_direita, bitmap.rato_esquerda, posicaoCamera);
+                        }
+                        else if (sistemaFase.faseAtual == 2 || sistemaFase.faseAtual == 3) {
+                            spawnar_boss(&inimigos[idx_boss], bitmap.boss_variola_direita, bitmap.boss_variola_esquerda, posicaoCamera);
+                        }
+                        boss_spawnado = true;
+                        fase_boss_ativa = true;
+                        spawn_ativo = false;
                     barraVidaBoss.barraVida = 300.0f;
+                    }
                 }
             }
         }
@@ -357,7 +375,7 @@ int main() {
             // Durante o boss: pausar novos spawns comuns e aguardar morte do boss
             bool bossVivo = false;
             for (int i = 0; i < MAX_INIMIGOS; ++i) {
-                if (inimigos[i].ativo && inimigos[i].tipo == TIPO_BOSS) {
+                if (inimigos[i].ativo && (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)) {
                     bossVivo = true; break;
                 }
             }
