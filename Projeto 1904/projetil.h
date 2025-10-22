@@ -27,6 +27,11 @@ typedef struct {
 
     int larguraProjetil[50];
     int alturaProjetil[50];
+
+    bool ataqueCorpoACorpoAtivo;
+    float tempoInicioAtaque;
+    float duracaoAtaque;
+
 } ProjetilPosicao;
 
 void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, Bitmaps* bitmap, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss);
@@ -36,5 +41,7 @@ void inicializar_armas(ProjetilPosicao* arma, Arma tipo_arma, float x, float y, 
 void trocar_arma(ProjetilPosicao* pp, Arma nova_arma);
 
 void configuracoes_armas(Arma tipo, float* velocidade, float* cadencia);
+
+void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, bool espaco, int larguraJogador, int alturaJogador, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss);
 
 #endif

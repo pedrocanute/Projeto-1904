@@ -4,6 +4,12 @@
 
 void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, Bitmaps *bitmap, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss) {
 
+    if (pp->tipo == ARMA_VASSOURA) {
+        ataque_corpo_a_corpo(pp, jogador, inimigos, numInimigos, espaco, larguraJogador, alturaJogador, sistemaFase, barraVidaBoss);
+        return;
+    }
+
+
     const float projetilTimer = al_get_time();
 
     // CRIAR PROJÉTEIS
@@ -176,6 +182,10 @@ void inicializar_armas(ProjetilPosicao* arma, Arma tipo_arma, float x, float y, 
     arma->tipo = tipo_arma;
     arma->proxProjetil = 0.0f;
 
+    arma->ataqueCorpoACorpoAtivo = false;
+    arma->tempoInicioAtaque = 0.0f;
+    arma->duracaoAtaque = 0.3f;
+
     for (int i = 0; i < 50; i++) {
         arma->projetilAtivo[i] = false;
         arma->projetilX[i] = 0.0f;
@@ -186,6 +196,8 @@ void inicializar_armas(ProjetilPosicao* arma, Arma tipo_arma, float x, float y, 
         arma->frameProjetil[i] = 0;
         arma->contadorFrameProjetil[i] = 0;
         arma->posicaoInicialX[i] = 0.0f;
+        arma->larguraProjetil[i] = 16;
+        arma->alturaProjetil[i] = 16;
     }
 }
 
@@ -213,5 +225,71 @@ void configuracoes_armas(Arma tipo, float* velocidade, float* cadencia) {
         *velocidade = 8.0f;
         *cadencia = 0.3f;
         break;
+    }
+}
+
+void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, bool espaco, int larguraJogador, int alturaJogador, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss) {
+
+    const float tempoAtual = al_get_time();
+
+    if (espaco && tempoAtual >= pp->proxProjetil && !pp->ataqueCorpoACorpoAtivo) {
+        float cadencia;
+        float velocidade;
+        configuracoes_armas(pp->tipo, &velocidade, &cadencia);
+
+        pp->ataqueCorpoACorpoAtivo = true;
+        pp->tempoInicioAtaque = tempoAtual;
+        pp->duracaoAtaque = 0.3f;
+        pp->proxProjetil = tempoAtual + cadencia;
+    }
+
+    if (pp->ataqueCorpoACorpoAtivo) {
+        if ((tempoAtual - pp->tempoInicioAtaque) >= pp->duracaoAtaque) {
+            pp->ataqueCorpoACorpoAtivo = false;
+            return;
+        }
+
+        //HITBOX DO ATAQUE
+        float ataqueX, ataqueY, ataqueLargura, ataqueAltura;
+
+        if (jogador.paraDireita) {
+            ataqueX = jogador.jogadorX + larguraJogador;
+            ataqueY = jogador.jogadorY + (alturaJogador * 0.3f);
+            ataqueLargura = 60.0f; //ALCANCE
+            ataqueAltura = alturaJogador * 0.5f;
+        }
+        else if (jogador.paraEsquerda) {
+            ataqueX = jogador.jogadorX - 60.0f;
+            ataqueY = jogador.jogadorY + (alturaJogador * 0.3f);
+            ataqueLargura = 60.0f;
+            ataqueAltura = alturaJogador * 0.5f;
+        }
+        else {
+            // Parado - ataque para frente da última direção
+            ataqueX = jogador.jogadorX + larguraJogador;
+            ataqueY = jogador.jogadorY + (alturaJogador * 0.3f);
+            ataqueLargura = 60.0f;
+            ataqueAltura = alturaJogador * 0.5f;
+        }
+
+        //VERIFICAR COLISAO
+        for (int j = 0; j < numInimigos; j++) {
+            if (!inimigos[j].ativo) continue;
+
+            if (colisao_aabb(ataqueX, ataqueY, ataqueLargura, ataqueAltura, inimigos[j].botX, inimigos[j].botY, inimigos[j].larguraBot, inimigos[j].alturaBot)) {
+
+                inimigos[j].vida--;
+
+                if (inimigos[j].vida <= 0) {
+                    inimigos[j].ativo = false;
+                    sistemaFase->inimigosMortos++;
+                }
+
+                if (inimigos[j].tipo == TIPO_BOSS) {
+                    barraVidaBoss->barraVida -= 6;
+                }
+
+            }
+        }
     }
 }
