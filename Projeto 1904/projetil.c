@@ -148,7 +148,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                 bool podeAtingir = false;
                 switch (pp->tipoProjetil[i]) {
                     case ARMA_VACINA:
-                        podeAtingir = (inimigos[j].tipo == TIPO_ZUMBI);
+                        podeAtingir = (inimigos[j].tipo == TIPO_ZUMBI || inimigos[j].tipo == TIPO_BOSS);
                         break;
                     case ARMA_VENENO:
                         podeAtingir = (inimigos[j].tipo == TIPO_MOSQUITO);
@@ -172,7 +172,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                     }
 
                     // Atualize a barra de vida do boss apenas se o inimigo for o boss
-                    if (inimigos[j].tipo == TIPO_BOSS || inimigos[j].tipo == TIPO_BOSS_RATO) {
+                    if (inimigos[j].tipo == TIPO_BOSS) {
                         barraVidaBoss->barraVida -= 6;
                     }
 
@@ -316,7 +316,7 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
                 }
 
                 if (inimigos[j].tipo == TIPO_BOSS_RATO) {
-                    barraVidaBoss->barraVida -= 6;
+                    barraVidaBoss->barraVida -= 10;
                 }
 
             }
