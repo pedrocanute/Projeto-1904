@@ -395,12 +395,12 @@ int main() {
             desenhar_caravana(bitmap.soldado, caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
 
             // jogador e inimigos
-            desenhar_jogador(jogador, w, a, s, d, espaco,&spritesJogador, projetil.tipo,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
+            desenhar_jogador(&jogador, w, a, s, d, espaco,&spritesJogador, projetil.tipo,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
             desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
             desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
             // tiros
-            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase, &barraVidaBoss);
+            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, &bitmap, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera, &sistemaFase, &barraVidaBoss);
 
             // HUD (fixo na tela)
             char texto[100];

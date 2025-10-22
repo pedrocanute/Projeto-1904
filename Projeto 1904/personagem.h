@@ -16,6 +16,9 @@ typedef enum {
 typedef struct {
     float jogadorX, jogadorY;
     bool paraDireita, paraEsquerda;
+
+    float tempoUltimoDisparo;
+    float cadenciaAtual;
 } Jogador;
 
 // Estrutura para armazenar todos os sprites do jogador
@@ -45,7 +48,7 @@ void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocid
 void restringirPosicao(Jogador* p, Caravana* caravana, float maximoX, float maximoY, float larguraJogador, float alturaJogador);
 
 // DESENHA JOGADOR COM BASE NO MOVIMENTO E ARMA EQUIPADA
-void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espaco,SpritesJogador* sprites, int arma_equipada,int* frame_atual, int* contador_frame, int frames_por_sprite,bool* virado_direita, int* frame_tiro, int* contador_frame_tiro);
+void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool espaco,SpritesJogador* sprites, int arma_equipada,int* frame_atual, int* contador_frame, int frames_por_sprite,bool* virado_direita, int* frame_tiro, int* contador_frame_tiro);
 
 void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador, float caravanaX, float caravanaVelocidade);
 

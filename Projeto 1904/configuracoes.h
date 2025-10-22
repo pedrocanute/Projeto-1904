@@ -50,6 +50,7 @@ typedef struct {
     ALLEGRO_BITMAP* atacando_vassoura_esquerda;
     ALLEGRO_BITMAP* atacando_veneno_direita;
     ALLEGRO_BITMAP* atacando_veneno_esquerda;
+    ALLEGRO_BITMAP* projetil_veneno;
     // Cenário
     ALLEGRO_BITMAP* cenario1;
     ALLEGRO_BITMAP* cenario2;

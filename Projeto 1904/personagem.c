@@ -68,7 +68,7 @@ void restringirPosicao(Jogador* p, Caravana* caravana, float maximoX, float maxi
         p->jogadorY = HEIGHT - alturaJogador;
 }
 
-void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espaco,SpritesJogador* sprites, int arma_equipada,int* frame_atual, int* contador_frame, int frames_por_sprite,bool* virado_direita, int* frame_tiro, int* contador_frame_tiro) {
+void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool espaco,SpritesJogador* sprites, int arma_equipada,int* frame_atual, int* contador_frame, int frames_por_sprite,bool* virado_direita, int* frame_tiro, int* contador_frame_tiro) {
 
     // Determina direção baseado no movimento
     if (d || (d && s) || (d && w)) {
@@ -84,6 +84,22 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
     ALLEGRO_BITMAP* sprite_atacando_dir = NULL;
     ALLEGRO_BITMAP* sprite_atacando_esq = NULL;
     int frames_ataque = 3; 
+
+    //VERIFICAR CADENCIA DE CADA ARMA E VELOCIDADE DE ANIMACAO
+    float velocidade, cadencia;
+    configuracoes_armas(arma_equipada, &velocidade, &cadencia);
+
+    int velocidadeAnimacao;
+
+    if (cadencia <= 0.2f) {
+        velocidadeAnimacao = 4;
+    }
+    else if (cadencia <= 0.5f) {
+        velocidadeAnimacao = 5;
+    }
+    else {
+        velocidadeAnimacao = (int)(cadencia * 8.0f); 
+    }
 
     // SELECIONA OS SPRITES COM BASE NA ARMA EQUIPADA
     switch (arma_equipada) {
@@ -131,7 +147,7 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
         // ANIMAÇÃO DE ATAQUE - SINCRONIZADA COM CADÊNCIA
        
         (*contador_frame_tiro)++;
-        if (*contador_frame_tiro >= 4) {  
+        if (*contador_frame_tiro >= velocidadeAnimacao) {  
             *frame_tiro = (*frame_tiro + 1) % frames_ataque; 
             *contador_frame_tiro = 0;
         }
@@ -143,7 +159,7 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
         int sy = 0;
 
         al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
-            jogador.jogadorX, jogador.jogadorY, 0);
+            jogador->jogadorX, jogador->jogadorY, 0);
     }
     else {
         
@@ -153,6 +169,9 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
         else {
             sprite_atual = sprite_andando_esq;
         }
+
+        *frame_tiro = 0;
+        *contador_frame_tiro = 0;
 
         // ANIMAÇÃO NORMAL DE CAMINHADA (2 colunas)
         if (esta_em_movimento) {
@@ -174,7 +193,7 @@ void desenhar_jogador(Jogador jogador, bool w, bool a, bool s, bool d, bool espa
         int sx = *frame_atual * largura_frame;
         int sy = 0;
 
-        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,jogador.jogadorX, jogador.jogadorY, 0);
+        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,jogador->jogadorX, jogador->jogadorY, 0);
     }
 }
 
