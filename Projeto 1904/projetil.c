@@ -6,7 +6,6 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
 
     if (pp->tipo == ARMA_VASSOURA) {
         ataque_corpo_a_corpo(pp, jogador, inimigos, numInimigos, espaco, larguraJogador, alturaJogador, sistemaFase, barraVidaBoss);
-        return;
     }
 
 
@@ -145,7 +144,24 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
             for (int j = 0; j < numInimigos; j++) {
                 if (!inimigos[j].ativo) continue;
 
-                if (colisao_projetil_inimigo(pp->projetilX[i], pp->projetilY[i], pp->larguraProjetil[i],pp->alturaProjetil[i], &inimigos[j])) {
+                // Verificação de tipo de projétil e inimigo
+                bool podeAtingir = false;
+                switch (pp->tipoProjetil[i]) {
+                    case ARMA_VACINA:
+                        podeAtingir = (inimigos[j].tipo == TIPO_ZUMBI);
+                        break;
+                    case ARMA_VENENO:
+                        podeAtingir = (inimigos[j].tipo == TIPO_MOSQUITO);
+                        break;
+                    // Vassoura não dispara projétil, só corpo a corpo
+                    default:
+                        podeAtingir = false;
+                        break;
+                }
+
+                if (!podeAtingir) continue;
+
+                if (colisao_projetil_inimigo(pp->projetilX[i], pp->projetilY[i], pp->larguraProjetil[i], pp->alturaProjetil[i], &inimigos[j])) {
                     
                     // SISTEMA DE VIDA E “MORTE” 
                     inimigos[j].vida--;
@@ -285,6 +301,9 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
             if (!inimigos[j].ativo) continue;
 
             if (pp->inimigosAtingidos[j]) continue;
+
+            // Só atinge ratos
+            if (inimigos[j].tipo != TIPO_RATO && inimigos[j].tipo != TIPO_BOSS_RATO) continue;
 
             if (colisao_aabb(ataqueX, ataqueY, ataqueLargura, ataqueAltura, inimigos[j].botX, inimigos[j].botY, inimigos[j].larguraBot, inimigos[j].alturaBot)) {
 
