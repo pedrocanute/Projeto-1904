@@ -34,7 +34,7 @@ int main() {
     bool dialogo1 = false, dialogo2 = false, dialogo3 = false;
     bool redesenhar = false;
 
-    bool w = false, a = false, s = false, d = false, espaco = false, shift = false, esc = false;
+    bool w = false, a = false, s = false, d = false, espaco = false, shift = false, esc = false, num1 = false, num2 = false, num3 = false;
     float mouseX = 0.0f, mouseY = 0.0f;
 
     ProjetilPosicao projetil = { 0 };
@@ -62,7 +62,21 @@ int main() {
 
     // JOGADOR
     Jogador jogador = { 120.0f, 520.0f, true, false };
-
+    SpritesJogador spritesJogador = {
+    .sprite_andando_direita = bitmap.sprite_andando_direita,
+    .sprite_andando_esquerda = bitmap.sprite_andando_esquerda,
+    .sprite_atirando_direita = bitmap.sprite_atirando_direita,
+    .sprite_atirando_esquerda = bitmap.sprite_atirando_esquerda,
+    .sprite_andando_direita_vassoura = bitmap.sprite_andando_direita_vassoura,
+    .sprite_andando_esquerda_vassoura = bitmap.sprite_andando_esquerda_vassoura,
+    .atacando_vassoura_direita = bitmap.atacando_vassoura_direita,
+    .atacando_vassoura_esquerda = bitmap.atacando_vassoura_esquerda,
+    .sprite_andando_direita_veneno = bitmap.sprite_andando_direita_veneno,
+    .sprite_andando_esquerda_veneno = bitmap.sprite_andando_esquerda_veneno,
+    .atacando_veneno_direita = bitmap.atacando_veneno_direita,
+    .atacando_veneno_esquerda = bitmap.atacando_veneno_esquerda
+    };
+    projetil.tipo = ARMA_VACINA;
     // CARAVANA
     Caravana caravana = { 0.0f, 305.0f, 80.0f, 732.0f, 1.0f };
 
@@ -225,9 +239,21 @@ int main() {
 
         // TECLADO
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
-            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc);
+            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc, &num1, &num2, &num3);
             if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 esc = true;
+            }
+
+            if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+                if (event.keyboard.keycode == ALLEGRO_KEY_1) {
+                    trocar_arma(&projetil, ARMA_VASSOURA);
+                }
+                else if (event.keyboard.keycode == ALLEGRO_KEY_2) {
+                    trocar_arma(&projetil, ARMA_VENENO);
+                }
+                else if (event.keyboard.keycode == ALLEGRO_KEY_3) {
+                    trocar_arma(&projetil, ARMA_VACINA);
+                }
             }
         }
 
@@ -249,22 +275,29 @@ int main() {
             restringirPosicao(&jogador, &caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
             atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
-            if (inimigos[0].ativo && inimigos[0].tipo == TIPO_BOSS) {
-                atualizar_boss_perseguindo(&inimigos[0], &jogador, 12.0f); // 8–20 px funciona bem
-                // Posiciona a barra de vida do boss
+            
+            for (int i = 0; i < MAX_INIMIGOS; i++) {
+                
+                if (inimigos[i].ativo &&
+                    (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)) {
 
-                // BARRA DE VIDA DO BOSS
-                barraVidaBoss.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2; // Centraliza a barra de vida em relação ao boss
-                barraVidaBoss.barraY = inimigos[0].botY - 30;
-                barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida; 
-                barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
+                    atualizar_boss_perseguindo(&inimigos[i], &jogador, 120.0f);
 
-                // Posiciona o FUNDO da barra de vida do boss
-                barraVidaBossFundo.barraX = inimigos[0].botX + (inimigos[0].larguraBot - 300) / 2;
-                barraVidaBossFundo.barraY = inimigos[0].botY - 30;
-                barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + 300;
-                barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + 25;
-            }; 
+                    // Posiciona barra de vida do boss
+                    barraVidaBoss.barraX = inimigos[i].botX + (inimigos[i].larguraBot - 300) / 2;
+                    barraVidaBoss.barraY = inimigos[i].botY - 30;
+                    barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida;
+                    barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
+
+                    // Fundo da barra
+                    barraVidaBossFundo.barraX = inimigos[i].botX + (inimigos[i].larguraBot - 300) / 2;
+                    barraVidaBossFundo.barraY = inimigos[i].botY - 30;
+                    barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + 300;
+                    barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + 25;
+
+                    break;
+                }
+            }
 
             camera_jogador(posicaoCamera, jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, caravana.caravanaX, caravana.caravanaVelocidade);
             redesenhar = true;
@@ -280,21 +313,23 @@ int main() {
 
         if (fase_boss_ativa) {
             for (int i = 0; i < MAX_INIMIGOS; i++) {
-                if (colisao_jogador_inimigo(&inimigos[0], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
-                    float tempoAtual = al_get_time();
-                    if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
-                        colisaoCaravana = true;
-                        barraInfeccao.barraLargura += inimigos[i].dano;
-                        timer_regen_infeccao = tempoAtual;
-                        inimigos[i].timer_intangibilidade = tempoAtual;
+                if (inimigos[i].ativo && (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)) {
+                    if (colisao_jogador_inimigo(&inimigos[0], &jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
+                        float tempoAtual = al_get_time();
+                        if (tempoAtual - inimigos[i].timer_intangibilidade >= TEMPO_INTANGIBILIDADE) {
+                            colisaoCaravana = true;
+                            barraInfeccao.barraLargura += inimigos[i].dano;
+                            timer_regen_infeccao = tempoAtual;
+                            inimigos[i].timer_intangibilidade = tempoAtual;
 
-                        dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
+                            dano_na_caravana = tempoAtual + 0.12f; //aplica um temporizador de dano
 
-                        if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
-                            corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
-                        }
-                        else {
-                            corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                            if (al_get_time() < dano_na_caravana) { //verifica o timer de dano e muda a cor da sprite para representar o dano
+                                corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                            }
+                            else {
+                                corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco no Allegro o branco nao altera a cor da sprite original
+                            }
                         }
                     }
                 }
@@ -375,15 +410,24 @@ int main() {
                 if (!boss_spawnado) {
                     int idx_boss = -1;
                     for (int i = 0; i < MAX_INIMIGOS; ++i) {
-                        if (!inimigos[i].ativo) { idx_boss = i; break; }
+                        if (!inimigos[i].ativo) { 
+                            idx_boss = i; 
+                            break; 
+                        }
                     }
-                    if (idx_boss < 0) idx_boss = 0;
+                    if (idx_boss >= 0) {
 
-                    spawnar_boss(&inimigos[idx_boss], bitmap.boss_variola_direita, bitmap.boss_variola_esquerda, posicaoCamera);
-                    boss_spawnado = true;
-                    fase_boss_ativa = true;
-                    spawn_ativo = false; // pausa spawns comuns
+                        if (sistemaFase.faseAtual == 1) {
+                            spawnar_boss_rato(&inimigos[idx_boss], bitmap.rato_direita, bitmap.rato_esquerda, posicaoCamera);
+                        }
+                        else if (sistemaFase.faseAtual == 2 || sistemaFase.faseAtual == 3) {
+                            spawnar_boss(&inimigos[idx_boss], bitmap.boss_variola_direita, bitmap.boss_variola_esquerda, posicaoCamera);
+                        }
+                        boss_spawnado = true;
+                        fase_boss_ativa = true;
+                        spawn_ativo = false;
                     barraVidaBoss.barraVida = 300.0f;
+                    }
                 }
             }
         }
@@ -391,7 +435,7 @@ int main() {
             // Durante o boss: pausar novos spawns comuns e aguardar morte do boss
             bool bossVivo = false;
             for (int i = 0; i < MAX_INIMIGOS; ++i) {
-                if (inimigos[i].ativo && inimigos[i].tipo == TIPO_BOSS) {
+                if (inimigos[i].ativo && (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)) {
                     bossVivo = true; break;
                 }
             }
@@ -429,11 +473,12 @@ int main() {
             desenhar_caravana(bitmap.soldado, caravana.caravanaX, caravana.caravanaY , caravana.caravanaLargura, caravana.caravanaAltura, corCaravana);
 
             // jogador e inimigos
-            desenhar_jogador(jogador, w, a, s, d, espaco, bitmap.sprite_andando_direita, bitmap.sprite_andando_esquerda, bitmap.sprite_atirando_direita, bitmap.sprite_atirando_esquerda,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
+            desenhar_jogador(&jogador, w, a, s, d, espaco,&spritesJogador, projetil.tipo,&frame_atual, &contador_frame, frames_por_sprite,&virado_direita, &frame_tiro, &contador_frame_tiro);
+            desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
             desenhar_todos_inimigos(inimigos, MAX_INIMIGOS);
 
             // tiros
-            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, bitmap.projetilDireita, bitmap.projetilEsquerda, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA,posicaoCamera, &sistemaFase, &barraVidaBoss);
+            atirar_multiplos_inimigos(&projetil, jogador, inimigos, MAX_INIMIGOS, &bitmap, espaco,LARGURA_PROJETIL, ALTURA_PROJETIL,ALTURA_JOGADOR, LARGURA_JOGADOR,WIDTH, VELOCIDADE_PROJETIL, CADENCIA, posicaoCamera, &sistemaFase, &barraVidaBoss);
 
             // Diálogo
             desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);

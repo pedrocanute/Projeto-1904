@@ -37,11 +37,20 @@ typedef struct {
     // Jogador
     ALLEGRO_BITMAP* sprite_andando_direita;
     ALLEGRO_BITMAP* sprite_andando_esquerda;
+    ALLEGRO_BITMAP* sprite_andando_direita_vassoura;
+    ALLEGRO_BITMAP* sprite_andando_esquerda_vassoura;
+    ALLEGRO_BITMAP* sprite_andando_direita_veneno;
+    ALLEGRO_BITMAP* sprite_andando_esquerda_veneno;
     ALLEGRO_BITMAP* sprite_atirando_direita;
     ALLEGRO_BITMAP* sprite_atirando_esquerda;
     // Projetil
     ALLEGRO_BITMAP* projetilDireita;
     ALLEGRO_BITMAP* projetilEsquerda;
+    ALLEGRO_BITMAP* atacando_vassoura_direita;
+    ALLEGRO_BITMAP* atacando_vassoura_esquerda;
+    ALLEGRO_BITMAP* atacando_veneno_direita;
+    ALLEGRO_BITMAP* atacando_veneno_esquerda;
+    ALLEGRO_BITMAP* projetil_veneno;
     // Cenário
     ALLEGRO_BITMAP* cenario1;
     ALLEGRO_BITMAP* cenario2;
