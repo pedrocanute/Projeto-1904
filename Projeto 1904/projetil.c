@@ -186,6 +186,10 @@ void inicializar_armas(ProjetilPosicao* arma, Arma tipo_arma, float x, float y, 
     arma->tempoInicioAtaque = 0.0f;
     arma->duracaoAtaque = 0.3f;
 
+    for (int k = 0; k < 20; k++) {
+        arma->inimigosAtingidos[k] = false;
+    }
+
     for (int i = 0; i < 50; i++) {
         arma->projetilAtivo[i] = false;
         arma->projetilX[i] = 0.0f;
@@ -241,6 +245,10 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
         pp->tempoInicioAtaque = tempoAtual;
         pp->duracaoAtaque = 0.3f;
         pp->proxProjetil = tempoAtual + cadencia;
+
+        for (int k = 0; k < 20; k++) {  // MAX_INIMIGOS
+            pp->inimigosAtingidos[k] = false;
+        }
     }
 
     if (pp->ataqueCorpoACorpoAtivo) {
@@ -276,8 +284,11 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
         for (int j = 0; j < numInimigos; j++) {
             if (!inimigos[j].ativo) continue;
 
+            if (pp->inimigosAtingidos[j]) continue;
+
             if (colisao_aabb(ataqueX, ataqueY, ataqueLargura, ataqueAltura, inimigos[j].botX, inimigos[j].botY, inimigos[j].larguraBot, inimigos[j].alturaBot)) {
 
+                pp->inimigosAtingidos[j] = true;
                 inimigos[j].vida--;
 
                 if (inimigos[j].vida <= 0) {

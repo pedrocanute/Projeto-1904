@@ -31,6 +31,7 @@ typedef struct {
     bool ataqueCorpoACorpoAtivo;
     float tempoInicioAtaque;
     float duracaoAtaque;
+    bool inimigosAtingidos[20];
 
 } ProjetilPosicao;
 
