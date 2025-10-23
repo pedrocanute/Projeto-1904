@@ -52,6 +52,8 @@ int main() {
     Bitmaps bitmap;
     carregar_bitmaps(&bitmap);
 
+
+
     // CAMERA
     float posicaoCamera[2] = { 0, 0 };
 
@@ -122,14 +124,14 @@ int main() {
     int telaGameOverAltura = al_get_bitmap_height(bitmap.telaGameOver);
     int botaoSairDoJogoLargura = al_get_bitmap_width(bitmap.botaoSairDoJogo);
     int botaoSairDoJogoAltura = al_get_bitmap_height(bitmap.botaoSairDoJogo);
-    int oswaldoLargura = al_get_bitmap_width(bitmap.oswaldo);
-    int oswaldoAltura = al_get_bitmap_height(bitmap.oswaldo);
-    int caixaDialogoLargura = al_get_bitmap_width(bitmap.caixaDialogo);
-    int caixaDialogoAltura = al_get_bitmap_height(bitmap.caixaDialogo);
+    int falandoLargura = al_get_bitmap_width(bitmap.falando);
+    int falandoAltura = al_get_bitmap_height(bitmap.falando);
+    int balaoLargura = al_get_bitmap_width(bitmap.balao);
+    int balaoAltura = al_get_bitmap_height(bitmap.balao);
 
-    int botaoJogarX = 200, botaoJogarY = 620;
-    int botaoRegrasX = 500, botaoRegrasY = 620;
-    int botaoSairX = 800, botaoSairY = 620;
+    int botaoJogarX = 200, botaoJogarY = 520;
+    int botaoRegrasX = 500, botaoRegrasY = 520;
+    int botaoSairX = 800, botaoSairY = 520;
     int botaoVoltarX = 520, botaoVoltarY = 500;
     int botaoSairDoJogoX = 445, botaoSairDoJogoY = 560;
     int caixaDialogoX = 10, caixaDialogoY = 540;
@@ -207,19 +209,39 @@ int main() {
         .botaoSairDoJogoLargura = botaoSairDoJogoLargura, .botaoSairDoJogoAltura = botaoSairDoJogoAltura
     };
 
+    ALLEGRO_FONT* fonteDialogo = al_load_ttf_font("joystix monospace.otf", 20, 0);
+ 
+
     Dialogo dialogo = {
-    .oswaldo = bitmap.oswaldo,
-    .caixaDialogo = bitmap.caixaDialogo,
-
-    .oswaldoLargura = oswaldoLargura,
-    .oswaldoAltura = oswaldoAltura,
-    .caixaDialogoLargura = caixaDialogoLargura, .caixaDialogoAltura = caixaDialogoAltura,
-    .caixaDialogoX = caixaDialogoX, .caixaDialogoY = caixaDialogoY,
-
-    .dialogo1 = &dialogo1,
-    .dialogo2 = &dialogo2,
-    .dialogo3 = &dialogo3
+    .falando = bitmap.falando,
+    .balao = bitmap.balao,
+    .fonteDialogo = fonteDialogo,
+    .falandoLargura = falandoLargura,
+    .falandoAltura = falandoAltura,
+    .balaoLargura = balaoLargura,
+    .balaoAltura = balaoAltura,
+    .frameAtual = 0,
+    .contadorFrame = 0,
+    .velocidadeAnimacao = 20,
+    .numeroTextos = 0,  
+    .textoAtual = 0,
+    .dialogo1 = false,
+    .dialogo2 = false,
+    .dialogo3 = false
     };
+
+    //  ADICIONA OS TEXTOS DO DIÁLOGO (máximo MAX_DIALOGOS = 10)
+    dialogo.textos[0] = "Sou Oswaldo Cruz, diretor de Saúde Pública desde 1903.";
+    dialogo.textos[1] = "Fui chamado pelo presidente Rodrigues Alves para sanear a capital.";
+    dialogo.textos[2] = "A cidade está doente: varíola, febre amarela e peste.";
+    dialogo.textos[3] = "A lei tornou a vacina da varíola obrigatória em todo o Brasil."; 
+    dialogo.textos[4] = "A medida gerou medo, boatos e protestos nas ruas."; 
+    dialogo.textos[5] = "Não recuarei: ciência, limpeza urbana e vacinação salvam vidas.";
+    dialogo.textos[6] = "Preciso de você no campo: vacinar, desinfestar e orientar o povo.";
+    dialogo.textos[7] = "Controle focos: mosquitos, ratos e aglomerações de risco.";
+    dialogo.textos[8] = "A ordem é proteger bairros e reduzir contágios rapidamente.";
+    dialogo.textos[9] = "Quando a cidade entender, venceremos as epidemias juntos.";
+    dialogo.numeroTextos = 10;
 
     // MENU PRINCIPAL
     menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
@@ -231,27 +253,27 @@ int main() {
         // TELA 1: Contexto inicial
         char* tela1[] = {
             "Rio de Janeiro, 1904...",
-            "A cidade enfrenta uma epidemia mortal.",
-            "Você é a última esperança."
+            "a capital tomada por epidemias e reformas urbanas duras."
+            
         };
-        adicionar_tela(&intro, 0, tela1, 3, 5.0f);  // Exibe por 4 segundos
+        adicionar_tela(&intro, 0, tela1, 2, 5.0f);  // Exibe por 4 segundos
 
         // TELA 2: Apresentação do protagonista
         char* tela2[] = {
-            "Como médico sanitarista,",
-            "você deve combater a varíola, febre amarela, peste bubônica",
-            "e enfrentar a revolta popular."
+            "Varíola, febre amarela e peste bubônica,",
+            "espalham medo nas ruas e afastam navios e visitantes"
+            
         };
-        adicionar_tela(&intro, 1, tela2, 3, 5.0f);
+        adicionar_tela(&intro, 1, tela2, 2, 5.0f);
 
         // TELA 3: Call to action
         char* tela3[] = {
-            "Oswaldo Cruz precisa de você.",
-            "O destino do Rio está em suas mãos.",
-            "Avance com o Exército Brasileiro para erradicar a epidemia..."
+            "O governo convoca Oswaldo Cruz,",
+            "para liderar uma campanha sanitária sem precedentes.",
+            
             
         };
-        adicionar_tela(&intro, 2, tela3, 3, 5.0f);  // Última tela: 5 segundos
+        adicionar_tela(&intro, 2, tela3, 2, 5.0f);  // Última tela: 5 segundos
 
         bool mostrarIntro = true;
         float tempoAnterior = al_get_time();
@@ -292,8 +314,50 @@ int main() {
 
     }
 
-    if (!jogando) {
-        // Saiu pelo menu
+    if (menuEstado.jogando) {
+        // FADE OUT (escurece) - 1 segundo
+        float alfaFade = 0.0f;
+        double tempoInicioFade = al_get_time();
+        const double DURACAO_FADE = 1.0;  // 1 segundo
+
+        while (alfaFade < 255.0f && menuEstado.jogando) {
+            ALLEGRO_EVENT event;
+            bool temEvento = al_wait_for_event_timed(fila_eventos, &event, 0.016);
+
+            if (temEvento && event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+                menuEstado.jogando = false;
+                break;  //SAI IMEDIATAMENTE
+            }
+
+            double tempoAtual = al_get_time();
+            double progresso = (tempoAtual - tempoInicioFade) / DURACAO_FADE;
+
+            if (progresso >= 1.0) {
+                alfaFade = 255.0f;
+            }
+            else {
+                alfaFade = (float)(progresso * 255.0);
+            }
+
+            // Desenha tela preta sobre tudo
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_draw_filled_rectangle(0, 0, WIDTH, HEIGHT,
+                al_map_rgba_f(0, 0, 0, alfaFade / 255.0f));
+            al_flip_display();
+        }
+        if (menuEstado.jogando) {
+            al_rest(0.3);
+        }
+    }
+
+    // Agora inicia o diálogo com fade in integrado
+    if (menuEstado.jogando) {
+        desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
+    }
+
+    // VERIFICA SE AINDA ESTÁ JOGANDO
+    if (!menuEstado.jogando) {
+        // Saiu durante o diálogo
         al_destroy_font(font);
         destruir_bitmaps(&bitmap);
         al_destroy_display(janela);
@@ -301,12 +365,10 @@ int main() {
         al_destroy_timer(timer);
         return 0;
     }
-
-    desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
     ALLEGRO_EVENT event;
 
     // LOOP PRINCIPAL
-    while (jogando) {
+    while (menuEstado.jogando) {
         al_wait_for_event(fila_eventos, &event);
 
         // CONDIÇÃO DE PARADA
@@ -592,7 +654,9 @@ int main() {
     } // fim while(jogando)
 
     // LIMPEZA
-    al_destroy_font(font);
+    if (fonteDialogo) {
+        al_destroy_font(fonteDialogo);
+    }
 
     destruir_bitmaps(&bitmap);
     al_destroy_display(janela);

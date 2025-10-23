@@ -70,8 +70,8 @@ typedef struct {
     ALLEGRO_BITMAP* botaoSairDoJogo;
     ALLEGRO_BITMAP* botaoSairDoJogo2;
     // Dialogo
-    ALLEGRO_BITMAP* oswaldo;
-    ALLEGRO_BITMAP* caixaDialogo;
+    ALLEGRO_BITMAP* falando;
+    ALLEGRO_BITMAP* balao;
 
 } Bitmaps;
 
