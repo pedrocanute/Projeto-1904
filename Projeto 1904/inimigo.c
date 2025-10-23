@@ -146,7 +146,7 @@ void desenhar_inimigo(Inimigo* inimigo, bool em_movimento) {
     int sy = 0;
 
     if (inimigo->tipo == TIPO_BOSS_RATO) {
-        al_draw_scaled_bitmap(sprite_atual, sx, sy, largura_frame, altura_frame, inimigo->botX, inimigo->botY, largura_frame * 3, altura_frame * 4, 0);
+        al_draw_scaled_bitmap(sprite_atual, sx, sy, largura_frame, altura_frame, inimigo->botX, inimigo->botY, largura_frame * 3, altura_frame * 3, 0);
     }
     else {
 
