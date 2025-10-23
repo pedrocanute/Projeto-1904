@@ -9,11 +9,14 @@
 #include "menu.h"
 #include "infeccao.h"
 #include "caravana.h"
+#include "introducao.h"
+
 
 int main() {
 
     al_init();
     al_init_font_addon();
+    al_init_ttf_addon();
     al_init_image_addon();
     al_install_keyboard();
     al_init_primitives_addon();
@@ -145,7 +148,12 @@ int main() {
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
     al_register_event_source(fila_eventos, al_get_keyboard_event_source());
     al_register_event_source(fila_eventos, al_get_mouse_event_source());
+    
+   
+    
     al_start_timer(timer);
+
+
 
     // SISTEMA MENUS
     MenuEstados menuEstado = {
@@ -215,6 +223,75 @@ int main() {
 
     // MENU PRINCIPAL
     menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
+    if (menuEstado.jogando) {
+
+        TelaIntroducao intro;
+        inicializar_introducao(&intro, "joystix monospace.otf", 14, 3);
+
+        // TELA 1: Contexto inicial
+        char* tela1[] = {
+            "Rio de Janeiro, 1904...",
+            "A cidade enfrenta uma epidemia mortal.",
+            "Você é a última esperança."
+        };
+        adicionar_tela(&intro, 0, tela1, 3, 5.0f);  // Exibe por 4 segundos
+
+        // TELA 2: Apresentação do protagonista
+        char* tela2[] = {
+            "Como médico sanitarista,",
+            "você deve combater a varíola, febre amarela, peste bubônica",
+            "e enfrentar a revolta popular."
+        };
+        adicionar_tela(&intro, 1, tela2, 3, 5.0f);
+
+        // TELA 3: Call to action
+        char* tela3[] = {
+            "Oswaldo Cruz precisa de você.",
+            "O destino do Rio está em suas mãos.",
+            "Avance com o Exército Brasileiro para erradicar a epidemia..."
+            
+        };
+        adicionar_tela(&intro, 2, tela3, 3, 5.0f);  // Última tela: 5 segundos
+
+        bool mostrarIntro = true;
+        float tempoAnterior = al_get_time();
+
+        while (mostrarIntro) {
+            ALLEGRO_EVENT event;
+            al_wait_for_event(fila_eventos, &event);
+
+            if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+                mostrarIntro = false;
+                continue;
+            }
+
+            if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+                if (event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                    intro.concluido = true;
+                }
+            }
+
+            if (event.type == ALLEGRO_EVENT_TIMER) {
+
+                float tempoAtual = al_get_time();
+                float deltaTime = tempoAtual - tempoAnterior;
+                tempoAnterior = tempoAtual;
+
+                atualizar_introducao(&intro, deltaTime);
+
+                desenhar_introducao(&intro, WIDTH, HEIGHT);
+                al_flip_display();
+
+                if (intro.concluido) {
+                    mostrarIntro = false;
+                }
+            }
+        }
+
+        destruir_introducao(&intro);
+
+    }
+
     if (!jogando) {
         // Saiu pelo menu
         al_destroy_font(font);
