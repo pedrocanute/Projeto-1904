@@ -172,7 +172,7 @@ int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos) {
     return inimigosAtivos;
 }
 
-void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
+void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual, int indiceInimigo) {
     int vida = 0;
     float velocidade = 1.0f;
     float dano = 0;
@@ -192,12 +192,9 @@ void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
         break;
     }
 
-    for (int i = 0; i < quantidade; ++i) {
-
-        inimigos[i].vida = inimigos[i].vida + vida;
-        inimigos[i].velocidade *= velocidade;
-        inimigos[i].dano *= dano;
-    }
+    inimigos[indiceInimigo].vida = inimigos[indiceInimigo].vida + vida;
+    inimigos[indiceInimigo].velocidade *= velocidade;
+    inimigos[indiceInimigo].dano *= dano;
 }
 
 void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera) {
@@ -210,6 +207,7 @@ void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* bo
     float spawn_y = (720 / 2) + 52;
 
     inicializar_inimigo(inimigo, TIPO_BOSS, spawn_x, spawn_y, boss_dir, boss_esq);
+    inimigo->ativo = true;
 }
 
 void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera) {
@@ -218,6 +216,7 @@ void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP
     float spawnY = (720 / 2) - 100;
 
     inicializar_inimigo(inimigo, TIPO_BOSS_RATO, spawnX, spawnY, ratodir, ratoesq);
+    inimigo->ativo = true;
 }
 
 void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada) {
