@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -21,6 +21,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
     inimigo->em_movimento = true;
     inimigo->ativo = true;
     inimigo->vida = 1;
+    inimigo->vidaMaxima = 1;  
     inimigo->timer_intangibilidade = 0.0f;
 
     // ATRIBUTOS DOS INIMIGOS
@@ -30,12 +31,16 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->alturaBot = 80.0f;
         inimigo->velocidade = 2.5f;
         inimigo->dano = 5.0f;
+        inimigo->vida = 1;
+        inimigo->vidaMaxima = 1;
         break;
     case TIPO_RATO:
         inimigo->larguraBot = 60.0f;
         inimigo->alturaBot = 50.0f;
         inimigo->velocidade = 2.8f;
         inimigo->dano = 3.0f;
+        inimigo->vida = 1;
+        inimigo->vidaMaxima = 1;
         break;
     case TIPO_MOSQUITO:
         inimigo->larguraBot = 80.0f;
@@ -43,6 +48,8 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->frames_por_sprite = 6;
         inimigo->velocidade = 2.9f;
         inimigo->dano = 2.0f;
+        inimigo->vida = 1;
+        inimigo->vidaMaxima = 1;
         break;
     case TIPO_BOSS:
         inimigo->larguraBot = 220.0f;
@@ -50,18 +57,20 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->frames_por_sprite = 15;
         inimigo->velocidade = 2.0f;
         inimigo->vida = 50;
+        inimigo->vidaMaxima = 50;  // ADICIONA VIDA MÁXIMA
         inimigo->dano = 10;
         break;
     case TIPO_BOSS_RATO:
-        // Rato normal tem 60x50, ent�o 3x = 180x150
+        // Rato normal tem 60x50, então 3x = 180x150
         inimigo->larguraBot = 180.0f;  // 60 * 3
         inimigo->alturaBot = 150.0f;   // 50 * 3
-        inimigo->frames_por_sprite = 11;  // Mesma anima��o do rato normal
+        inimigo->frames_por_sprite = 11;  // Mesma animação do rato normal
         inimigo->velocidade = 1.5f;     // Mais lento que rato normal
         inimigo->vida = 30;             // Vida de boss
+        inimigo->vidaMaxima = 30;       // ADICIONA VIDA MÁXIMA
         inimigo->dano = 15;             // Dano alto
         break;
-    
+
     }
 }
 

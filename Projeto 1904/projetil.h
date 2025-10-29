@@ -1,4 +1,4 @@
-#ifndef PROJETIL_H
+﻿#ifndef PROJETIL_H
 #define PROJETIL_H
 
 #include <stdbool.h>

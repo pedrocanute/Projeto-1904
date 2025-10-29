@@ -1,4 +1,4 @@
-#ifndef INTRODUCAO_H
+﻿#ifndef INTRODUCAO_H
 #define INTRODUCAO_H
 
 #include <allegro5/allegro.h>
@@ -17,7 +17,7 @@ typedef enum {
 typedef struct {
 	char** linhas;           // Array de strings (linhas do texto)
 	int numeroLinhas;        // Quantidade de linhas
-	float tempoExibicao;     // Tempo que a tela fica vis�vel
+	float tempoExibicao;     // Tempo que a tela fica visível
 } TelaTexto;
 
 

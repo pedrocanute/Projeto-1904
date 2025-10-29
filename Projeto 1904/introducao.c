@@ -157,11 +157,13 @@ void destruir_introducao(TelaIntroducao* intro) {
     if (intro->telas) {
         for (int i = 0; i < intro->numeroTelas; i++) {
             TelaTexto* tela = &intro->telas[i];
-            if (tela->linhas) {
+            // Adiciona verificação se tela->linhas foi inicializado
+            if (tela->linhas != NULL) {
                 for (int j = 0; j < tela->numeroLinhas; j++) {
                     if (tela->linhas[j]) free(tela->linhas[j]);
                 }
                 free(tela->linhas);
+                tela->linhas = NULL;
             }
         }
         free(intro->telas);

@@ -1,4 +1,4 @@
-#include "caravana.h"
+﻿#include "caravana.h"
 
 void desenhar_caravana(ALLEGRO_BITMAP* sprite_soldado, float caravanaX, float caravanaY, float caravanaLargura, float caravanaAltura, ALLEGRO_COLOR corCaravana) {
     static int frame_atual = 0;
