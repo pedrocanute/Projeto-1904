@@ -62,6 +62,10 @@ int main() {
     inicializarSistemaFases(&sistemaFase, &inimigos[0]);
     inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
 
+    int indiceInimigo = 0;
+    float timerSpawn = 0.0f;
+    int inimigosSpawnado = 0;
+
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
     ALLEGRO_COLOR corCaravana = al_map_rgb(0, 0, 0);
 
@@ -143,6 +147,8 @@ int main() {
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_TIMER* timerRespawnInimigo = al_create_timer(1.0);
+
     ALLEGRO_TRANSFORM camera;
 
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue();
@@ -150,10 +156,14 @@ int main() {
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
     al_register_event_source(fila_eventos, al_get_keyboard_event_source());
     al_register_event_source(fila_eventos, al_get_mouse_event_source());
-    
+   
+    al_register_event_source(fila_eventos, al_get_timer_event_source(timerRespawnInimigo));
+    al_start_timer(timerRespawnInimigo);
    
     
     al_start_timer(timer);
+    al_start_timer(timerRespawnInimigo);
+    
 
 
 
@@ -293,8 +303,7 @@ int main() {
                 }
             }
 
-            if (event.type == ALLEGRO_EVENT_TIMER) {
-
+            if (event.type == ALLEGRO_EVENT_TIMER && event.any.source == timer) {
                 float tempoAtual = al_get_time();
                 float deltaTime = tempoAtual - tempoAnterior;
                 tempoAnterior = tempoAtual;
@@ -306,6 +315,9 @@ int main() {
 
                 if (intro.concluido) {
                     mostrarIntro = false;
+                    printf("terminou a intro\n");
+                    
+                    
                 }
             }
         }
@@ -413,6 +425,26 @@ int main() {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, &caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
+            //Gera os inimigos um de cada vez
+            float tempoAtual = al_get_time();
+            if (tempoAtual - timerSpawn >= 1.0f && inimigosSpawnado < 20) {
+                printf("%d\n", indiceInimigo);
+                timerSpawn = tempoAtual;
+
+                // Atualiza a posição e tipo do inimigo antes de ativar
+                respawn_inimigo_na_camera(
+                    &inimigos[indiceInimigo],
+                    bitmap.zumbi_direita, bitmap.zumbi_esquerda,
+                    bitmap.rato_direita, bitmap.rato_esquerda,
+                    bitmap.mosquito_direita, bitmap.mosquito_esquerda,
+                    posicaoCamera
+                );
+
+                inimigos[indiceInimigo].ativo = true;
+                indiceInimigo++;
+                inimigosSpawnado++;
+            }
+            
             atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
             
             for (int i = 0; i < MAX_INIMIGOS; i++) {
@@ -536,8 +568,12 @@ int main() {
                     }
                     else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
                         inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
+                        
                         aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual);
                         spawn_ativo = false;
+
+                        indiceInimigo = 0;
+                        inimigosSpawnado = 0;
                     }
                 }
                 else {

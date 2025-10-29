@@ -19,7 +19,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
     inimigo->frames_por_sprite = 11;
     inimigo->virado_direita = false;
     inimigo->em_movimento = true;
-    inimigo->ativo = true;
+    inimigo->ativo = false;
     inimigo->vida = 1;
     inimigo->timer_intangibilidade = 0.0f;
 
@@ -167,6 +167,7 @@ int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos) {
     for (int i = 0; i < maxInimigos; i++) {
         if (inimigos[i].ativo)
             inimigosAtivos++;
+        printf("h\n");
     }
     return inimigosAtivos;
 }
