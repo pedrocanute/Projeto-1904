@@ -1,4 +1,4 @@
-#include "configuracoes.h"
+﻿#include "configuracoes.h"
 #include "personagem.h"
 #include "fases.h"
 #include "inimigo.h"
@@ -10,10 +10,10 @@
 #include "infeccao.h"
 #include "caravana.h"
 #include "introducao.h"
-
+#include "transicoes.h"
 
 int main() {
-
+      
     al_init();
     al_init_font_addon();
     al_init_ttf_addon();
@@ -246,134 +246,32 @@ int main() {
     // MENU PRINCIPAL
     menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
     if (menuEstado.jogando) {
-
-        TelaIntroducao intro;
-        inicializar_introducao(&intro, "joystix monospace.otf", 14, 3);
-
-        // TELA 1: Contexto inicial
-        char* tela1[] = {
-            "Rio de Janeiro, 1904...",
-            "a capital tomada por epidemias e reformas urbanas duras."
-            
-        };
-        adicionar_tela(&intro, 0, tela1, 2, 5.0f);  // Exibe por 4 segundos
-
-        // TELA 2: Apresentação do protagonista
-        char* tela2[] = {
-            "Varíola, febre amarela e peste bubônica,",
-            "espalham medo nas ruas e afastam navios e visitantes"
-            
-        };
-        adicionar_tela(&intro, 1, tela2, 2, 5.0f);
-
-        // TELA 3: Call to action
-        char* tela3[] = {
-            "O governo convoca Oswaldo Cruz,",
-            "para liderar uma campanha sanitária sem precedentes.",
-            
-            
-        };
-        adicionar_tela(&intro, 2, tela3, 2, 5.0f);  // Última tela: 5 segundos
-
-        bool mostrarIntro = true;
-        float tempoAnterior = al_get_time();
-
-        while (mostrarIntro) {
-            ALLEGRO_EVENT event;
-            al_wait_for_event(fila_eventos, &event);
-
-            if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-                mostrarIntro = false;
-                continue;
-            }
-
-            if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-                if (event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
-                    intro.concluido = true;
-                }
-            }
-
-            if (event.type == ALLEGRO_EVENT_TIMER) {
-
-                float tempoAtual = al_get_time();
-                float deltaTime = tempoAtual - tempoAnterior;
-                tempoAnterior = tempoAtual;
-
-                atualizar_introducao(&intro, deltaTime);
-
-                desenhar_introducao(&intro, WIDTH, HEIGHT);
-                al_flip_display();
-
-                if (intro.concluido) {
-                    mostrarIntro = false;
-                }
-            }
+        if (!executarIntroducao(&menuEstado, &menuEvent)) {
+            menuEstado.jogando = false;
         }
-
-        destruir_introducao(&intro);
-
     }
 
     if (menuEstado.jogando) {
-        // FADE OUT (escurece) - 1 segundo
-        float alfaFade = 0.0f;
-        double tempoInicioFade = al_get_time();
-        const double DURACAO_FADE = 1.0;  // 1 segundo
-
-        while (alfaFade < 255.0f && menuEstado.jogando) {
-            ALLEGRO_EVENT event;
-            bool temEvento = al_wait_for_event_timed(fila_eventos, &event, 0.016);
-
-            if (temEvento && event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-                menuEstado.jogando = false;
-                break;  //SAI IMEDIATAMENTE
-            }
-
-            double tempoAtual = al_get_time();
-            double progresso = (tempoAtual - tempoInicioFade) / DURACAO_FADE;
-
-            if (progresso >= 1.0) {
-                alfaFade = 255.0f;
-            }
-            else {
-                alfaFade = (float)(progresso * 255.0);
-            }
-
-            // Desenha tela preta sobre tudo
-            al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_filled_rectangle(0, 0, WIDTH, HEIGHT,
-                al_map_rgba_f(0, 0, 0, alfaFade / 255.0f));
-            al_flip_display();
-        }
-        if (menuEstado.jogando) {
-            al_rest(0.3);
+        if (!executarFadeTransicao(&menuEstado, &menuEvent, 1.0, false)) {
+            menuEstado.jogando = false;
         }
     }
 
-    // Agora inicia o diálogo com fade in integrado
     if (menuEstado.jogando) {
-        desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
+        al_rest(0.3);
+        if (!executarDialogoInicial(&dialogo, &sistemaFase, &menuEvent, &menuEstado)) {
+            menuEstado.jogando = false;
+        }
     }
-
-    // VERIFICA SE AINDA ESTÁ JOGANDO
-    if (!menuEstado.jogando) {
-        // Saiu durante o diálogo
-        al_destroy_font(font);
-        destruir_bitmaps(&bitmap);
-        al_destroy_display(janela);
-        al_destroy_event_queue(fila_eventos);
-        al_destroy_timer(timer);
-        return 0;
-    }
-    ALLEGRO_EVENT event;
 
     // LOOP PRINCIPAL
+    ALLEGRO_EVENT event;
     while (menuEstado.jogando) {
         al_wait_for_event(fila_eventos, &event);
 
         // CONDIÇÃO DE PARADA
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            jogando = false;
+            menuEstado.jogando = false;
         }
 
         // TECLADO
@@ -665,3 +563,5 @@ int main() {
 
     return 0;
 }
+
+
