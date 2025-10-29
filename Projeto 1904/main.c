@@ -14,7 +14,7 @@
 #include "jogo.h"
 
 int main() {
-    // ========== INICIALIZAÇÃO DO ALLEGRO ==========
+    // ========== INICIALIZAÇÃO DO ALLEGRO ===========
     al_init();
     al_init_font_addon();
     al_init_ttf_addon();
