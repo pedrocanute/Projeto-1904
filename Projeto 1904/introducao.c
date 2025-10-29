@@ -150,6 +150,7 @@ void desenhar_introducao(TelaIntroducao* intro, int larguraTela, int alturaTela)
 }
 
 void destruir_introducao(TelaIntroducao* intro) {
+    printf("d\n");
     if (intro->fonte) {
         al_destroy_font(intro->fonte);
         intro->fonte = NULL;

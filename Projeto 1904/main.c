@@ -53,6 +53,16 @@ int main() {
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
     al_register_event_source(fila_eventos, al_get_mouse_event_source());
+   
+    al_register_event_source(fila_eventos, al_get_timer_event_source(timerRespawnInimigo));
+    al_start_timer(timerRespawnInimigo);
+   
+    
+    al_start_timer(timer);
+    al_start_timer(timerRespawnInimigo);
+    
+
+
 
     al_start_timer(timer);
 
@@ -181,7 +191,50 @@ int main() {
             mover(&entidades.jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &animacao.frames_por_sprite);
             restringirPosicao(&entidades.jogador, &entidades.caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
-            atualizar_movimento_inimigos(&entidades.caravana, entidades.inimigos, MAX_INIMIGOS);
+            //Gera os inimigos um de cada vez ==========================================MUDANÇA THIAGO
+            float tempoAtual = al_get_time();
+            if (tempoAtual - timerSpawn >= 1.0f && inimigosSpawnado < 20) {
+                printf("%d\n", indiceInimigo);
+                timerSpawn = tempoAtual;
+
+                // Atualiza a posição e tipo do inimigo antes de ativar
+                respawn_inimigo_na_camera(
+                    &inimigos[indiceInimigo],
+                    bitmap.zumbi_direita, bitmap.zumbi_esquerda,
+                    bitmap.rato_direita, bitmap.rato_esquerda,
+                    bitmap.mosquito_direita, bitmap.mosquito_esquerda,
+                    posicaoCamera
+                );
+
+                inimigos[indiceInimigo].ativo = true;
+                indiceInimigo++;
+                inimigosSpawnado++;
+            }
+            
+            atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
+            
+            for (int i = 0; i < MAX_INIMIGOS; i++) {
+                
+                if (inimigos[i].ativo &&
+                    (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO)) {
+
+                    atualizar_boss_perseguindo(&inimigos[i], &jogador, 120.0f);
+
+                    // Posiciona barra de vida do boss
+                    barraVidaBoss.barraX = inimigos[i].botX + (inimigos[i].larguraBot - 300) / 2;
+                    barraVidaBoss.barraY = inimigos[i].botY - 30;
+                    barraVidaBoss.barraLargura = barraVidaBoss.barraX + barraVidaBoss.barraVida;
+                    barraVidaBoss.barraAltura = barraVidaBoss.barraY + 25;
+
+                    // Fundo da barra
+                    barraVidaBossFundo.barraX = inimigos[i].botX + (inimigos[i].larguraBot - 300) / 2;
+                    barraVidaBossFundo.barraY = inimigos[i].botY - 30;
+                    barraVidaBossFundo.barraLargura = barraVidaBossFundo.barraX + 300;
+                    barraVidaBossFundo.barraAltura = barraVidaBossFundo.barraY + 25;
+
+                    break;
+                }
+            }
 
             // Atualiza boss se estiver ativo
             atualizarBossAtivo(&entidades, &barras);
