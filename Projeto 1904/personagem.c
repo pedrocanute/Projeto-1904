@@ -1,4 +1,4 @@
-#include "personagem.h"
+﻿#include "personagem.h"
 #include "projetil.h"
 
 void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocidade, int* frames_por_sprite) {

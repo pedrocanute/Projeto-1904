@@ -1,4 +1,4 @@
-#ifndef CARAVANA_H
+﻿#ifndef CARAVANA_H
 #define CARAVANA_H
 
 #include <stdbool.h>

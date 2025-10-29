@@ -1,4 +1,4 @@
-#include "infeccao.h"
+﻿#include "infeccao.h"
 
 void desenhar_barra(float infeccaoX, float infeccaoY, float infeccaoLargura, float infeccaoAltura) {
     al_draw_filled_rectangle(infeccaoX, infeccaoY, infeccaoLargura, infeccaoAltura, al_map_rgb(0, 0, 0));

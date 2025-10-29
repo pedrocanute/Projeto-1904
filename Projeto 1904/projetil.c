@@ -1,4 +1,4 @@
-#include "projetil.h"
+Ôªø#include "projetil.h"
 #include "fases.h"
 #include <math.h>
 
@@ -11,7 +11,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
 
     const float projetilTimer = al_get_time();
 
-    // CRIAR PROJ…TEIS
+    // CRIAR PROJ√âTEIS
     if (espaco && projetilTimer >= pp->proxProjetil) {
         for (int i = 0; i < 50; i++) {
             if (!pp->projetilAtivo[i]) {
@@ -72,7 +72,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
         }
     }
 
-    // MOVER E VERIFICAR PROJ…TEIS
+    // MOVER E VERIFICAR PROJ√âTEIS
     for (int i = 0; i < 50; i++) {
         if (pp->projetilAtivo[i]) {
             
@@ -117,7 +117,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                     break;
                 }
 
-            // DESENHAR PROJ…TIL
+            // DESENHAR PROJ√âTIL
             if (spriteProjetil != NULL)
                 if (pp->tipoProjetil[i] == ARMA_VENENO) {
 
@@ -139,12 +139,12 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                 continue;
             }
 
-            // VERIFICAR COLIS√O COM TODOS OS INIMIGOS 
+            // VERIFICAR COLIS√ÉO COM TODOS OS INIMIGOS 
             bool colidiu = false;
             for (int j = 0; j < numInimigos; j++) {
                 if (!inimigos[j].ativo) continue;
 
-                // VerificaÁ„o de tipo de projÈtil e inimigo
+                // Verifica√ß√£o de tipo de proj√©til e inimigo
                 bool podeAtingir = false;
                 switch (pp->tipoProjetil[i]) {
                     case ARMA_VACINA:
@@ -153,7 +153,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                     case ARMA_VENENO:
                         podeAtingir = (inimigos[j].tipo == TIPO_MOSQUITO);
                         break;
-                    // Vassoura n„o dispara projÈtil, sÛ corpo a corpo
+                    // Vassoura n√£o dispara proj√©til, s√≥ corpo a corpo
                     default:
                         podeAtingir = false;
                         break;
@@ -163,17 +163,12 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
 
                 if (colisao_projetil_inimigo(pp->projetilX[i], pp->projetilY[i], pp->larguraProjetil[i], pp->alturaProjetil[i], &inimigos[j])) {
                     
-                    // SISTEMA DE VIDA E ìMORTEî 
+                    // SISTEMA DE VIDA E ‚ÄúMORTE‚Äù 
                     inimigos[j].vida--;
                     if (inimigos[j].vida <= 0) {
                         
                         inimigos[j].ativo = false;
                         sistemaFase->inimigosMortos++;
-                    }
-
-                    // Atualize a barra de vida do boss apenas se o inimigo for o boss
-                    if (inimigos[j].tipo == TIPO_BOSS) {
-                        barraVidaBoss->barraVida -= 6;
                     }
 
                     pp->projetilAtivo[i] = false;
@@ -185,7 +180,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
             if (colidiu) {
                 pp->projetilAtivo[i] = false;
             }
-            // VERIFICA LIMITES DA C¬MERA
+            // VERIFICA LIMITES DA C√ÇMERA
             else if (pp->projetilX[i] < posicaoCamera[0] - 100 || pp->projetilX[i] > posicaoCamera[0] + width + 100) {
                 pp->projetilAtivo[i] = false;
             }
@@ -289,7 +284,7 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
             ataqueAltura = alturaJogador * 0.5f;
         }
         else {
-            // Parado - ataque para frente da ˙ltima direÁ„o
+            // Parado - ataque para frente da √∫ltima dire√ß√£o
             ataqueX = jogador.jogadorX + larguraJogador;
             ataqueY = jogador.jogadorY + (alturaJogador * 0.3f);
             ataqueLargura = 60.0f;
@@ -302,7 +297,7 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
 
             if (pp->inimigosAtingidos[j]) continue;
 
-            // SÛ atinge ratos
+            // S√≥ atinge ratos
             if (inimigos[j].tipo != TIPO_RATO && inimigos[j].tipo != TIPO_BOSS_RATO) continue;
 
             if (colisao_aabb(ataqueX, ataqueY, ataqueLargura, ataqueAltura, inimigos[j].botX, inimigos[j].botY, inimigos[j].larguraBot, inimigos[j].alturaBot)) {
@@ -313,10 +308,6 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
                 if (inimigos[j].vida <= 0) {
                     inimigos[j].ativo = false;
                     sistemaFase->inimigosMortos++;
-                }
-
-                if (inimigos[j].tipo == TIPO_BOSS_RATO) {
-                    barraVidaBoss->barraVida -= 10;
                 }
 
             }

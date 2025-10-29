@@ -1,4 +1,4 @@
-#ifndef INFECCAO_H
+﻿#ifndef INFECCAO_H
 #define INFECCAO_H
 
 #include <stdbool.h>

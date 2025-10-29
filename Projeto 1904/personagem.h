@@ -1,4 +1,4 @@
-#ifndef PERSONAGEM_H
+﻿#ifndef PERSONAGEM_H
 #define PERSONAGEM_H
 
 #include <stdbool.h>
