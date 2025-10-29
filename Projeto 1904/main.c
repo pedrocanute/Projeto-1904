@@ -1,4 +1,4 @@
-#include "configuracoes.h"
+﻿#include "configuracoes.h"
 #include "personagem.h"
 #include "fases.h"
 #include "inimigo.h"
@@ -26,7 +26,7 @@ int main() {
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
 
-    //--DECLARACAO DE VARIAVEIS--//
+    //--DECLARACAO DE VARIAVEIS---//
 #pragma region VARIAVEIS
 
     bool telaMenu = true;
