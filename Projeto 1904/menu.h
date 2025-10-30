@@ -11,6 +11,8 @@
 #include "input.h"
 #include "cenario.h"
 
+#define MAX_DIALOGOS 10
+
 
 typedef struct {
     bool* telaMenu;
@@ -67,14 +69,25 @@ typedef struct {
 // Em menu.h
 
 typedef struct {
-    ALLEGRO_BITMAP* oswaldo;
-    ALLEGRO_BITMAP* caixaDialogo;
-    int caixaDialogoX, caixaDialogoY;
-    int caixaDialogoLargura, caixaDialogoAltura;
-    int oswaldoLargura, oswaldoAltura;
-    bool* dialogo1;
-    bool* dialogo2;
-    bool* dialogo3;
+    ALLEGRO_BITMAP* falando;
+    ALLEGRO_BITMAP* balao;
+    ALLEGRO_FONT* fonteDialogo;
+    int falandoLargura, falandoAltura;
+    int balaoLargura, balaoAltura;
+
+    // Animação da spritesheet
+    int frameAtual;
+    int contadorFrame;
+    int velocidadeAnimacao;
+
+    char* textos[MAX_DIALOGOS];  // Array de textos
+    int numeroTextos;             // Quantidade total de textos
+    int textoAtual;
+
+    // Estados de diálogo
+    bool dialogo1;
+    bool dialogo2;
+    bool dialogo3;
 } Dialogo;
 
 void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);

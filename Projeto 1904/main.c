@@ -1,4 +1,4 @@
-#include "configuracoes.h"
+﻿#include "configuracoes.h"
 #include "personagem.h"
 #include "fases.h"
 #include "inimigo.h"
@@ -9,11 +9,14 @@
 #include "menu.h"
 #include "infeccao.h"
 #include "caravana.h"
+#include "introducao.h"
+
 
 int main() {
 
     al_init();
     al_init_font_addon();
+    al_init_ttf_addon();
     al_init_image_addon();
     al_install_keyboard();
     al_init_primitives_addon();
@@ -23,7 +26,7 @@ int main() {
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
 
-    //--DECLARACAO DE VARIAVEIS--//
+    //--DECLARACAO DE VARIAVEIS---//
 #pragma region VARIAVEIS
 
     bool telaMenu = true;
@@ -56,6 +59,10 @@ int main() {
     Inimigo inimigos[MAX_INIMIGOS];
     inicializarSistemaFases(&sistemaFase, &inimigos[0]);
     inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
+
+    int indiceInimigo = 0;
+    float timerSpawn = 0.0f;
+    int inimigosSpawnado = 0;
 
     ALLEGRO_COLOR cor = al_map_rgb(0, 0, 0);
     ALLEGRO_COLOR corCaravana = al_map_rgb(0, 0, 0);
@@ -119,14 +126,14 @@ int main() {
     int telaGameOverAltura = al_get_bitmap_height(bitmap.telaGameOver);
     int botaoSairDoJogoLargura = al_get_bitmap_width(bitmap.botaoSairDoJogo);
     int botaoSairDoJogoAltura = al_get_bitmap_height(bitmap.botaoSairDoJogo);
-    int oswaldoLargura = al_get_bitmap_width(bitmap.oswaldo);
-    int oswaldoAltura = al_get_bitmap_height(bitmap.oswaldo);
-    int caixaDialogoLargura = al_get_bitmap_width(bitmap.caixaDialogo);
-    int caixaDialogoAltura = al_get_bitmap_height(bitmap.caixaDialogo);
+    int falandoLargura = al_get_bitmap_width(bitmap.falando);
+    int falandoAltura = al_get_bitmap_height(bitmap.falando);
+    int balaoLargura = al_get_bitmap_width(bitmap.balao);
+    int balaoAltura = al_get_bitmap_height(bitmap.balao);
 
-    int botaoJogarX = 200, botaoJogarY = 620;
-    int botaoRegrasX = 500, botaoRegrasY = 620;
-    int botaoSairX = 800, botaoSairY = 620;
+    int botaoJogarX = 200, botaoJogarY = 520;
+    int botaoRegrasX = 500, botaoRegrasY = 520;
+    int botaoSairX = 800, botaoSairY = 520;
     int botaoVoltarX = 520, botaoVoltarY = 500;
     int botaoSairDoJogoX = 445, botaoSairDoJogoY = 560;
     int caixaDialogoX = 10, caixaDialogoY = 540;
@@ -138,6 +145,8 @@ int main() {
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_TIMER* timerRespawnInimigo = al_create_timer(1.0);
+
     ALLEGRO_TRANSFORM camera;
 
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue();
@@ -145,7 +154,16 @@ int main() {
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
     al_register_event_source(fila_eventos, al_get_keyboard_event_source());
     al_register_event_source(fila_eventos, al_get_mouse_event_source());
+   
+    al_register_event_source(fila_eventos, al_get_timer_event_source(timerRespawnInimigo));
+    al_start_timer(timerRespawnInimigo);
+   
+    
     al_start_timer(timer);
+    al_start_timer(timerRespawnInimigo);
+    
+
+
 
     // SISTEMA MENUS
     MenuEstados menuEstado = {
@@ -199,24 +217,157 @@ int main() {
         .botaoSairDoJogoLargura = botaoSairDoJogoLargura, .botaoSairDoJogoAltura = botaoSairDoJogoAltura
     };
 
+    ALLEGRO_FONT* fonteDialogo = al_load_ttf_font("joystix monospace.otf", 20, 0);
+ 
+
     Dialogo dialogo = {
-    .oswaldo = bitmap.oswaldo,
-    .caixaDialogo = bitmap.caixaDialogo,
-
-    .oswaldoLargura = oswaldoLargura,
-    .oswaldoAltura = oswaldoAltura,
-    .caixaDialogoLargura = caixaDialogoLargura, .caixaDialogoAltura = caixaDialogoAltura,
-    .caixaDialogoX = caixaDialogoX, .caixaDialogoY = caixaDialogoY,
-
-    .dialogo1 = &dialogo1,
-    .dialogo2 = &dialogo2,
-    .dialogo3 = &dialogo3
+    .falando = bitmap.falando,
+    .balao = bitmap.balao,
+    .fonteDialogo = fonteDialogo,
+    .falandoLargura = falandoLargura,
+    .falandoAltura = falandoAltura,
+    .balaoLargura = balaoLargura,
+    .balaoAltura = balaoAltura,
+    .frameAtual = 0,
+    .contadorFrame = 0,
+    .velocidadeAnimacao = 20,
+    .numeroTextos = 0,  
+    .textoAtual = 0,
+    .dialogo1 = false,
+    .dialogo2 = false,
+    .dialogo3 = false
     };
+
+    //  ADICIONA OS TEXTOS DO DIÁLOGO (máximo MAX_DIALOGOS = 10)
+    dialogo.textos[0] = "Sou Oswaldo Cruz, diretor de Saúde Pública desde 1903.";
+    dialogo.textos[1] = "Fui chamado pelo presidente Rodrigues Alves para sanear a capital.";
+    dialogo.textos[2] = "A cidade está doente: varíola, febre amarela e peste.";
+    dialogo.textos[3] = "A lei tornou a vacina da varíola obrigatória em todo o Brasil."; 
+    dialogo.textos[4] = "A medida gerou medo, boatos e protestos nas ruas."; 
+    dialogo.textos[5] = "Não recuarei: ciência, limpeza urbana e vacinação salvam vidas.";
+    dialogo.textos[6] = "Preciso de você no campo: vacinar, desinfestar e orientar o povo.";
+    dialogo.textos[7] = "Controle focos: mosquitos, ratos e aglomerações de risco.";
+    dialogo.textos[8] = "A ordem é proteger bairros e reduzir contágios rapidamente.";
+    dialogo.textos[9] = "Quando a cidade entender, venceremos as epidemias juntos.";
+    dialogo.numeroTextos = 10;
 
     // MENU PRINCIPAL
     menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
-    if (!jogando) {
-        // Saiu pelo menu
+    if (menuEstado.jogando) {
+
+        TelaIntroducao intro;
+        inicializar_introducao(&intro, "joystix monospace.otf", 14, 3);
+
+        // TELA 1: Contexto inicial
+        char* tela1[] = {
+            "Rio de Janeiro, 1904...",
+            "a capital tomada por epidemias e reformas urbanas duras."
+            
+        };
+        adicionar_tela(&intro, 0, tela1, 2, 5.0f);  // Exibe por 4 segundos
+
+        // TELA 2: Apresentação do protagonista
+        char* tela2[] = {
+            "Varíola, febre amarela e peste bubônica,",
+            "espalham medo nas ruas e afastam navios e visitantes"
+            
+        };
+        adicionar_tela(&intro, 1, tela2, 2, 5.0f);
+
+        // TELA 3: Call to action
+        char* tela3[] = {
+            "O governo convoca Oswaldo Cruz,",
+            "para liderar uma campanha sanitária sem precedentes.",
+            
+            
+        };
+        adicionar_tela(&intro, 2, tela3, 2, 5.0f);  // Última tela: 5 segundos
+
+        bool mostrarIntro = true;
+        float tempoAnterior = al_get_time();
+
+        while (mostrarIntro) {
+            ALLEGRO_EVENT event;
+            al_wait_for_event(fila_eventos, &event);
+
+            if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+                mostrarIntro = false;
+                continue;
+            }
+
+            if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+                if (event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                    intro.concluido = true;
+                }
+            }
+
+            if (event.type == ALLEGRO_EVENT_TIMER && event.any.source == timer) {
+                float tempoAtual = al_get_time();
+                float deltaTime = tempoAtual - tempoAnterior;
+                tempoAnterior = tempoAtual;
+
+                atualizar_introducao(&intro, deltaTime);
+
+                desenhar_introducao(&intro, WIDTH, HEIGHT);
+                al_flip_display();
+
+                if (intro.concluido) {
+                    mostrarIntro = false;
+                    printf("terminou a intro\n");
+                    
+                    
+                }
+            }
+        }
+
+        destruir_introducao(&intro);
+
+    }
+
+    if (menuEstado.jogando) {
+        // FADE OUT (escurece) - 1 segundo
+        float alfaFade = 0.0f;
+        double tempoInicioFade = al_get_time();
+        const double DURACAO_FADE = 1.0;  // 1 segundo
+
+        while (alfaFade < 255.0f && menuEstado.jogando) {
+            ALLEGRO_EVENT event;
+            bool temEvento = al_wait_for_event_timed(fila_eventos, &event, 0.016);
+
+            if (temEvento && event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+                menuEstado.jogando = false;
+                break;  //SAI IMEDIATAMENTE
+            }
+
+            double tempoAtual = al_get_time();
+            double progresso = (tempoAtual - tempoInicioFade) / DURACAO_FADE;
+
+            if (progresso >= 1.0) {
+                alfaFade = 255.0f;
+            }
+            else {
+                alfaFade = (float)(progresso * 255.0);
+            }
+
+            // Desenha tela preta sobre tudo
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_draw_filled_rectangle(0, 0, WIDTH, HEIGHT,
+                al_map_rgba_f(0, 0, 0, alfaFade / 255.0f));
+            al_flip_display();
+        }
+        if (menuEstado.jogando) {
+            al_rest(0.3);
+        }
+    }
+
+    // Agora inicia o diálogo com fade in integrado
+    if (menuEstado.jogando) {
+        desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
+    }
+
+    // VERIFICA SE AINDA ESTÁ JOGANDO
+    if (!menuEstado.jogando) {
+        // Saiu durante o diálogo
         al_destroy_font(font);
         destruir_bitmaps(&bitmap);
         al_destroy_display(janela);
@@ -224,12 +375,10 @@ int main() {
         al_destroy_timer(timer);
         return 0;
     }
-
-    desenhar_tela_dialogo(&dialogo, &sistemaFase, &menuEvent, &menuEstado);
     ALLEGRO_EVENT event;
 
     // LOOP PRINCIPAL
-    while (jogando) {
+    while (menuEstado.jogando) {
         al_wait_for_event(fila_eventos, &event);
 
         // CONDIÇÃO DE PARADA
@@ -273,7 +422,7 @@ int main() {
         if (event.type == ALLEGRO_EVENT_TIMER && esc == false) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, &caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
-
+            
             atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
             
             for (int i = 0; i < MAX_INIMIGOS; i++) {
@@ -387,6 +536,23 @@ int main() {
         }
 
         // RESPAWN POR FASE
+        //Gera os inimigos de maneira cadenciada
+        float tempoAtual = al_get_time();
+        if (tempoAtual - timerSpawn >= 1.0f && inimigosSpawnado < 20) {
+            printf("%d\n", indiceInimigo);
+            timerSpawn = tempoAtual;
+
+            // Atualiza a posição e tipo do inimigo antes de ativar
+            respawn_inimigo_na_camera(&inimigos[indiceInimigo], bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
+
+            inimigos[indiceInimigo].ativo = true;
+
+            aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual, indiceInimigo);
+            
+            indiceInimigo++;
+            inimigosSpawnado++;
+        }
+
         if (!fase_boss_ativa) {
             // Ciclo normal de hordas
             if (!verificarProgressoDaFase(&sistemaFase)) {
@@ -395,10 +561,10 @@ int main() {
                         timer_spawn_inimigos = al_get_time(); // usa relógio do Allegro
                         spawn_ativo = true;
                     }
-                    else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
-                        inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
-                        aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual);
+                    else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) { //Recomeça a horda de inimigos
                         spawn_ativo = false;
+                        indiceInimigo = 0;
+                        inimigosSpawnado = 0;
                     }
                 }
                 else {
@@ -515,7 +681,9 @@ int main() {
     } // fim while(jogando)
 
     // LIMPEZA
-    al_destroy_font(font);
+    if (fonteDialogo) {
+        al_destroy_font(fonteDialogo);
+    }
 
     destruir_bitmaps(&bitmap);
     al_destroy_display(janela);

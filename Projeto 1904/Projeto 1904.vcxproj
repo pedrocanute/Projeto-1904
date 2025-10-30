@@ -30,6 +30,7 @@
     <ClCompile Include="infeccao.c" />
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="input.c" />
+    <ClCompile Include="introducao.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="menu.c" />
     <ClCompile Include="personagem.c">
@@ -46,6 +47,7 @@
     <ClInclude Include="infeccao.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="introducao.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="personagem.h" />
     <ClInclude Include="projetil.h" />

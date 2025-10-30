@@ -51,7 +51,7 @@ void atualizar_movimento_inimigos(Caravana* caravana, Inimigo* inimigos, int qua
 
 int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 
-void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual);
+void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual, int indiceInimigo);
 
 void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera);
 
