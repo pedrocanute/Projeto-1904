@@ -98,7 +98,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         velocidadeAnimacao = 5;
     }
     else {
-        velocidadeAnimacao = (int)(cadencia * 8.0f); 
+        velocidadeAnimacao = cadencia * 8.0f; 
     }
 
     // SELECIONA OS SPRITES COM BASE NA ARMA EQUIPADA

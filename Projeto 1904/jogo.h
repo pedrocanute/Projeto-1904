@@ -39,14 +39,18 @@ typedef struct {
 // Estrutura para variáveis de controle
 typedef struct {
     float timer_regen_infeccao;
-    const float TEMPO_REGEN_INFECCAO;
-    const float TEMPO_INTANGIBILIDADE;
+    float TEMPO_REGEN_INFECCAO;
+    float TEMPO_INTANGIBILIDADE;
     float timer_spawn_inimigos;
     bool spawn_ativo;
-    const float TEMPO_SPAWN;
+    float TEMPO_SPAWN;
     bool boss_spawnado;
     bool fase_boss_ativa;
-    bool mostrar_dialogo_transicao;  // NOVO
+    bool mostrar_dialogo_transicao;
+    // SPAWN CADENCIADO
+    int inimigos_spawnados;
+    float timer_spawn_individual;
+    float INTERVALO_SPAWN_INDIVIDUAL;
 } JogoControle;
 
 // Estrutura para animação

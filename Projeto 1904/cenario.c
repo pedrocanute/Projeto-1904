@@ -5,7 +5,7 @@ void desenhar_cenario(ALLEGRO_BITMAP* cenario1, ALLEGRO_BITMAP* cenario2, float 
     int larguraCenario = 1280;
 
     // VERIFICA A SEÇÃO COM BASE NA POSICAO DA CAMERA (eixo X)
-    int secao_atual = (int)(posicaoCamera[0] / larguraCenario);
+    int secao_atual = posicaoCamera[0] / larguraCenario;
 
     // DESENHA 4 CENARIOS: anterior (-1), atual(0), próximo(1), e mais um(2)
     for (int posicao = -1; posicao <= 2; posicao++) {

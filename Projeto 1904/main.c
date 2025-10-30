@@ -27,6 +27,8 @@ int main() {
     al_set_window_title(janela, "Projeto 1904");
     al_set_window_position(janela, 200, 200);
 
+    ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue();
+
     // ========== DECLARAÇÃO DE VARIÁVEIS DE ESTADO ==========
     bool telaMenu = true;
     bool regrasAberta = false;
@@ -46,7 +48,6 @@ int main() {
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_FONT* fonteDialogo = al_load_ttf_font("joystix monospace.otf", 20, 0);
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
-    ALLEGRO_TIMER* timerRespawnInimigo = al_create_timer(1.0);
 
     ALLEGRO_TRANSFORM camera;
 
@@ -55,19 +56,9 @@ int main() {
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
     al_register_event_source(fila_eventos, al_get_mouse_event_source());
    
-    al_register_event_source(fila_eventos, al_get_timer_event_source(timerRespawnInimigo));
-    al_start_timer(timerRespawnInimigo);
-   
-    
-    al_start_timer(timer);
-    al_start_timer(timerRespawnInimigo);
-    
-
-
-
     al_start_timer(timer);
 
-    // ========== INICIALIZAÇÃO DAS ESTRUTURAS DO JOGO (LIMPO!) ==========
+    // ========== INICIALIZAÇÃO DAS ESTRUTURAS DO JOGO  ==========
 
     JogoCamera jogoCamera;
     inicializarJogoCamera(&jogoCamera, &camera);
@@ -84,7 +75,7 @@ int main() {
     JogoAnimacao animacao;
     inicializarJogoAnimacao(&animacao);
 
-    // ========== INICIALIZAÇÃO DO SISTEMA DE MENUS (LIMPO!) ==========
+    // ========== INICIALIZAÇÃO DO SISTEMA DE MENUS  ==========
 
     MenuEstados menuEstado;
     inicializarMenuEstados(&menuEstado, &telaMenu, &jogando, &regrasAberta, &esc, &jogoPausado, &fimDeJogo);
@@ -138,7 +129,7 @@ int main() {
         }
     }
 
-    // LOOP PRINCIPAL
+    // =============LOOP PRINCIPAL==============
     ALLEGRO_EVENT event;
     while (menuEstado.jogando) {
         al_wait_for_event(fila_eventos, &event);
@@ -167,6 +158,15 @@ int main() {
 
         // PAUSE
         if (esc) {
+            // Para o timer durante o pause
+            al_stop_timer(timer);
+            
+            // Limpa a fila de eventos acumulados
+            ALLEGRO_EVENT ev_temp;
+            while (al_get_next_event(fila_eventos, &ev_temp)) {
+                // Descarta eventos acumulados durante o jogo
+            }
+            
             configurarPosicoesBotoesPausa(&menuBotao);
 
             menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao);
@@ -178,13 +178,18 @@ int main() {
             d = false;
             espaco = false;
             shift = false;
+            esc = false;  
             num1 = false;
             num2 = false;
             num3 = false;
             
-            if (!jogando)
+            // Reinicia o timer se voltar ao jogo
+            if (jogando) {
+                al_start_timer(timer);
+            }
+            else {
                 break;  // saiu pelo "Sair" no pause
-            // se voltou, esc foi limpo dentro de menu_pausa
+            }
         }
 
         // ATUALIZAÇÃO DE JOGO (quando não pausado)
@@ -199,15 +204,17 @@ int main() {
 
             camera_jogador(jogoCamera.posicaoCamera, entidades.jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, entidades.caravana.caravanaX, entidades.caravana.caravanaVelocidade);
             redesenhar = true;
+            
+            // Atualiza movimento da caravana apenas se não houver boss ativo
             if (!controle.fase_boss_ativa) {
                 atualizar_movimento_caravana(&entidades.caravana);
             }
         }
 
-        // Processa colisões e dano (MODULARIZADO!)
+        // Processa colisões e dano 
         ResultadoColisao resultadoColisao = processarColisoes(&entidades, &barras, &controle, &jogoCamera);
 
-        // Regeneração de vida (MODULARIZADO!)
+        // Regeneração de vida
         processarRegeneracaoVida(&barras, &controle, resultadoColisao.ocorreuColisao);
 
         // VERIFICAÇÃO DE GAME OVER 
@@ -222,59 +229,32 @@ int main() {
             }
         }
 
-        // RESPAWN POR FASE
-        //Gera os inimigos de maneira cadenciada
-        float tempoAtual = al_get_time();
-        if (tempoAtual - timerSpawn >= 1.0f && inimigosSpawnado < 20) {
-            printf("%d\n", indiceInimigo);
-            timerSpawn = tempoAtual;
+        // SISTEMA DE SPAWN E FASES 
+        processarSpawnInimigos(&entidades, &controle, &bitmap, jogoCamera.posicaoCamera);
 
-            // Atualiza a posição e tipo do inimigo antes de ativar
-            respawn_inimigo_na_camera(&inimigos[indiceInimigo], bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
+        // Verifica se boss foi derrotado
+        verificarMorteBoss(&entidades, &controle);
 
-            inimigos[indiceInimigo].ativo = true;
-
-            aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual, indiceInimigo);
+        // Verifica se precisa mostrar diálogo de transição de fase
+        if (controle.mostrar_dialogo_transicao) {
+            controle.mostrar_dialogo_transicao = false;
             
-            indiceInimigo++;
-            inimigosSpawnado++;
-        }
-
-        if (!fase_boss_ativa) {
-            // Ciclo normal de hordas
-            if (!verificarProgressoDaFase(&sistemaFase)) {
-                if (contarInimigosAtivos(inimigos, MAX_INIMIGOS) == 0) {
-                    if (!spawn_ativo) {
-                        timer_spawn_inimigos = al_get_time(); // usa relógio do Allegro
-                        spawn_ativo = true;
-                    }
-                    else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) { //Recomeça a horda de inimigos
-                        spawn_ativo = false;
-                        indiceInimigo = 0;
-                        inimigosSpawnado = 0;
-                    }
-                }
-                else {
-                    spawn_ativo = false;
-                }
-            }
-            
-            // Configura e exibe o diálogo de transição
-            configurarTextosDialogo(&dialogo, faseParaDialogo);
+            // Para o jogo e mostra diálogo
+            al_stop_timer(timer);
+            al_identity_transform(&camera);
+            al_use_transform(&camera);
             
             if (!executarDialogoInicial(&dialogo, &entidades.sistemaFase, &menuEvent, &menuEstado)) {
                 menuEstado.jogando = false;
             }
             
-            // Após o diálogo, avança a fase
-            if (faseParaDialogo <= 3) {
-                avancarFase(&entidades.sistemaFase, entidades.inimigos);
-            } else {
-                // Fase 3 completa - pode adicionar tela de vitória aqui
-                menuEstado.jogando = false; // Encerra o jogo após diálogo final
+            // Verifica se completou todas as fases
+            if (entidades.sistemaFase.faseAtual > 3) {
+                // Jogo concluído!
+                menuEstado.jogando = false;
             }
             
-            // Restaura timer e câmera
+            // Restaura timer se ainda estiver jogando
             if (menuEstado.jogando) {
                 al_start_timer(timer);
             }
@@ -312,12 +292,6 @@ int main() {
             // tiros
             atirar_multiplos_inimigos(&entidades.projetil, entidades.jogador, entidades.inimigos, MAX_INIMIGOS, &bitmap, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, jogoCamera.posicaoCamera, &entidades.sistemaFase, &barras.barraVidaBoss);
 
-            // Diálogo
-            desenhar_tela_dialogo(&dialogo, &entidades.sistemaFase, &menuEvent, &menuEstado);
-
-            // Game Over
-            desenhar_tela_gameOver(&gameOver, &barras.barraInfeccao, &menuEvent, &menuEstado);
-
             // HUD (fixo na tela)
             char texto[100];
             if (controle.spawn_ativo) {
@@ -330,7 +304,7 @@ int main() {
             else {
                 int inimigos_restantes = entidades.sistemaFase.metaEliminacoes - entidades.sistemaFase.inimigosMortos;
                 if (inimigos_restantes < 0) inimigos_restantes = 0;
-                sprintf_s(texto, sizeof(texto), "PROJETO 1904 - INIMIGOS RESTANTES: %d", inimigos_restantes);
+                sprintf_s(texto, sizeof(texto), "PROJETO 1904 - INIMIGOS RESTANTES: %d | FASE %d", inimigos_restantes, entidades.sistemaFase.faseAtual);
             }
 
             ALLEGRO_TRANSFORM world_backup;

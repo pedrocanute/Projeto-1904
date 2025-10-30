@@ -139,7 +139,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                 continue;
             }
 
-            // VERIFICAR COLISÃO COM TODOS OS INIMIGOS 
+            // VERIFICA COLISÃO COM TODOS OS INIMIGOS 
             bool colidiu = false;
             for (int j = 0; j < numInimigos; j++) {
                 if (!inimigos[j].ativo) continue;
@@ -303,13 +303,19 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
             if (colisao_aabb(ataqueX, ataqueY, ataqueLargura, ataqueAltura, inimigos[j].botX, inimigos[j].botY, inimigos[j].larguraBot, inimigos[j].alturaBot)) {
 
                 pp->inimigosAtingidos[j] = true;
-                inimigos[j].vida--;
+                
+                // Boss recebe mais dano que inimigos normais
+                int dano = 1;
+                if (inimigos[j].tipo == TIPO_BOSS_RATO) {
+                    dano = 3;  // Boss Rato recebe 3 de dano (30 vida / 3 = 10 ataques = 5 segundos)
+                }
+                
+                inimigos[j].vida -= dano;
 
                 if (inimigos[j].vida <= 0) {
                     inimigos[j].ativo = false;
                     sistemaFase->inimigosMortos++;
                 }
-
             }
         }
     }

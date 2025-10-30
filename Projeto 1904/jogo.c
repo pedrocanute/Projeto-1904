@@ -1,5 +1,6 @@
 ﻿#include "jogo.h"
 #include <allegro5/allegro_primitives.h>
+#include "inimigo.h"
 
 void inicializarJogoCamera(JogoCamera* camera, ALLEGRO_TRANSFORM* transform) {
     camera->posicaoCamera[0] = 0.0f;
@@ -47,6 +48,8 @@ void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* 
 
     // Sistema de fases
     inicializarSistemaFases(&entidades->sistemaFase, &entidades->inimigos[0]);
+    
+    // Inicializa array de inimigos mas não ativa ainda (spawn cadenciado)
     inicializar_array_inimigos(entidades->inimigos, MAX_INIMIGOS, bitmap->zumbi_direita, bitmap->zumbi_esquerda, bitmap->rato_direita, bitmap->rato_esquerda, bitmap->mosquito_direita, bitmap->mosquito_esquerda, posicaoCamera);
 }
 
@@ -79,14 +82,19 @@ void inicializarJogoBarras(JogoBarras* barras) {
 
 void inicializarJogoControle(JogoControle* controle) {
     controle->timer_regen_infeccao = 0.0f;
-    *(float*)&controle->TEMPO_REGEN_INFECCAO = 5.0f;
-    *(float*)&controle->TEMPO_INTANGIBILIDADE = 0.7f;
+    controle->TEMPO_REGEN_INFECCAO = 5.0f;
+    controle->TEMPO_INTANGIBILIDADE = 0.7f;
     controle->timer_spawn_inimigos = 0.0f;
     controle->spawn_ativo = false;
-    *(float*)&controle->TEMPO_SPAWN = 3.0f;
+    controle->TEMPO_SPAWN = 3.0f;
     controle->boss_spawnado = false;
     controle->fase_boss_ativa = false;
-    controle->mostrar_dialogo_transicao = false; 
+    controle->mostrar_dialogo_transicao = false;
+    
+    // =======SPAWN CADENCIADO==========
+    controle->inimigos_spawnados = 0;
+    controle->timer_spawn_individual = 0.0f;
+    controle->INTERVALO_SPAWN_INDIVIDUAL = 1.0f; // Spawna 1 inimigo a cada 1s
 }
 
 void inicializarJogoAnimacao(JogoAnimacao* animacao) {
@@ -104,7 +112,7 @@ void atualizarBossAtivo(JogoEntidades* entidades, JogoBarras* barras) {
         if (entidades->inimigos[i].ativo &&
             (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO)) {
 
-            atualizar_boss_perseguindo(&entidades->inimigos[i], &entidades->jogador, 120.0f);
+            atualizar_boss_perseguindo(&entidades->inimigos[i], &entidades->jogador, 100.0f);
             posicionarBarraVidaBoss(barras, &entidades->inimigos[i]);
             break;
         }
@@ -138,7 +146,7 @@ void posicionarBarraVidaBoss(JogoBarras* barras, Inimigo* boss) {
 }
 
 // Processa colisões e retorna resultado
-ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras, JogoControle* controle, JogoCamera* jogoCamera) {
+ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras, JogoControle* controle, JogoCamera* jogoCamera) { //ESSA FUNCAO RETORNA UMA STRUCT DE COLISOES
     ResultadoColisao resultado;
     resultado.ocorreuColisao = false;
     resultado.corCaravana = al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f); // branco
@@ -240,24 +248,52 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
         }
     }
     else {
+        // SPAWN CADENCIADO: Verifica se está no processo de spawn
+        if (controle->inimigos_spawnados > 0 && controle->inimigos_spawnados < MAX_INIMIGOS) {
+            // Continua ativando inimigos aos poucos
+            float tempo_atual = al_get_time();
+            if (tempo_atual - controle->timer_spawn_individual >= controle->INTERVALO_SPAWN_INDIVIDUAL) {
+                // Ativa o próximo inimigo
+                respawn_inimigo_na_camera(&entidades->inimigos[controle->inimigos_spawnados],bitmap->zumbi_direita, bitmap->zumbi_esquerda,bitmap->rato_direita, bitmap->rato_esquerda,bitmap->mosquito_direita, bitmap->mosquito_esquerda,posicaoCamera);
+
+                // Aplica buffs da fase atual
+                aplicar_buffs_por_fase(&entidades->inimigos[controle->inimigos_spawnados],1,entidades->sistemaFase.faseAtual);
+
+                // Agora sim ativa o inimigo
+                entidades->inimigos[controle->inimigos_spawnados].ativo = true;
+
+                controle->inimigos_spawnados++;
+                controle->timer_spawn_individual = tempo_atual;
+            }
+            return;
+        }
+
         // Ciclo normal de hordas
         if (contarInimigosAtivos(entidades->inimigos, MAX_INIMIGOS) == 0) {
             if (!controle->spawn_ativo) {
+                // Inicia o processo de spawn
                 controle->timer_spawn_inimigos = al_get_time();
                 controle->spawn_ativo = true;
             }
             else if (al_get_time() - controle->timer_spawn_inimigos >= controle->TEMPO_SPAWN) {
+                // Após aguardar TEMPO_SPAWN, inicializa os inimigos
                 inicializar_array_inimigos(entidades->inimigos, MAX_INIMIGOS,
                     bitmap->zumbi_direita, bitmap->zumbi_esquerda,
                     bitmap->rato_direita, bitmap->rato_esquerda,
                     bitmap->mosquito_direita, bitmap->mosquito_esquerda,
                     posicaoCamera);
+                
+                // Aplica buffs baseado na fase (CORRIGIDO: removido o quarto parâmetro)
                 aplicar_buffs_por_fase(entidades->inimigos, MAX_INIMIGOS, entidades->sistemaFase.faseAtual);
+                
+                // Ativa o primeiro inimigo imediatamente
+                entidades->inimigos[0].ativo = true;
+                
+                // Reseta contadores para spawn cadenciado (começa no índice 1)
+                controle->inimigos_spawnados = 1;
+                controle->timer_spawn_individual = al_get_time();
                 controle->spawn_ativo = false;
             }
-        }
-        else {
-            controle->spawn_ativo = false;
         }
     }
 }
@@ -270,18 +306,21 @@ void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle) {
 
     bool bossVivo = false;
     for (int i = 0; i < MAX_INIMIGOS; ++i) {
-        if (entidades->inimigos[i].ativo &&
-            (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO)) {
+        if (entidades->inimigos[i].ativo && (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO)) {
             bossVivo = true;
             break;
         }
     }
 
     if (!bossVivo) {
-        // Boss derrotado: avança fase e reseta estado
+        // Boss derrotado: avança fase e ativa diálogo de transição
         avancarFase(&entidades->sistemaFase, entidades->inimigos);
         controle->fase_boss_ativa = false;
         controle->boss_spawnado = false;
         controle->spawn_ativo = false;
+        controle->inimigos_spawnados = 0; // Reseta contador de spawn cadenciado
+        
+        // Ativa flag para mostrar diálogo de transição
+        controle->mostrar_dialogo_transicao = true;
     }
 }

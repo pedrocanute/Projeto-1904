@@ -52,12 +52,14 @@ void atualizar_movimento_inimigos(Caravana* caravana, Inimigo* inimigos, int qua
 
 int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 
-void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual, int indiceInimigo);
+void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual);
 
 void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera);
 
 void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera);
 
 void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada);
+
+void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera);
 
 #endif

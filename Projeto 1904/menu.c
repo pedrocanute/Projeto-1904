@@ -80,9 +80,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
         }
 
         // Desenha menu principal
-        al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0,
-            menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura,
-            0, 0, WIDTH, HEIGHT, 0);
+        al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0, menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
 
         // Botão Jogar (hover)
         if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= menuBotao->botaoJogarX + menuBotao->botaoJogarLargura && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= menuBotao->botaoJogarY + menuBotao->botaoJogarAltura) {
@@ -189,9 +187,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
                     }
 
                     // Desenha aba de regras
-                    al_draw_scaled_bitmap(menuImg->abaRegras, 0, 0,
-                        menuBotao->abaRegrasLargura, menuBotao->abaRegrasAltura,
-                        0, 0, WIDTH, HEIGHT, 0);
+                    al_draw_scaled_bitmap(menuImg->abaRegras, 0, 0, menuBotao->abaRegrasLargura, menuBotao->abaRegrasAltura, 0, 0, WIDTH, HEIGHT, 0);
 
                     // Desenha botão voltar (com hover)
                     if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura) {
@@ -279,9 +275,7 @@ void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEv
         }
 
         // Desenha tela de Game Over
-        al_draw_scaled_bitmap(gameover->telaGameOver, 0, 0,
-            gameover->telaGameOverLargura, gameover->telaGameOverAltura,
-            0, 0, WIDTH, HEIGHT, 0);
+        al_draw_scaled_bitmap(gameover->telaGameOver, 0, 0, gameover->telaGameOverLargura, gameover->telaGameOverAltura, 0, 0, WIDTH, HEIGHT, 0);
 
         // Botão Sair (hover)
         if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX && *menuEvent->mouseX <= gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura && *menuEvent->mouseY >= gameover->botaoSairDoJogoY && *menuEvent->mouseY <= gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura) {
@@ -357,19 +351,23 @@ void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* men
                 dialogoAtivo = false;
                 // Limpa fila para garantir que o loop principal detecta o fechamento
                 al_flush_event_queue(menuEvent->fila_eventos);
-                return; // Sai imediatamente sem processar mais nada
+                return; 
             }
 
             // SPACE avança texto (só após fade in)
             if (event.type == ALLEGRO_EVENT_KEY_DOWN && fadeInCompleto) {
-                if (event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
-
+                // ENTER pula todo o diálogo
+                if (event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                    dialogoAtivo = false;
+                    break;
+                }
+                // SPACE avança para o próximo texto
+                else if (event.keyboard.keycode == ALLEGRO_KEY_SPACE) {
                     dialogo->textoAtual++;
 
                     if (dialogo->textoAtual >= dialogo->numeroTextos) {
                         dialogoAtivo = false;
                     }
-
                     precisaRedesenhar = true;
                 }
             }

@@ -150,24 +150,42 @@ void desenhar_introducao(TelaIntroducao* intro, int larguraTela, int alturaTela)
 }
 
 void destruir_introducao(TelaIntroducao* intro) {
-    printf("d\n");
+    if (!intro) return;
+    
+    // Libera a fonte se ela existir
     if (intro->fonte) {
         al_destroy_font(intro->fonte);
         intro->fonte = NULL;
     }
+    
+    // Libera todas as telas e seu conteúdo
     if (intro->telas) {
         for (int i = 0; i < intro->numeroTelas; i++) {
             TelaTexto* tela = &intro->telas[i];
-            // Adiciona verificação se tela->linhas foi inicializado
-            if (tela->linhas != NULL) {
+            
+            // Verifica se a tela tem linhas antes de liberar
+            if (tela->linhas) {
+                // Libera cada linha de texto individualmente
                 for (int j = 0; j < tela->numeroLinhas; j++) {
-                    if (tela->linhas[j]) free(tela->linhas[j]);
+                    if (tela->linhas[j]) {
+                        free(tela->linhas[j]);
+                        tela->linhas[j] = NULL;
+                    }
                 }
+                // Libera o array de linhas
                 free(tela->linhas);
                 tela->linhas = NULL;
             }
+            
+            tela->numeroLinhas = 0;
         }
+        
+        // Libera o array de telas
         free(intro->telas);
         intro->telas = NULL;
     }
+    
+    intro->numeroTelas = 0;
+    intro->telaAtual = 0;
+    intro->concluido = true;
 }

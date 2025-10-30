@@ -57,18 +57,17 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->frames_por_sprite = 15;
         inimigo->velocidade = 2.0f;
         inimigo->vida = 50;
-        inimigo->vidaMaxima = 50;  // ADICIONA VIDA MÁXIMA
+        inimigo->vidaMaxima = 50;  
         inimigo->dano = 10;
         break;
     case TIPO_BOSS_RATO:
-        // Rato normal tem 60x50, então 3x = 180x150
-        inimigo->larguraBot = 180.0f;  // 60 * 3
-        inimigo->alturaBot = 150.0f;   // 50 * 3
-        inimigo->frames_por_sprite = 11;  // Mesma animação do rato normal
-        inimigo->velocidade = 1.5f;     // Mais lento que rato normal
-        inimigo->vida = 30;             // Vida de boss
-        inimigo->vidaMaxima = 30;       // ADICIONA VIDA MÁXIMA
-        inimigo->dano = 15;             // Dano alto
+        inimigo->larguraBot = 180.0f;  
+        inimigo->alturaBot = 150.0f;   
+        inimigo->frames_por_sprite = 11;  
+        inimigo->velocidade = 1.5f;     
+        inimigo->vida = 30;             
+        inimigo->vidaMaxima = 30;       
+        inimigo->dano = 15;             
         break;
 
     }
@@ -77,15 +76,24 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
 // SPAWNA INIMIGOS COM BASE NA CAMERA
 void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
 
-    float camera_direita = posicaoCamera[0] + 1280;
-    float spawn_x_min = camera_direita + 50;
-    float spawn_x_max = camera_direita + 300;
+    // Largura da tela (campo de visão do jogador)
+    const float LARGURA_TELA = 1280.0f;
+    
+    // Calcula onde termina o campo de visão da câmera (baseado na posição X atual da câmera)
+    float limite_direito_camera = posicaoCamera[0] + LARGURA_TELA;
+    
+    // Spawna SEMPRE fora do campo de visão (além do limite direito)
+    
+    float spawn_x_min = limite_direito_camera + 50.0f;   // Mínimo 50px fora da visão
+    float spawn_x_max = limite_direito_camera + 300.0f;  // Máximo 300px fora da visão
 
-    float spawn_y_min = (720 / 2) + 52;
-    float spawn_y_max = 720 - 100;
+    // Define área vertical de spawn
+    float spawn_y_min = (720.0f / 2.0f) + 52.0f;
+    float spawn_y_max = 720.0f - 100.0f;
 
-    float x = spawn_x_min + (float)(rand() % (int)(spawn_x_max - spawn_x_min)); //(float) converte toda a opera??o da funcao rand (que tem tipo 
-    float y = spawn_y_min + (float)(rand() % (int)(spawn_y_max - spawn_y_min)); //int) em float
+    // Gera posição aleatória dentro dos limites
+    float x = spawn_x_min + rand() % (int)(spawn_x_max - spawn_x_min + 1);
+    float y = spawn_y_min + rand() % (int)(spawn_y_max - spawn_y_min + 1);
 
     TipoInimigo tipo = (TipoInimigo)(rand() % 3);
 
@@ -128,7 +136,7 @@ void atualizar_movimento_inimigos(Caravana* caravana,Inimigo* inimigos, int quan
 void desenhar_inimigo(Inimigo* inimigo, bool em_movimento) {
     if (inimigo->ativo == false) return;
 
-    // Escolhe sprite pela orienta??o
+    // Escolhe sprite pela orientacao
     ALLEGRO_BITMAP* sprite_atual = inimigo->virado_direita ? inimigo->sprite_direita : inimigo->sprite_esquerda;
 
     int num_colunas;
@@ -159,7 +167,7 @@ void desenhar_inimigo(Inimigo* inimigo, bool em_movimento) {
     }
     else {
 
-    al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,inimigo->botX, inimigo->botY, 0);
+        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,inimigo->botX, inimigo->botY, 0);
     }
 
 }
@@ -176,34 +184,35 @@ int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos) {
     for (int i = 0; i < maxInimigos; i++) {
         if (inimigos[i].ativo)
             inimigosAtivos++;
-        printf("h\n");
     }
     return inimigosAtivos;
 }
 
-void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual, int indiceInimigo) {
-    int vida = 0;
-    float velocidade = 1.0f;
-    float dano = 0;
+void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
+    for (int i = 0; i < quantidade; i++) {
+        
+        // Só aplica buffs em inimigos normais (não bosses)
+        if (inimigos[i].tipo == TIPO_BOSS || inimigos[i].tipo == TIPO_BOSS_RATO) {
+            continue;
+        }
 
-    switch (faseAtual) {
-    case FASE_2:
-        vida = 1;
-        velocidade = 1.50f;
-        dano = 2;
-        break;
-    case FASE_3:
-        vida = 2;
-        velocidade = 2.00f;
-        dano = 3;
-        break;
-    default:
-        break;
+        // Buffs progressivos baseados na fase
+        // Fase 1: sem buff adicional (valores base)
+        // Fase 2: +1 de multiplier
+        // Fase 3: +2 de multiplier
+        float multiplicador = faseAtual;
+        
+        // Aumenta vida máxima
+        inimigos[i].vidaMaxima = inimigos[i].vidaMaxima * multiplicador;
+        if (inimigos[i].vidaMaxima < 1) inimigos[i].vidaMaxima = 1;
+        inimigos[i].vida = inimigos[i].vidaMaxima;
+        
+        // Aumenta dano (menos agressivo que vida)
+        inimigos[i].dano += (faseAtual - 1) * 2.0f;
+        
+        // Aumenta velocidade levemente
+        inimigos[i].velocidade += (faseAtual - 1) * 0.3f;
     }
-
-    inimigos[indiceInimigo].vida = inimigos[indiceInimigo].vida + vida;
-    inimigos[indiceInimigo].velocidade *= velocidade;
-    inimigos[indiceInimigo].dano *= dano;
 }
 
 void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera) {
@@ -234,24 +243,41 @@ void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float dis
     if (boss->botY + boss->alturaBot >= 720)
         boss->botY = 720 - boss->alturaBot;
 
+    // Calcula distância entre as bordas das hitboxes, não os centros
     float distanciaX = jogador->jogadorX - boss->botX;
     float distanciaY = jogador->jogadorY - boss->botY;
 
-    // Vetor de distancia
-    float distanciaTotal = sqrtf(distanciaX * distanciaX + distanciaY * distanciaY);
+    // Vetor de distancia entre centros (para direção do movimento)
+    float centroJogadorX = jogador->jogadorX + (80.0f / 2.0f);
+    float centroJogadorY = jogador->jogadorY + (96.0f / 2.0f);
+    
+    float centroBossX = boss->botX + (boss->larguraBot / 2.0f);
+    float centroBossY = boss->botY + (boss->alturaBot / 2.0f);
 
-    // Se ja esta muito perto, para de avancar (evita tremedeira)
-    if (distanciaTotal <= distanciaParada) {
+    float distanciaCentroX = centroJogadorX - centroBossX;
+    float distanciaCentroY = centroJogadorY - centroBossY;
+    float distanciaTotal = sqrtf(distanciaCentroX * distanciaCentroX + distanciaCentroY * distanciaCentroY);
+
+    // Verifica se as hitboxes já estão sobrepostas ou muito próximas
+    
+    bool sobreposX = (boss->botX < jogador->jogadorX + 80.0f) && 
+                    (boss->botX + boss->larguraBot > jogador->jogadorX);
+    
+    bool sobreposY = (boss->botY < jogador->jogadorY + 96.0f) && 
+                    (boss->botY + boss->alturaBot > jogador->jogadorY);
+
+    // Se já está colidindo ou muito próximo, para de se mover
+    if ((sobreposX && sobreposY) || distanciaTotal < 30.0f) {
         boss->em_movimento = false;
         return;
     }
 
-    // Normaliza direcao (evita divisao por zero) - RECOMENDACAO DO GPT
+    // Normaliza direcao (evita divisao por zero)
     float direcaoX = 0.0f;
     float direcaoY = 0.0f;
     if (distanciaTotal > 0.0001f) {
-        direcaoX = distanciaX / distanciaTotal;
-        direcaoY = distanciaY / distanciaTotal;
+        direcaoX = distanciaCentroX / distanciaTotal;
+        direcaoY = distanciaCentroY / distanciaTotal;
     }
 
     // Move em direcao ao jogador
