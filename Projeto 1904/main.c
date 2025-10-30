@@ -52,8 +52,6 @@ int main() {
     Bitmaps bitmap;
     carregar_bitmaps(&bitmap);
 
-
-
     // CAMERA
     float posicaoCamera[2] = { 0, 0 };
 
@@ -424,26 +422,6 @@ int main() {
         if (event.type == ALLEGRO_EVENT_TIMER && esc == false) {
             mover(&jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &frames_por_sprite);
             restringirPosicao(&jogador, &caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
-
-            //Gera os inimigos um de cada vez
-            float tempoAtual = al_get_time();
-            if (tempoAtual - timerSpawn >= 1.0f && inimigosSpawnado < 20) {
-                printf("%d\n", indiceInimigo);
-                timerSpawn = tempoAtual;
-
-                // Atualiza a posição e tipo do inimigo antes de ativar
-                respawn_inimigo_na_camera(
-                    &inimigos[indiceInimigo],
-                    bitmap.zumbi_direita, bitmap.zumbi_esquerda,
-                    bitmap.rato_direita, bitmap.rato_esquerda,
-                    bitmap.mosquito_direita, bitmap.mosquito_esquerda,
-                    posicaoCamera
-                );
-
-                inimigos[indiceInimigo].ativo = true;
-                indiceInimigo++;
-                inimigosSpawnado++;
-            }
             
             atualizar_movimento_inimigos(&caravana, inimigos, MAX_INIMIGOS);
             
@@ -558,6 +536,23 @@ int main() {
         }
 
         // RESPAWN POR FASE
+        //Gera os inimigos de maneira cadenciada
+        float tempoAtual = al_get_time();
+        if (tempoAtual - timerSpawn >= 1.0f && inimigosSpawnado < 20) {
+            printf("%d\n", indiceInimigo);
+            timerSpawn = tempoAtual;
+
+            // Atualiza a posição e tipo do inimigo antes de ativar
+            respawn_inimigo_na_camera(&inimigos[indiceInimigo], bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
+
+            inimigos[indiceInimigo].ativo = true;
+
+            aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual, indiceInimigo);
+            
+            indiceInimigo++;
+            inimigosSpawnado++;
+        }
+
         if (!fase_boss_ativa) {
             // Ciclo normal de hordas
             if (!verificarProgressoDaFase(&sistemaFase)) {
@@ -566,12 +561,8 @@ int main() {
                         timer_spawn_inimigos = al_get_time(); // usa relógio do Allegro
                         spawn_ativo = true;
                     }
-                    else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) {
-                        inicializar_array_inimigos(inimigos, MAX_INIMIGOS, bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
-                        
-                        aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual);
+                    else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) { //Recomeça a horda de inimigos
                         spawn_ativo = false;
-
                         indiceInimigo = 0;
                         inimigosSpawnado = 0;
                     }
