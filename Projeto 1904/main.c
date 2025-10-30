@@ -46,13 +46,24 @@ int main() {
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_FONT* fonteDialogo = al_load_ttf_font("joystix monospace.otf", 20, 0);
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
-    ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue();
+    ALLEGRO_TIMER* timerRespawnInimigo = al_create_timer(1.0);
+
     ALLEGRO_TRANSFORM camera;
 
     al_register_event_source(fila_eventos, al_get_keyboard_event_source());
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
     al_register_event_source(fila_eventos, al_get_mouse_event_source());
+   
+    al_register_event_source(fila_eventos, al_get_timer_event_source(timerRespawnInimigo));
+    al_start_timer(timerRespawnInimigo);
+   
+    
+    al_start_timer(timer);
+    al_start_timer(timerRespawnInimigo);
+    
+
+
 
     al_start_timer(timer);
 
@@ -211,26 +222,41 @@ int main() {
             }
         }
 
-        // Spawn de inimigos e bosses (MODULARIZADO!)
-        processarSpawnInimigos(&entidades, &controle, &bitmap, jogoCamera.posicaoCamera);
+        // RESPAWN POR FASE
+        //Gera os inimigos de maneira cadenciada
+        float tempoAtual = al_get_time();
+        if (tempoAtual - timerSpawn >= 1.0f && inimigosSpawnado < 20) {
+            printf("%d\n", indiceInimigo);
+            timerSpawn = tempoAtual;
 
-        // Verifica morte do boss (MODULARIZADO!)
-        verificarMorteBoss(&entidades, &controle);
+            // Atualiza a posição e tipo do inimigo antes de ativar
+            respawn_inimigo_na_camera(&inimigos[indiceInimigo], bitmap.zumbi_direita, bitmap.zumbi_esquerda, bitmap.rato_direita, bitmap.rato_esquerda, bitmap.mosquito_direita, bitmap.mosquito_esquerda, posicaoCamera);
 
-        // DIÁLOGO DE TRANSIÇÃO DE FASE
-        if (controle.mostrar_dialogo_transicao) {
-            controle.mostrar_dialogo_transicao = false;
+            inimigos[indiceInimigo].ativo = true;
+
+            aplicar_buffs_por_fase(inimigos, MAX_INIMIGOS, sistemaFase.faseAtual, indiceInimigo);
             
-            al_stop_timer(timer);
-            al_identity_transform(&camera);
-            al_use_transform(&camera);
-            
-            // Determina qual diálogo mostrar baseado na fase atual
-            int faseParaDialogo = entidades.sistemaFase.faseAtual + 1;
-            
-            // Se passou da fase 3, mostra diálogo final (caso 4)
-            if (faseParaDialogo > 3) {
-                faseParaDialogo = 4; // Diálogo de vitória final
+            indiceInimigo++;
+            inimigosSpawnado++;
+        }
+
+        if (!fase_boss_ativa) {
+            // Ciclo normal de hordas
+            if (!verificarProgressoDaFase(&sistemaFase)) {
+                if (contarInimigosAtivos(inimigos, MAX_INIMIGOS) == 0) {
+                    if (!spawn_ativo) {
+                        timer_spawn_inimigos = al_get_time(); // usa relógio do Allegro
+                        spawn_ativo = true;
+                    }
+                    else if (al_get_time() - timer_spawn_inimigos >= TEMPO_SPAWN) { //Recomeça a horda de inimigos
+                        spawn_ativo = false;
+                        indiceInimigo = 0;
+                        inimigosSpawnado = 0;
+                    }
+                }
+                else {
+                    spawn_ativo = false;
+                }
             }
             
             // Configura e exibe o diálogo de transição
