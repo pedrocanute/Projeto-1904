@@ -1,4 +1,4 @@
-#ifndef MENU_H
+﻿#ifndef MENU_H
 #define MENU_H
 
 #include <stdbool.h>
@@ -75,7 +75,7 @@ typedef struct {
     int falandoLargura, falandoAltura;
     int balaoLargura, balaoAltura;
 
-    // Anima��o da spritesheet
+    // Animação da spritesheet
     int frameAtual;
     int contadorFrame;
     int velocidadeAnimacao;
@@ -84,7 +84,7 @@ typedef struct {
     int numeroTextos;             // Quantidade total de textos
     int textoAtual;
 
-    // Estados de di�logo
+    // Estados de diálogo
     bool dialogo1;
     bool dialogo2;
     bool dialogo3;
@@ -97,5 +97,25 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
 void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
 void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* menuEvent, MenuEstados* menuEstado);
+
+//==========INICIALIZACAO DOS SISTEMAS===========
+void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando, bool* regrasAberta, bool* esc, bool* jogoPausado, bool* fimDeJogo);
+
+void inicializarMenuEvents(MenuEvents* events, ALLEGRO_EVENT_QUEUE* fila, ALLEGRO_TIMER* timer, ALLEGRO_TRANSFORM* camera, float* mouseX, float* mouseY);
+
+void inicializarMenuImagens(MenuImagens* img, Bitmaps* bitmap);
+
+void inicializarMenuBotoes(MenuBotoes* botao, Bitmaps* bitmap);
+
+// Inicialização do Game Over
+void inicializarGameOver(GameOver* gameOver, Bitmaps* bitmap);
+
+// Inicialização do Diálogo
+void inicializarDialogo(Dialogo* dialogo, Bitmaps* bitmap,ALLEGRO_FONT* fonte);
+
+void configurarTextosDialogo(Dialogo* dialogo, int fase);
+
+// Nova função para configurar posições dos botões do menu de pausa
+void configurarPosicoesBotoesPausa(MenuBotoes* menuBotao);
 
 #endif 

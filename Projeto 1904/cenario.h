@@ -1,4 +1,4 @@
-#ifndef CENARIO_H
+﻿#ifndef CENARIO_H
 #define CENARIO_H
 
 #include "configuracoes.h"

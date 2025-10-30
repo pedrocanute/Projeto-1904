@@ -1,4 +1,4 @@
-#include "configuracoes.h"
+﻿#include "configuracoes.h"
 
 static ALLEGRO_BITMAP* carregar(const char* caminho) { //GPT QUE FEZ essa funcao static
     ALLEGRO_BITMAP* bmp = al_load_bitmap(caminho);

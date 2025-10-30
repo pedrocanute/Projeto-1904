@@ -1,4 +1,4 @@
-#ifndef INIMIGO_H
+Ôªø#ifndef INIMIGO_H
 #define INIMIGO_H
 
 #include <stdbool.h>
@@ -20,7 +20,8 @@ typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que es
     TipoInimigo tipo;
     bool ativo;
     int vida;
-    // Vari·veis de animaÁ„o
+    int vidaMaxima; 
+    // Vari√°veis de anima√ß√£o
     int frame_atual;
     int contador_frame;
     int frames_por_sprite;
@@ -32,7 +33,7 @@ typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que es
 
     float velocidade;
 
-    // Vari·veis de dano
+    // Vari√°veis de dano
     float dano;
     float timer_intangibilidade;
 } Inimigo;

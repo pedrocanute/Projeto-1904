@@ -1,4 +1,4 @@
-#include "fases.h"
+﻿#include "fases.h"
 #include "inimigo.h"
 
 void inicializarSistemaFases(SistemaFases* sistema, Inimigo* inimigo) {
