@@ -11,7 +11,7 @@
 #include "input.h"
 #include "cenario.h"
 
-#define MAX_DIALOGOS 10
+#define MAX_DIALOGOS 15
 
 
 typedef struct {

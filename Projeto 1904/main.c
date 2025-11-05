@@ -184,7 +184,7 @@ int main() {
             num3 = false;
             
             // Reinicia o timer se voltar ao jogo
-            if (jogando) {
+            if (*menuEstado.jogando) {
                 al_start_timer(timer);
             }
             else {
@@ -238,25 +238,45 @@ int main() {
         // Verifica se precisa mostrar diálogo de transição de fase
         if (controle.mostrar_dialogo_transicao) {
             controle.mostrar_dialogo_transicao = false;
-            
+                
             // Para o jogo e mostra diálogo
             al_stop_timer(timer);
             al_identity_transform(&camera);
             al_use_transform(&camera);
             
+            // Mostra diálogo da fase atual (pode ser fase 2, 3 ou 4 - vitória)
             if (!executarDialogoInicial(&dialogo, &entidades.sistemaFase, &menuEvent, &menuEstado)) {
                 menuEstado.jogando = false;
             }
             
-            // Verifica se completou todas as fases
-            if (entidades.sistemaFase.faseAtual > 3) {
-                // Jogo concluído!
-                menuEstado.jogando = false;
+            w = false;
+            a = false;
+            s = false;
+            d = false;
+            espaco = false;  // IMPORTANTE: Impede tiro automático
+            shift = false;
+            esc = false;
+            num1 = false;
+            num2 = false;
+            num3 = false;
+
+            // Limpa a fila de eventos que possam ter se acumulado durante o diálogo
+            ALLEGRO_EVENT evento_temp;
+            while (al_get_next_event(fila_eventos, &evento_temp)) {
+                // Descarta eventos acumulados durante o diálogo
             }
-            
-            // Restaura timer se ainda estiver jogando
-            if (menuEstado.jogando) {
-                al_start_timer(timer);
+
+            // Verifica se completou todas as fases APÓS exibir o diálogo
+            if (entidades.sistemaFase.faseAtual > 3) {
+                // Jogo concluído! Encerra após mostrar diálogo de vitória (fase 4)
+                menuEstado.jogando = false;
+                // Não precisa restaurar o timer, pois o jogo vai encerrar
+            }
+            else {
+                // Restaura timer para continuar jogando
+                if (menuEstado.jogando) {
+                    al_start_timer(timer);
+                }
             }
         }
 

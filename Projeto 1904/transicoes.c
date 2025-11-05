@@ -133,7 +133,6 @@ bool executarFadeTransicao(MenuEstados* menuEstado, MenuEvents* menuEvent, doubl
 }
 
 bool executarDialogoInicial(Dialogo* dialogo, SistemaFases* sistemaFase, MenuEvents* menuEvent, MenuEstados* menuEstado) {
-   
 
     // Verifica qual diálogo deve iniciar
     bool iniciarDialogo = false;
@@ -144,6 +143,10 @@ bool executarDialogoInicial(Dialogo* dialogo, SistemaFases* sistemaFase, MenuEve
         iniciarDialogo = true;
     }
     else if (sistemaFase->faseAtual == 3 && !dialogo->dialogo3) {
+        iniciarDialogo = true;
+    }
+    else if (sistemaFase->faseAtual == 4) {
+        // Diálogo de vitória - sempre exibe quando fase == 4
         iniciarDialogo = true;
     }
 
@@ -160,8 +163,8 @@ bool executarDialogoInicial(Dialogo* dialogo, SistemaFases* sistemaFase, MenuEve
     // Chama a função existente de diálogo
     desenhar_tela_dialogo(dialogo, sistemaFase, menuEvent, menuEstado);
 
-    // Retoma o timer
-    if (menuEstado->jogando) {
+    // Retoma o timer (só se não for vitória)
+    if (menuEstado->jogando && sistemaFase->faseAtual < 4) {
         al_start_timer(menuEvent->timer);
     }
 

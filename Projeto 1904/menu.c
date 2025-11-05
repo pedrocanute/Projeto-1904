@@ -613,11 +613,13 @@ void configurarTextosDialogo(Dialogo* dialogo, int fase) {
         dialogo->textos[3] = "A lei tornou a vacina da varíola obrigatória em todo o Brasil.";
         dialogo->textos[4] = "A medida gerou medo, boatos e protestos nas ruas.";
         dialogo->textos[5] = "Não recuarei: ciência, limpeza urbana e vacinação salvam vidas.";
-        dialogo->textos[6] = "Preciso de você no campo: vacinar, desinfetar e orientar o povo.";
-        dialogo->textos[7] = "Controle focos: mosquitos, ratos e aglomerações de risco.";
-        dialogo->textos[8] = "A ordem é proteger bairros e reduzir contágios rapidamente.";
-        dialogo->textos[9] = "Quando a cidade entender, venceremos as epidemias juntos.";
-        dialogo->numeroTextos = 10;
+        dialogo->textos[6] = "Preciso de você no campo: vacinar, desinfetar e exterminar ratos.";
+        dialogo->textos[7] = "Cada ferramenta é eficaz à apenas um tipo de inimigo.";
+        dialogo->textos[8] = "A vassoura extermina o rato, o veneno neutraliza o mosquito e a vacina cura o povo.";
+        dialogo->textos[9] = "Aperte 1 para usar a vassoura, 2 para selecionar o veneno e 3 para a vacina.";
+        dialogo->textos[10] = "A ordem é proteger bairros e reduzir contágios rapidamente.";
+        dialogo->textos[11] = "Quando a cidade entender, venceremos as epidemias juntos.";
+        dialogo->numeroTextos = 12;
         break;
 
     case 2:
@@ -636,7 +638,16 @@ void configurarTextosDialogo(Dialogo* dialogo, int fase) {
         dialogo->textos[2] = "Juntos, erradicaremos as epidemias do Rio de Janeiro.";
         dialogo->numeroTextos = 3;
         break;
-
+    case 4:  // === DIÁLOGO DE VITÓRIA ===
+        dialogo->textos[0] = "VITÓRIA!";
+        dialogo->textos[1] = "As epidemias foram controladas no Rio de Janeiro.";
+        dialogo->textos[2] = "A vacinação obrigatória, apesar da resistência inicial,";
+        dialogo->textos[3] = "salvou milhares de vidas e transformou a saúde pública.";
+        dialogo->textos[4] = "A ciência e a determinação venceram o medo e a ignorância.";
+        dialogo->textos[5] = "O legado de Oswaldo Cruz vive até hoje.";
+        dialogo->textos[6] = "Parabéns por completar sua missão!";
+        dialogo->numeroTextos = 7;
+        break;
     default:
         dialogo->numeroTextos = 0;
         break;

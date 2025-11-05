@@ -16,16 +16,17 @@ void configurarFase(SistemaFases* sistema, int numeroFase, Inimigo* inimigo) {
 
 	switch (numeroFase) {
 	case FASE_1:
-		sistema->metaEliminacoes = 20;
+		sistema->metaEliminacoes = 2;
 		break;
 	case FASE_2:
-		sistema->metaEliminacoes = 20;
+		sistema->metaEliminacoes = 2;
 		break;
 	case FASE_3:
-		sistema->metaEliminacoes = 20;
-		
+		sistema->metaEliminacoes = 2;
 		break;
 	default:
+		// Fase inválida ou jogo concluído
+		sistema->metaEliminacoes = 0;
 		break;
 	}
 }
@@ -36,10 +37,10 @@ bool verificarProgressoDaFase(SistemaFases* sistema) {
 
 void avancarFase(SistemaFases* sistema, Inimigo* inimigo) {
 	if (verificarProgressoDaFase(sistema)) {
+		sistema->faseCompleta = true;
 		int proxima = sistema->faseAtual + 1;
-		if (proxima > FASE_3) 
-			proxima = FASE_3;
+		
+		// Permite avançar além da fase 3 para indicar jogo completo
 		configurarFase(sistema, proxima, inimigo);
 	}
-	return;
 }

@@ -46,11 +46,13 @@ typedef struct {
     float TEMPO_SPAWN;
     bool boss_spawnado;
     bool fase_boss_ativa;
-    bool mostrar_dialogo_transicao;
+
     // SPAWN CADENCIADO
     int inimigos_spawnados;
     float timer_spawn_individual;
     float INTERVALO_SPAWN_INDIVIDUAL;
+
+    bool mostrar_dialogo_transicao;
 } JogoControle;
 
 // Estrutura para animação

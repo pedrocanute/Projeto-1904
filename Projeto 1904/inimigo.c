@@ -56,7 +56,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->alturaBot = 220.0f;
         inimigo->frames_por_sprite = 15;
         inimigo->velocidade = 2.0f;
-        inimigo->vida = 50;
+        inimigo->vida = 10;
         inimigo->vidaMaxima = 50;  
         inimigo->dano = 10;
         break;
