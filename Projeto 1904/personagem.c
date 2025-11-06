@@ -68,7 +68,7 @@ void restringirPosicao(Jogador* p, Caravana* caravana, float maximoX, float maxi
         p->jogadorY = HEIGHT - alturaJogador;
 }
 
-void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool espaco,SpritesJogador* sprites, int arma_equipada,int* frame_atual, int* contador_frame, int frames_por_sprite,bool* virado_direita, int* frame_tiro, int* contador_frame_tiro) {
+void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool espaco, SpritesJogador* sprites, int arma_equipada, int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita, int* frame_tiro, int* contador_frame_tiro, SistemaSom* sons) {
 
     // Determina direção baseado no movimento
     if (d || (d && s) || (d && w)) {
@@ -83,7 +83,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
     ALLEGRO_BITMAP* sprite_andando_esq = NULL;
     ALLEGRO_BITMAP* sprite_atacando_dir = NULL;
     ALLEGRO_BITMAP* sprite_atacando_esq = NULL;
-    int frames_ataque = 3; 
+    int frames_ataque = 3;
 
     //VERIFICAR CADENCIA DE CADA ARMA E VELOCIDADE DE ANIMACAO
     float velocidade, cadencia;
@@ -98,7 +98,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         velocidadeAnimacao = 5;
     }
     else {
-        velocidadeAnimacao = cadencia * 8.0f; 
+        velocidadeAnimacao = cadencia * 8.0f;
     }
 
     // SELECIONA OS SPRITES COM BASE NA ARMA EQUIPADA
@@ -108,7 +108,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         sprite_andando_esq = sprites->sprite_andando_esquerda_vassoura;
         sprite_atacando_dir = sprites->atacando_vassoura_direita;
         sprite_atacando_esq = sprites->atacando_vassoura_esquerda;
-        frames_ataque = 3; 
+        frames_ataque = 3;
         break;
 
     case ARMA_VENENO:
@@ -116,7 +116,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         sprite_andando_esq = sprites->sprite_andando_esquerda_veneno;
         sprite_atacando_dir = sprites->atacando_veneno_direita;
         sprite_atacando_esq = sprites->atacando_veneno_esquerda;
-        frames_ataque = 3; 
+        frames_ataque = 3;
         break;
 
     case ARMA_VACINA:
@@ -126,7 +126,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         sprite_andando_esq = sprites->sprite_andando_esquerda;
         sprite_atacando_dir = sprites->sprite_atirando_direita;
         sprite_atacando_esq = sprites->sprite_atirando_esquerda;
-        frames_ataque = 3; 
+        frames_ataque = 3;
         break;
     }
 
@@ -136,7 +136,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
     bool esta_em_movimento = (a || d || s || w);
 
     if (esta_atirando) {
-        
+
         if (*virado_direita) {
             sprite_atual = sprite_atacando_dir;
         }
@@ -145,10 +145,10 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         }
 
         // ANIMAÇÃO DE ATAQUE - SINCRONIZADA COM CADÊNCIA
-       
+
         (*contador_frame_tiro)++;
-        if (*contador_frame_tiro >= velocidadeAnimacao) {  
-            *frame_tiro = (*frame_tiro + 1) % frames_ataque; 
+        if (*contador_frame_tiro >= velocidadeAnimacao) {
+            *frame_tiro = (*frame_tiro + 1) % frames_ataque;
             *contador_frame_tiro = 0;
         }
 
@@ -162,7 +162,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
             jogador->jogadorX, jogador->jogadorY, 0);
     }
     else {
-        
+
         if (*virado_direita) {
             sprite_atual = sprite_andando_dir;
         }
@@ -177,14 +177,26 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         if (esta_em_movimento) {
             (*contador_frame)++;
             if (*contador_frame >= frames_por_sprite) {
+                int frame_anterior = *frame_atual;
                 *frame_atual = (*frame_atual + 1) % 2;
                 *contador_frame = 0;
+
+                // Toca som de passos apenas quando muda para o frame 1 E passou tempo suficiente E está em movimento
+                float tempo_atual = al_get_time();
+                float tempo_minimo_entre_passos = 0.3f; // Mínimo 0.3 segundos entre sons
+
+                if (*frame_atual == 1 && frame_anterior == 0 && esta_em_movimento) {
+                    if (tempo_atual - jogador->tempoUltimoPasso >= tempo_minimo_entre_passos) {
+                        tocarSomAndando(sons);
+                        jogador->tempoUltimoPasso = tempo_atual;
+                    }
+                }
             }
         }
         else {
-            // Parado - primeiro frame
+            // Parado - primeiro frame e reseta contador
             *frame_atual = 0;
-            *contador_frame = 1;
+            *contador_frame = 0;
         }
 
         // Calcula coordenadas usando 2 colunas para caminhada
@@ -193,7 +205,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         int sx = *frame_atual * largura_frame;
         int sy = 0;
 
-        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,jogador->jogadorX, jogador->jogadorY, 0);
+        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame, jogador->jogadorX, jogador->jogadorY, 0);
     }
 }
 

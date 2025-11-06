@@ -10,12 +10,13 @@ void inicializarJogoCamera(JogoCamera* camera, ALLEGRO_TRANSFORM* transform) {
     camera->camera = transform;
 }
 
-void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* posicaoCamera) {
+void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* posicaoCamera, SistemaSom* sons) {
     // Jogador
     entidades->jogador.jogadorX = 120.0f;
     entidades->jogador.jogadorY = 520.0f;
     entidades->jogador.paraDireita = true;
     entidades->jogador.paraEsquerda = false;
+    entidades->jogador.tempoUltimoPasso = 0.0f;
 
     // Sprites do jogador
     entidades->spritesJogador.sprite_andando_direita = bitmap->sprite_andando_direita;
@@ -50,7 +51,7 @@ void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* 
     inicializarSistemaFases(&entidades->sistemaFase, &entidades->inimigos[0]);
     
     // Inicializa array de inimigos mas não ativa ainda (spawn cadenciado)
-    inicializar_array_inimigos(entidades->inimigos, MAX_INIMIGOS, bitmap->zumbi_direita, bitmap->zumbi_esquerda, bitmap->rato_direita, bitmap->rato_esquerda, bitmap->mosquito_direita, bitmap->mosquito_esquerda, posicaoCamera);
+    inicializar_array_inimigos(entidades->inimigos, MAX_INIMIGOS, bitmap->zumbi_direita, bitmap->zumbi_esquerda, bitmap->rato_direita, bitmap->rato_esquerda, bitmap->mosquito_direita, bitmap->mosquito_esquerda, posicaoCamera, sons);
 }
 
 void inicializarJogoBarras(JogoBarras* barras) {
@@ -233,7 +234,7 @@ void processarRegeneracaoVida(JogoBarras* barras, JogoControle* controle, bool c
 }
 
 // Processa spawn de inimigos
-void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bitmaps* bitmap, float* posicaoCamera) {
+void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bitmaps* bitmap, float* posicaoCamera, SistemaSom* sons) {
     // NÃO SPAWNA INIMIGOS ATÉ A CUTSCENE TERMINAR
     if (!controle->cutscene_concluida) {
         return;
@@ -257,10 +258,10 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
 
             if (idx_boss >= 0) {
                 if (entidades->sistemaFase.faseAtual == 1) {
-                    spawnar_boss_rato(&entidades->inimigos[idx_boss], bitmap->rato_direita, bitmap->rato_esquerda, posicaoCamera);
+                    spawnar_boss_rato(&entidades->inimigos[idx_boss], bitmap->rato_direita, bitmap->rato_esquerda, posicaoCamera, sons);
                 }
                 else if (entidades->sistemaFase.faseAtual == 2 || entidades->sistemaFase.faseAtual == 3) {
-                    spawnar_boss(&entidades->inimigos[idx_boss], bitmap->boss_variola_direita, bitmap->boss_variola_esquerda, posicaoCamera);
+                    spawnar_boss(&entidades->inimigos[idx_boss], bitmap->boss_variola_direita, bitmap->boss_variola_esquerda, posicaoCamera, sons);
                 }
                 controle->boss_spawnado = true;
                 controle->fase_boss_ativa = true;
@@ -275,13 +276,16 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
             float tempo_atual = al_get_time();
             if (tempo_atual - controle->timer_spawn_individual >= controle->INTERVALO_SPAWN_INDIVIDUAL) {
                 // Ativa o próximo inimigo
-                respawn_inimigo_na_camera(&entidades->inimigos[controle->inimigos_spawnados],bitmap->zumbi_direita, bitmap->zumbi_esquerda,bitmap->rato_direita, bitmap->rato_esquerda,bitmap->mosquito_direita, bitmap->mosquito_esquerda,posicaoCamera);
+                respawn_inimigo_na_camera(&entidades->inimigos[controle->inimigos_spawnados],bitmap->zumbi_direita, bitmap->zumbi_esquerda,bitmap->rato_direita, bitmap->rato_esquerda,bitmap->mosquito_direita, bitmap->mosquito_esquerda,posicaoCamera, sons);
 
                 // Aplica buffs da fase atual
                 aplicar_buffs_por_fase(&entidades->inimigos[controle->inimigos_spawnados],1,entidades->sistemaFase.faseAtual);
 
                 // Agora sim ativa o inimigo
                 entidades->inimigos[controle->inimigos_spawnados].ativo = true;
+                
+                // Toca o som do inimigo ao ativar
+                tocar_som_inimigo(&entidades->inimigos[controle->inimigos_spawnados], sons);
 
                 controle->inimigos_spawnados++;
                 controle->timer_spawn_individual = tempo_atual;
@@ -302,7 +306,7 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
                     bitmap->zumbi_direita, bitmap->zumbi_esquerda,
                     bitmap->rato_direita, bitmap->rato_esquerda,
                     bitmap->mosquito_direita, bitmap->mosquito_esquerda,
-                    posicaoCamera);
+                    posicaoCamera, sons);
                 
                 // Aplica buffs baseado na fase
                 aplicar_buffs_por_fase(entidades->inimigos, MAX_INIMIGOS, entidades->sistemaFase.faseAtual);
@@ -310,6 +314,9 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
                 // Ativa o primeiro inimigo imediatamente
                 entidades->inimigos[0].ativo = true;
                 
+                // Toca o som do primeiro inimigo
+                tocar_som_inimigo(&entidades->inimigos[0], sons);
+     
                 // Reseta contadores para spawn cadenciado (começa no índice 1)
                 controle->inimigos_spawnados = 1;
                 controle->timer_spawn_individual = al_get_time();

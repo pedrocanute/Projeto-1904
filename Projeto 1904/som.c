@@ -32,6 +32,11 @@ bool carregarSons(SistemaSom* sons) {
     // Inicializa todos os ponteiros como NULL
     sons->somTiro = NULL;
     sons->somClick = NULL;
+    sons->somAndando = NULL;
+    sons->somMosquito = NULL;
+    sons->somVassoura = NULL;
+    sons->somZumbi = NULL;
+    sons->somVeneno = NULL;
     sons->musicaMenu = NULL;
 
     // Carrega o som de tiro do caminho especificado
@@ -47,6 +52,46 @@ bool carregarSons(SistemaSom* sons) {
 
     if (!sons->somClick) {
         fprintf(stderr, "Falha ao carregar sons/Som Click.wav!\n");
+        return false;
+    }
+
+    // Carrega o som de passos
+    sons->somAndando = al_load_sample("sons/andando.wav");
+
+    if (!sons->somAndando) {
+        fprintf(stderr, "Falha ao carregar sons/andando.wav!\n");
+        return false;
+    }
+
+    // Carrega o som do mosquito
+    sons->somMosquito = al_load_sample("sons/mosquito.wav");
+
+    if (!sons->somMosquito) {
+        fprintf(stderr, "Falha ao carregar sons/mosquito.wav!\n");
+        return false;
+    }
+
+    // Carrega o som da vassoura
+    sons->somVassoura = al_load_sample("sons/Vassoura.wav");
+
+    if (!sons->somVassoura) {
+        fprintf(stderr, "Falha ao carregar sons/Vassoura.wav!\n");
+        return false;
+    }
+
+    // Carrega o som do zumbi
+    sons->somZumbi = al_load_sample("sons/Zumbi.wav");
+
+    if (!sons->somZumbi) {
+        fprintf(stderr, "Falha ao carregar sons/Zumbi.wav!\n");
+        return false;
+    }
+
+    // Carrega o som do veneno
+    sons->somVeneno = al_load_sample("sons/Veneno.wav");
+
+    if (!sons->somVeneno) {
+        fprintf(stderr, "Falha ao carregar sons/Veneno.wav!\n");
         return false;
     }
 
@@ -66,6 +111,11 @@ bool carregarSons(SistemaSom* sons) {
 
     printf("Som de tiro carregado com sucesso!\n");
     printf("Som de clique carregado com sucesso!\n");
+    printf("Som de passos carregado com sucesso!\n");
+    printf("Som de mosquito carregado com sucesso!\n");
+    printf("Som de vassoura carregado com sucesso!\n");
+    printf("Som de zumbi carregado com sucesso!\n");
+    printf("Som de veneno carregado com sucesso!\n");
     printf("Música do menu carregada com sucesso!\n");
     return true;
 }
@@ -100,16 +150,109 @@ void tocarSomClick(SistemaSom* sons) {
     );
 }
 
-void tocarMusicaMenu(SistemaSom* sons) {
-    if (!sons || !sons->musicaMenu) {
+void tocarSomAndando(SistemaSom* sons) {
+    if (!sons || !sons->somAndando) {
         return;
     }
 
-    // Define o volume da música (mais baixo para não sobrepor os efeitos sonoros)
-    al_set_audio_stream_gain(sons->musicaMenu, 0.9f);
+    al_play_sample(
+        sons->somAndando,
+        0.5f, // Volume 50%
+        0.0f, // Centro (stereo)
+        1.0f, // Velocidade normal
+        ALLEGRO_PLAYMODE_ONCE,
+        NULL
+    );
+}
+
+void tocarSomMosquito(SistemaSom* sons) {
+    if (!sons || !sons->somMosquito) {
+        return;
+    }
+
+    al_play_sample(
+        sons->somMosquito,
+        0.4f, // Volume 40%
+        0.0f, // Centro (stereo)
+        1.0f, // Velocidade normal
+        ALLEGRO_PLAYMODE_ONCE,
+        NULL
+    );
+}
+
+void tocarSomVassoura(SistemaSom* sons) {
+    if (!sons || !sons->somVassoura) {
+        return;
+    }
+
+    al_play_sample(
+        sons->somVassoura,
+        0.7f, // Volume 70%
+        0.0f, // Centro (stereo)
+        1.0f, // Velocidade normal
+        ALLEGRO_PLAYMODE_ONCE,
+        NULL
+    );
+}
+
+void tocarSomZumbi(SistemaSom* sons) {
+    if (!sons || !sons->somZumbi) {
+        return;
+    }
+
+    al_play_sample(
+        sons->somZumbi,
+        0.4f, // Volume 40%
+        0.0f, // Centro (stereo)
+        1.0f, // Velocidade normal
+        ALLEGRO_PLAYMODE_ONCE,
+        NULL
+    );
+}
+
+void tocarSomVeneno(SistemaSom* sons) {
+    if (!sons || !sons->somVeneno) {
+        return;
+    }
+
+    al_play_sample(
+        sons->somVeneno,
+        0.6f, // Volume 60%
+        0.0f, // Centro (stereo)
+        1.0f, // Velocidade normal
+        ALLEGRO_PLAYMODE_ONCE,
+        NULL
+    );
+}
+
+void tocarMusicaMenu(SistemaSom* sons) {
+    if (!sons) {
+        fprintf(stderr, "ERRO: ponteiro sons é NULL!\n");
+        return;
+    }
+    
+    if (!sons->musicaMenu) {
+        fprintf(stderr, "ERRO: musicaMenu é NULL!\n");
+        return;
+    }
+
+    printf("Tentando tocar música do menu...\n");
+
+    // Define o volume da música
+  al_set_audio_stream_gain(sons->musicaMenu, 1.0f);
+    printf("Volume configurado: 1.0\n");
 
     // Inicia a reprodução da música
     al_set_audio_stream_playing(sons->musicaMenu, true);
+    printf("Comando de play enviado...\n");
+    
+    // Verifica se está realmente tocando
+    if (al_get_audio_stream_playing(sons->musicaMenu)) {
+        printf("✓ Música do menu iniciada com sucesso!\n");
+    } else {
+        fprintf(stderr, "✗ ERRO: Música não está tocando!\n");
+        fprintf(stderr, "Verifique se sons/MusicaMenu.wav existe!\n");
+    }
 }
 
 void pararMusicaMenu(SistemaSom* sons) {
@@ -145,5 +288,33 @@ void destruirSons(SistemaSom* sons) {
         sons->somClick = NULL;
     }
 
-    // Aqui você destruiria outros sons no futuro
+    // Destroi o som de passos
+    if (sons->somAndando) {
+        al_destroy_sample(sons->somAndando);
+        sons->somAndando = NULL;
+    }
+
+    // Destroi o som do mosquito
+    if (sons->somMosquito) {
+        al_destroy_sample(sons->somMosquito);
+        sons->somMosquito = NULL;
+    }
+
+    // Destroi o som da vassoura
+    if (sons->somVassoura) {
+        al_destroy_sample(sons->somVassoura);
+        sons->somVassoura = NULL;
+    }
+
+    // Destroi o som do zumbi
+    if (sons->somZumbi) {
+        al_destroy_sample(sons->somZumbi);
+        sons->somZumbi = NULL;
+    }
+
+    // Destroi o som do veneno
+    if (sons->somVeneno) {
+        al_destroy_sample(sons->somVeneno);
+        sons->somVeneno = NULL;
+    }
 }

@@ -74,7 +74,7 @@ typedef struct {
 
 // Funções de inicialização
 void inicializarJogoCamera(JogoCamera* camera, ALLEGRO_TRANSFORM* transform);
-void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* posicaoCamera);
+void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* posicaoCamera, SistemaSom* sons);
 void inicializarJogoBarras(JogoBarras* barras);
 void inicializarJogoControle(JogoControle* controle);
 void inicializarJogoAnimacao(JogoAnimacao* animacao);
@@ -88,7 +88,7 @@ ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras,
 void processarRegeneracaoVida(JogoBarras* barras, JogoControle* controle, bool colisaoOcorreu);
 
 // Funções de spawn e fases
-void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bitmaps* bitmap, float* posicaoCamera);
+void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bitmaps* bitmap, float* posicaoCamera, SistemaSom* sons);
 void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle);
 
 #endif

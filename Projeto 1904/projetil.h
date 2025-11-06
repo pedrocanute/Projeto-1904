@@ -45,6 +45,6 @@ void trocar_arma(ProjetilPosicao* pp, Arma nova_arma);
 
 void configuracoes_armas(Arma tipo, float* velocidade, float* cadencia);
 
-void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, bool espaco, int larguraJogador, int alturaJogador, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss);
+void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, bool espaco, int larguraJogador, int alturaJogador, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss, SistemaSom* sons);
 
 #endif

@@ -5,7 +5,7 @@
 void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, Bitmaps *bitmap, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss, SistemaSom* sons) {
 
     if (pp->tipo == ARMA_VASSOURA) {
-        ataque_corpo_a_corpo(pp, jogador, inimigos, numInimigos, espaco, larguraJogador, alturaJogador, sistemaFase, barraVidaBoss);
+        ataque_corpo_a_corpo(pp, jogador, inimigos, numInimigos, espaco, larguraJogador, alturaJogador, sistemaFase, barraVidaBoss, sons);
     }
 
 
@@ -15,9 +15,12 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
     if (espaco && projetilTimer >= pp->proxProjetil) {
         for (int i = 0; i < 50; i++) {
             if (!pp->projetilAtivo[i]) {
-                // Toca o som de tiro apenas para a arma VACINA
+                // Toca o som apropriado para cada arma
                 if (pp->tipo == ARMA_VACINA) {
                     tocarSomTiro(sons);
+                }
+                else if (pp->tipo == ARMA_VENENO) {
+                    tocarSomVeneno(sons);
                 }
      
                 pp->tipoProjetil[i] = pp->tipo;
@@ -248,7 +251,7 @@ void configuracoes_armas(Arma tipo, float* velocidade, float* cadencia) {
     }
 }
 
-void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, bool espaco, int larguraJogador, int alturaJogador, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss) {
+void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, bool espaco, int larguraJogador, int alturaJogador, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss, SistemaSom* sons) {
 
     const float tempoAtual = al_get_time();
 
@@ -261,6 +264,11 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
         pp->tempoInicioAtaque = tempoAtual;
         pp->duracaoAtaque = 0.3f;
         pp->proxProjetil = tempoAtual + cadencia;
+
+        // Toca som da vassoura
+        if (sons) {
+            tocarSomVassoura(sons);
+        }
 
         for (int k = 0; k < 20; k++) {  // MAX_INIMIGOS
             pp->inimigosAtingidos[k] = false;

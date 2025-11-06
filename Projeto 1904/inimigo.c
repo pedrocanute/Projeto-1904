@@ -7,7 +7,7 @@
 #include "personagem.h"
 #include "fases.h"
 
-void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, ALLEGRO_BITMAP* sprite_dir, ALLEGRO_BITMAP* sprite_esq) {
+void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, ALLEGRO_BITMAP* sprite_dir, ALLEGRO_BITMAP* sprite_esq, SistemaSom* sons) {
 
     inimigo->tipo = tipo;
     inimigo->botX = x;
@@ -23,6 +23,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
     inimigo->vida = 1;
     inimigo->vidaMaxima = 1;  
     inimigo->timer_intangibilidade = 0.0f;
+    inimigo->somTocado = false;
     
     inimigo->colidindo_caravana = false;
     inimigo->timer_colisao_inicio = 0.0;
@@ -36,6 +37,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->dano = 5.0f;
         inimigo->vida = 1;
         inimigo->vidaMaxima = 1;
+        // NÃO toca som aqui - será tocado quando ativar
         break;
     case TIPO_RATO:
         inimigo->larguraBot = 60.0f;
@@ -44,7 +46,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->dano = 3.0f;
         inimigo->vida = 1;
         inimigo->vidaMaxima = 1;
-        break;
+    break;
     case TIPO_MOSQUITO:
         inimigo->larguraBot = 80.0f;
         inimigo->alturaBot = 80.0f;
@@ -53,6 +55,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->dano = 2.0f;
         inimigo->vida = 1;
         inimigo->vidaMaxima = 1;
+        // NÃO toca som aqui - será tocado quando ativar
         break;
     case TIPO_BOSS:
         inimigo->larguraBot = 220.0f;
@@ -60,24 +63,23 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->frames_por_sprite = 15;
         inimigo->velocidade = 2.0f;
         inimigo->vida = 10;
-        inimigo->vidaMaxima = 50;  
+        inimigo->vidaMaxima = 50;
         inimigo->dano = 10;
         break;
     case TIPO_BOSS_RATO:
-        inimigo->larguraBot = 180.0f;  
-        inimigo->alturaBot = 150.0f;   
-        inimigo->frames_por_sprite = 11;  
-        inimigo->velocidade = 1.5f;     
-        inimigo->vida = 30;             
-        inimigo->vidaMaxima = 30;       
-        inimigo->dano = 15;             
-        break;
-
+        inimigo->larguraBot = 180.0f;
+        inimigo->alturaBot = 150.0f;
+        inimigo->frames_por_sprite = 11;
+        inimigo->velocidade = 1.5f;
+        inimigo->vida = 30;
+        inimigo->vidaMaxima = 30;
+        inimigo->dano = 15;
+     break;
     }
 }
 
 // SPAWNA INIMIGOS COM BASE NA CAMERA
-void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
+void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera, SistemaSom* sons) {
 
     // Largura da tela (campo de visão do jogador)
     const float LARGURA_TELA = 1280.0f;
@@ -102,21 +104,21 @@ void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLE
 
     switch (tipo) {
     case TIPO_ZUMBI:
-        inicializar_inimigo(inimigo, TIPO_ZUMBI, x, y, zumbi_dir, zumbi_esq);
+      inicializar_inimigo(inimigo, TIPO_ZUMBI, x, y, zumbi_dir, zumbi_esq, sons);
         break;
     case TIPO_RATO:
-        inicializar_inimigo(inimigo, TIPO_RATO, x, y, rato_dir, rato_esq);
+        inicializar_inimigo(inimigo, TIPO_RATO, x, y, rato_dir, rato_esq, sons);
         break;
     case TIPO_MOSQUITO:
-        inicializar_inimigo(inimigo, TIPO_MOSQUITO, x, y, mosquito_dir, mosquito_esq);
+        inicializar_inimigo(inimigo, TIPO_MOSQUITO, x, y, mosquito_dir, mosquito_esq, sons);
         break;
     }
 }
 
-void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera) {
+void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera, SistemaSom* sons) {
     srand(time(NULL));
     for (int i = 0; i < quantidade; i++) {
-        respawn_inimigo_na_camera(&inimigos[i], zumbi_dir, zumbi_esq, rato_dir, rato_esq, mosquito_dir, mosquito_esq, posicaoCamera);
+        respawn_inimigo_na_camera(&inimigos[i], zumbi_dir, zumbi_esq, rato_dir, rato_esq, mosquito_dir, mosquito_esq, posicaoCamera, sons);
     }
 }
 
@@ -218,7 +220,7 @@ void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
     }
 }
 
-void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera) {
+void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera, SistemaSom* sons) {
 
     // Boss spawna mais a frente da camera
     float camera_direita = posicaoCamera[0] + 1280;
@@ -227,16 +229,16 @@ void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* bo
     // Boss spawna no centro vertical da tela
     float spawn_y = (720 / 2) + 52;
 
-    inicializar_inimigo(inimigo, TIPO_BOSS, spawn_x, spawn_y, boss_dir, boss_esq);
+    inicializar_inimigo(inimigo, TIPO_BOSS, spawn_x, spawn_y, boss_dir, boss_esq, sons);
     inimigo->ativo = true;
 }
 
-void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera) {
+void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera, SistemaSom* sons) {
     float camera_direita = posicaoCamera[0] + 1280;
     float spawnX = camera_direita + 500;
     float spawnY = (720 / 2) - 100;
 
-    inicializar_inimigo(inimigo, TIPO_BOSS_RATO, spawnX, spawnY, ratodir, ratoesq);
+    inicializar_inimigo(inimigo, TIPO_BOSS_RATO, spawnX, spawnY, ratodir, ratoesq, sons);
     inimigo->ativo = true;
 }
 
@@ -297,20 +299,39 @@ void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float dis
 void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade) {
     const double TEMPO_VIDA_COLISAO = 2.5; // 2.5 segundos até morrer
     double tempo_atual = al_get_time();
-    
+
     for (int i = 0; i < quantidade; i++) {
         if (!inimigos[i].ativo) continue;
-        
-        // Se está colidindo com a caravana
-        if (inimigos[i].colidindo_caravana) {
-            // Calcula há quanto tempo está colidindo
-            double tempo_colisao = tempo_atual - inimigos[i].timer_colisao_inicio;
+      
+   if (inimigos[i].colidindo_caravana) {
+            double tempo_colidindo = tempo_atual - inimigos[i].timer_colisao_inicio;
             
-            // Se passou 2 segundos, desativa o inimigo
-            if (tempo_colisao >= TEMPO_VIDA_COLISAO) {
-                inimigos[i].ativo = false;
-                inimigos[i].colidindo_caravana = false;
-            }
+     if (tempo_colidindo >= TEMPO_VIDA_COLISAO) {
+    inimigos[i].ativo = false;
+inimigos[i].colidindo_caravana = false;
+          }
         }
+    }
+}
+
+// Toca o som do inimigo quando ele é ativado
+void tocar_som_inimigo(Inimigo* inimigo, SistemaSom* sons) {
+    if (!inimigo || !sons || inimigo->somTocado) {
+     return;
+    }
+    
+  // Toca som baseado no tipo do inimigo
+    switch (inimigo->tipo) {
+        case TIPO_ZUMBI:
+      tocarSomZumbi(sons);
+          inimigo->somTocado = true;
+         break;
+        case TIPO_MOSQUITO:
+ tocarSomMosquito(sons);
+      inimigo->somTocado = true;
+   break;
+  default:
+          // Outros tipos de inimigos não têm som
+      break;
     }
 }

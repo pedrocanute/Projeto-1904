@@ -10,6 +10,11 @@
 typedef struct {
     ALLEGRO_SAMPLE* somTiro;
     ALLEGRO_SAMPLE* somClick;
+    ALLEGRO_SAMPLE* somAndando;
+    ALLEGRO_SAMPLE* somMosquito;
+    ALLEGRO_SAMPLE* somVassoura;
+    ALLEGRO_SAMPLE* somZumbi;
+    ALLEGRO_SAMPLE* somVeneno;
     ALLEGRO_AUDIO_STREAM* musicaMenu;
     
 } SistemaSom;
@@ -25,6 +30,21 @@ void tocarSomTiro(SistemaSom* sons);
 
 // Função para tocar o som de clique
 void tocarSomClick(SistemaSom* sons);
+
+// Função para tocar o som de passos
+void tocarSomAndando(SistemaSom* sons);
+
+// Função para tocar o som do mosquito
+void tocarSomMosquito(SistemaSom* sons);
+
+// Função para tocar o som da vassoura
+void tocarSomVassoura(SistemaSom* sons);
+
+// Função para tocar o som do zumbi
+void tocarSomZumbi(SistemaSom* sons);
+
+// Função para tocar o som do veneno
+void tocarSomVeneno(SistemaSom* sons);
 
 // Função para tocar a música do menu
 void tocarMusicaMenu(SistemaSom* sons);

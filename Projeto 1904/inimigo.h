@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <allegro5/allegro.h>
 #include "personagem.h"
+#include "som.h"
 
 #define MAX_INIMIGOS 20
 
@@ -39,14 +40,15 @@ typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que es
     
     bool colidindo_caravana;      
     double timer_colisao_inicio;  
+    bool somTocado; // Controla se o som do inimigo já foi tocado
 } Inimigo;
 
 void desenhar_inimigo(Inimigo* inimigo, bool em_movimento);
 
-void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, ALLEGRO_BITMAP* sprite_dir, ALLEGRO_BITMAP* sprite_esq);
+void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, ALLEGRO_BITMAP* sprite_dir, ALLEGRO_BITMAP* sprite_esq, SistemaSom* sons);
 
 // DE ACORDO COM A POSICAO DA CAMERA
-void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera);
+void inicializar_array_inimigos(Inimigo* inimigos, int quantidade, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera, SistemaSom* sons);
 
 void desenhar_todos_inimigos(Inimigo* inimigos, int quantidade);
 
@@ -57,14 +59,17 @@ int contarInimigosAtivos(Inimigo* inimigos, int maxInimigos);
 
 void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual);
 
-void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera);
+void spawnar_boss(Inimigo* inimigo, ALLEGRO_BITMAP* boss_dir, ALLEGRO_BITMAP* boss_esq, float* posicaoCamera, SistemaSom* sons);
 
-void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera);
+void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP* ratoesq, float* posicaoCamera, SistemaSom* sons);
 
 void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada);
 
-void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera);
+void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera, SistemaSom* sons);
 
 void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade);
+
+// Toca o som do inimigo quando ele é ativado
+void tocar_som_inimigo(Inimigo* inimigo, SistemaSom* sons);
 
 #endif

@@ -77,7 +77,7 @@ int main() {
     inicializarJogoCamera(&jogoCamera, &camera);
 
     JogoEntidades entidades;
-    inicializarJogoEntidades(&entidades, &bitmap, jogoCamera.posicaoCamera);
+    inicializarJogoEntidades(&entidades, &bitmap, jogoCamera.posicaoCamera, &sons);
 
     JogoBarras barras;
     inicializarJogoBarras(&barras);
@@ -253,7 +253,7 @@ int main() {
         }
 
         // SISTEMA DE SPAWN E FASES 
-        processarSpawnInimigos(&entidades, &controle, &bitmap, jogoCamera.posicaoCamera);
+        processarSpawnInimigos(&entidades, &controle, &bitmap, jogoCamera.posicaoCamera, &sons);
 
         // Verifica se boss foi derrotado
         verificarMorteBoss(&entidades, &controle);
@@ -329,7 +329,8 @@ int main() {
             desenhar_caravana(bitmap.soldado, entidades.caravana.caravanaX, entidades.caravana.caravanaY, entidades.caravana.caravanaLargura, entidades.caravana.caravanaAltura, resultadoColisao.corCaravana);
 
             // jogador e inimigos
-            desenhar_jogador(&entidades.jogador, w, a, s, d, espaco, &entidades.spritesJogador, entidades.projetil.tipo, &animacao.frame_atual, &animacao.contador_frame, animacao.frames_por_sprite, &animacao.virado_direita, &animacao.frame_tiro, &animacao.contador_frame_tiro);
+            desenhar_jogador(&entidades.jogador, w, a, s, d, espaco, &entidades.spritesJogador, entidades.projetil.tipo, &animacao.frame_atual, &animacao.contador_frame, animacao.frames_por_sprite, &animacao.virado_direita, &animacao.frame_tiro, &animacao.contador_frame_tiro, &sons);
+
             desenhar_todos_inimigos(entidades.inimigos, MAX_INIMIGOS);
 
             // tiros
