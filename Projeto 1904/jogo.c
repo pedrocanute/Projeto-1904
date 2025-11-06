@@ -189,6 +189,13 @@ ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras,
                 barras->barraInfeccao.barraLargura < INFECCAO_MAXIMA) {
 
                 float tempoAtual = al_get_time();
+                
+                // Registra início da colisão
+                if (!entidades->inimigos[i].colidindo_caravana) {
+                    
+                    entidades->inimigos[i].colidindo_caravana = true;
+                    entidades->inimigos[i].timer_colisao_inicio = tempoAtual;
+                }
 
                 if (tempoAtual - entidades->inimigos[i].timer_intangibilidade >= controle->TEMPO_INTANGIBILIDADE) {
                     resultado.ocorreuColisao = true;
@@ -201,6 +208,13 @@ ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras,
                     if (al_get_time() < fimDanoVisual) {
                         resultado.corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
                     }
+                }
+            }
+            else {
+                // reseta o timer
+                if (entidades->inimigos[i].colidindo_caravana) {
+                    entidades->inimigos[i].colidindo_caravana = false;
+                    entidades->inimigos[i].timer_colisao_inicio = 0.0;
                 }
             }
         }

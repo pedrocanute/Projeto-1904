@@ -1,8 +1,210 @@
 ﻿#include "menu.h"
 #include "configuracoes.h"
+#include "dialogos.h"
 
-void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte) {
+// Estrutura para controlar a animação do menu
+typedef struct {
+    float jogadorX;
+    float jogadorY;
+    float zumbiX;
+    float zumbiY;
+    float ratoX;
+    float ratoY;
+    float mosquitoX;
+    float mosquitoY;
+    int frameJogador;
+    int contadorFrameJogador;
+    int frameZumbi;
+    int contadorFrameZumbi;
+    int frameRato;
+    int contadorFrameRato;
+    int frameMosquito;
+    int contadorFrameMosquito;
+    bool jogadorAtivo;
+    bool zumbiAtivo;
+    bool ratoAtivo;
+    bool mosquitoAtivo;
+    double tempoUltimaAnimacao;
+} AnimacaoMenu;
+
+void inicializarAnimacaoMenu(AnimacaoMenu* anim) {
+    anim->jogadorX = -150.0f;  // Fora da tela à esquerda
+    anim->jogadorY = 400.0f;
+    anim->zumbiX = WIDTH + 150.0f;  // Fora da tela à direita
+    anim->zumbiY = 400.0f;
+    anim->ratoX = -150.0f;
+    anim->ratoY = 450.0f;
+    anim->mosquitoX = WIDTH + 150.0f;
+    anim->mosquitoY = 380.0f;
+    
+    anim->frameJogador = 0;
+    anim->contadorFrameJogador = 0;
+    anim->frameZumbi = 0;
+    anim->contadorFrameZumbi = 0;
+    anim->frameRato = 0;
+    anim->contadorFrameRato = 0;
+    anim->frameMosquito = 0;
+    anim->contadorFrameMosquito = 0;
+    
+    anim->jogadorAtivo = true;
+    anim->zumbiAtivo = false;
+    anim->ratoAtivo = false;
+    anim->mosquitoAtivo = false;
+    anim->tempoUltimaAnimacao = al_get_time();
+}
+
+void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
+    const float VELOCIDADE_DOUTOR = 3.0f;
+    const float VELOCIDADE_ZUMBI = 2.5f;
+    const float VELOCIDADE_RATO = 4.0f;
+    const float VELOCIDADE_MOSQUITO = 3.5f;
+    const int FRAMES_POR_SPRITE = 8;
+
+    // Atualiza posição do jogador
+    if (anim->jogadorAtivo) {
+        anim->jogadorX += VELOCIDADE_DOUTOR;
+        
+        // Animação do jogador
+        anim->contadorFrameJogador++;
+        if (anim->contadorFrameJogador >= FRAMES_POR_SPRITE) {
+            anim->contadorFrameJogador = 0;
+            anim->frameJogador = (anim->frameJogador + 1) % 2;  // 2 frames de caminhada
+        }
+
+        // Se saiu da tela pela direita, ativa o zumbi
+        if (anim->jogadorX > WIDTH + 150.0f) {
+            anim->jogadorAtivo = false;
+            anim->zumbiAtivo = true;
+            anim->zumbiX = WIDTH + 150.0f;
+        }
+    }
+
+    // Atualiza posição do zumbi
+    if (anim->zumbiAtivo) {
+        anim->zumbiX -= VELOCIDADE_ZUMBI;
+        
+        // Animação do zumbi
+        anim->contadorFrameZumbi++;
+        if (anim->contadorFrameZumbi >= FRAMES_POR_SPRITE) {
+            anim->contadorFrameZumbi = 0;
+            anim->frameZumbi = (anim->frameZumbi + 1) % 2;  // 2 frames do zumbi
+        }
+
+        // Se saiu da tela pela esquerda, ativa o rato
+        if (anim->zumbiX < -150.0f) {
+            anim->zumbiAtivo = false;
+            anim->ratoAtivo = true;
+            anim->ratoX = -150.0f;
+        }
+    }
+
+    // Atualiza posição do rato
+    if (anim->ratoAtivo) {
+        anim->ratoX += VELOCIDADE_RATO;
+        
+        // Animação do rato
+        anim->contadorFrameRato++;
+        if (anim->contadorFrameRato >= FRAMES_POR_SPRITE) {
+            anim->contadorFrameRato = 0;
+            anim->frameRato = (anim->frameRato + 1) % 2;  // 2 frames do rato
+        }
+
+        // Se saiu da tela pela direita, ativa o mosquito
+        if (anim->ratoX > WIDTH + 150.0f) {
+            anim->ratoAtivo = false;
+            anim->mosquitoAtivo = true;
+            anim->mosquitoX = WIDTH + 150.0f;
+        }
+    }
+
+    // Atualiza posição do mosquito
+    if (anim->mosquitoAtivo) {
+        anim->mosquitoX -= VELOCIDADE_MOSQUITO;
+        
+        // Animação do mosquito
+        anim->contadorFrameMosquito++;
+        if (anim->contadorFrameMosquito >= FRAMES_POR_SPRITE) {
+            anim->contadorFrameMosquito = 0;
+            anim->frameMosquito = (anim->frameMosquito + 1) % 2;  // 2 frames do mosquito
+        }
+
+        // Se saiu da tela pela esquerda, reinicia o ciclo
+        if (anim->mosquitoX < -150.0f) {
+            anim->mosquitoAtivo = false;
+            anim->jogadorAtivo = true;
+            anim->jogadorX = -150.0f;
+        }
+    }
+}
+
+void desenharAnimacaoMenu(AnimacaoMenu* anim, Bitmaps* bitmap) {
+    // Desenha jogador (se ativo)
+    if (anim->jogadorAtivo && anim->jogadorX > -150.0f && anim->jogadorX < WIDTH + 150.0f) {
+        ALLEGRO_BITMAP* spriteJogador = bitmap->sprite_andando_direita;
+        
+        if (spriteJogador) {
+            int larguraTotal = al_get_bitmap_width(spriteJogador);
+            int alturaFrame = al_get_bitmap_height(spriteJogador);
+            int larguraFrame = larguraTotal / 2;  // 2 frames
+            int sx = anim->frameJogador * larguraFrame;
+            
+            al_draw_bitmap_region(spriteJogador, sx, 0, larguraFrame, alturaFrame, 
+                                 anim->jogadorX, anim->jogadorY, 0);
+        }
+    }
+
+    // Desenha zumbi (se ativo)
+    if (anim->zumbiAtivo && anim->zumbiX > -150.0f && anim->zumbiX < WIDTH + 150.0f) {
+        ALLEGRO_BITMAP* spriteZumbi = bitmap->zumbi_esquerda;
+        
+        if (spriteZumbi) {
+            int larguraTotal = al_get_bitmap_width(spriteZumbi);
+            int alturaFrame = al_get_bitmap_height(spriteZumbi);
+            int larguraFrame = larguraTotal / 2;  // 2 frames
+            int sx = anim->frameZumbi * larguraFrame;
+            
+            al_draw_bitmap_region(spriteZumbi, sx, 0, larguraFrame, alturaFrame, 
+                                 anim->zumbiX, anim->zumbiY, 0);
+        }
+    }
+
+    // Desenha rato (se ativo)
+    if (anim->ratoAtivo && anim->ratoX > -150.0f && anim->ratoX < WIDTH + 150.0f) {
+        ALLEGRO_BITMAP* spriteRato = bitmap->rato_direita;
+        
+        if (spriteRato) {
+            int larguraTotal = al_get_bitmap_width(spriteRato);
+            int alturaFrame = al_get_bitmap_height(spriteRato);
+            int larguraFrame = larguraTotal / 2;  // 2 frames
+            int sx = anim->frameRato * larguraFrame;
+            
+            al_draw_bitmap_region(spriteRato, sx, 0, larguraFrame, alturaFrame, 
+                                 anim->ratoX, anim->ratoY, 0);
+        }
+    }
+
+    // Desenha mosquito (se ativo)
+    if (anim->mosquitoAtivo && anim->mosquitoX > -150.0f && anim->mosquitoX < WIDTH + 150.0f) {
+        ALLEGRO_BITMAP* spriteMosquito = bitmap->mosquito_esquerda;
+        
+        if (spriteMosquito) {
+            int larguraTotal = al_get_bitmap_width(spriteMosquito);
+            int alturaFrame = al_get_bitmap_height(spriteMosquito);
+            int larguraFrame = larguraTotal / 2;  // 2 frames
+            int sx = anim->frameMosquito * larguraFrame;
+            
+            al_draw_bitmap_region(spriteMosquito, sx, 0, larguraFrame, alturaFrame, 
+                                 anim->mosquitoX, anim->mosquitoY, 0);
+        }
+    }
+}
+
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, Bitmaps* bitmap) {
     ALLEGRO_EVENT event;
+
+    // Inicializa animação do menu
+    AnimacaoMenu animMenu;
+    inicializarAnimacaoMenu(&animMenu);
 
     // Limpa fila de eventos
     al_flush_event_queue(menuEvent->fila_eventos);
@@ -19,6 +221,11 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
         if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
             *menuEvent->mouseX = event.mouse.x;
             *menuEvent->mouseY = event.mouse.y;
+        }
+
+        // Atualiza animação do menu a cada frame do timer
+        if (event.type == ALLEGRO_EVENT_TIMER) {
+            atualizarAnimacaoMenu(&animMenu);
         }
 
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
@@ -124,8 +331,15 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
             }
         }
 
-        // Desenha menu principal
+        // ========== DESENHO DO MENU PRINCIPAL ==========
+        
+        // Desenha fundo do menu
         al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0, menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
+
+        // Desenha animação de fundo (jogador e zumbi)
+        desenharAnimacaoMenu(&animMenu, bitmap);
+
+        // Desenha botões por cima da animação
 
         // Botão Jogar (hover)
         if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= menuBotao->botaoJogarX + menuBotao->botaoJogarLargura && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= menuBotao->botaoJogarY + menuBotao->botaoJogarAltura) {
@@ -292,10 +506,9 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
 
                     al_flip_display();
                 }
-                continue;
             }
 
-            // Sair
+            // Botão Sair
             if (*menuEvent->mouseX >= menuBotao->botaoSairX && *menuEvent->mouseX <= menuBotao->botaoSairX + menuBotao->botaoSairLargura && *menuEvent->mouseY >= menuBotao->botaoSairY && *menuEvent->mouseY <= menuBotao->botaoSairY + menuBotao->botaoSairAltura) {
                 *menuEstado->jogando = false;
                 *menuEstado->jogoPausado = false;
@@ -382,190 +595,6 @@ void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEv
     }
 }
 
-void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* menuEvent, MenuEstados* menuEstado) {
-    // Valida se diálogo foi inicializado corretamente
-    if (!dialogo || !dialogo->falando || !dialogo->balao || !dialogo->fonteDialogo) {
-        return; // Não desenha se recursos essenciais não foram carregados
-    }
-
-    // Reseta transformação da câmera
-    al_identity_transform(menuEvent->camera);
-    al_use_transform(menuEvent->camera);
-
-    // Verifica se deve iniciar diálogo baseado na fase
-    bool iniciarDialogo = false;
-    if (fase->faseAtual == 1 && !dialogo->dialogo1) {
-        iniciarDialogo = true;
-        configurarTextosDialogo(dialogo, 1);
-    }
-    else if (fase->faseAtual == 2 && !dialogo->dialogo2) {
-        iniciarDialogo = true;
-        configurarTextosDialogo(dialogo, 2);
-    }
-    else if (fase->faseAtual == 3 && !dialogo->dialogo3) {
-        iniciarDialogo = true;
-        configurarTextosDialogo(dialogo, 3);
-    }
-
-    if (!iniciarDialogo) return;
-
-    // Para o timer do jogo
-    al_stop_timer(menuEvent->timer);
-
-    // Limpa eventos antigos
-    al_flush_event_queue(menuEvent->fila_eventos);
-
-    ALLEGRO_EVENT event;
-    bool dialogoAtivo = true;
-
-    // Reinicia no primeiro texto
-    dialogo->textoAtual = 0;
-
-    // Timer manual para animação
-    double ultimoTempoAnimacao = al_get_time();
-    const double TEMPO_POR_FRAME = 0.15;
-
-    bool precisaRedesenhar = true;
-
-    // FADE IN (clarear) - 1 segundo
-    float alfaFadeIn = 255.0f;
-    double tempoInicioFadeIn = al_get_time();
-    const double DURACAO_FADE_IN = 1.0;
-    bool fadeInCompleto = false;
-
-    while (dialogoAtivo && *menuEstado->jogando) {
-
-        bool temEvento = al_get_next_event(menuEvent->fila_eventos, &event);
-
-        if (temEvento) {
-
-            if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-                *menuEstado->jogando = false;
-                dialogoAtivo = false;
-                // Limpa fila para garantir que o loop principal detecta o fechamento
-                al_flush_event_queue(menuEvent->fila_eventos);
-                return; 
-            }
-
-            // SPACE avança texto (só após fade in)
-            if (event.type == ALLEGRO_EVENT_KEY_DOWN && fadeInCompleto) {
-                // ENTER pula todo o diálogo
-                if (event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
-                    dialogoAtivo = false;
-                    break;
-                }
-                // SPACE avança para o próximo texto
-                else if (event.keyboard.keycode == ALLEGRO_KEY_SPACE) {
-                    dialogo->textoAtual++;
-
-                    if (dialogo->textoAtual >= dialogo->numeroTextos) {
-                        dialogoAtivo = false;
-                    }
-                    precisaRedesenhar = true;
-                }
-            }
-        }
-
-        // Verifica se ainda está jogando
-        if (!*menuEstado->jogando) {
-            return; // Sai imediatamente
-        }
-
-        // Atualiza fade in
-        if (!fadeInCompleto) {
-            double tempoAtual = al_get_time();
-            double progresso = (tempoAtual - tempoInicioFadeIn) / DURACAO_FADE_IN;
-
-            if (progresso >= 1.0) {
-                alfaFadeIn = 0.0f;
-                fadeInCompleto = true;
-            }
-            else {
-                alfaFadeIn = 255.0f * (1.0f - progresso);
-            }
-            precisaRedesenhar = true;
-        }
-
-        // Atualiza animação
-        double tempoAtual = al_get_time();
-        if (tempoAtual - ultimoTempoAnimacao >= TEMPO_POR_FRAME) {
-            dialogo->frameAtual = (dialogo->frameAtual + 1) % 2;
-            ultimoTempoAnimacao = tempoAtual;
-            precisaRedesenhar = true;
-        }
-
-        // Desenha sempre
-        if (precisaRedesenhar) {
-            // 1. FUNDO RGB(45, 29, 46)
-            al_clear_to_color(al_map_rgb(45, 29, 46));
-
-            // 2. SPRITESHEET FALANDO
-            int larguraFrame = 576;
-            int alturaFrame = 576;
-            int falandoX = (WIDTH / 2) - (larguraFrame / 2);
-            int falandoY = -20;
-            int sx = dialogo->frameAtual * larguraFrame;
-            int sy = 0;
-
-            al_draw_bitmap_region(dialogo->falando, sx, sy, larguraFrame, alturaFrame, falandoX, falandoY, 0);
-
-            // 3. BALÃO
-            int balaoX = (WIDTH / 2) - (1000 / 2);
-            int balaoY = HEIGHT - 280 - 20;
-            al_draw_bitmap(dialogo->balao, balaoX, balaoY, 0);
-
-            // 4. TEXTO
-            if (dialogo->textoAtual < dialogo->numeroTextos) {
-                char* textoAtual = dialogo->textos[dialogo->textoAtual];
-
-                float textoX = balaoX + 40;
-                float textoY = balaoY + 30;
-                float textoLarguraMax = 920.0f;
-                float alturaLinha = 28.0f;
-
-                al_draw_multiline_text(dialogo->fonteDialogo, al_map_rgb(255, 255, 255), textoX, textoY, textoLarguraMax, alturaLinha, ALLEGRO_ALIGN_LEFT, textoAtual);
-
-                // Indicador
-                float indicadorX = balaoX + 560;
-                float indicadorY = balaoY + 220;
-
-                if (dialogo->textoAtual < dialogo->numeroTextos - 1) {
-                    al_draw_text(dialogo->fonteDialogo, al_map_rgb(200, 200, 200), indicadorX, indicadorY, ALLEGRO_ALIGN_RIGHT, "[SPACE]");
-                }
-            }
-
-            // 5. FADE IN
-            if (!fadeInCompleto) {
-                al_draw_filled_rectangle(0, 0, WIDTH, HEIGHT,
-                    al_map_rgba_f(0, 0, 0, alfaFadeIn / 255.0f));
-            }
-
-            al_flip_display();
-            precisaRedesenhar = false;
-        }
-
-        al_rest(0.001);
-    }
-
-    // Verifica se foi fechado antes de continuar
-    if (!*menuEstado->jogando) {
-        return;
-    }
-
-    // Marca diálogo completo
-    if (fase->faseAtual == 1) dialogo->dialogo1 = true;
-    if (fase->faseAtual == 2) dialogo->dialogo2 = true;
-    if (fase->faseAtual == 3) dialogo->dialogo3 = true;
-
-    // Limpa eventos antes de retomar
-    al_flush_event_queue(menuEvent->fila_eventos);
-
-    // Retoma o jogo
-    if (*menuEstado->jogando) {
-        al_start_timer(menuEvent->timer);
-    }
-}
-
 void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando,bool* regrasAberta, bool* esc, bool* jogoPausado,bool* fimDeJogo) {
     if (!estado) return;
 
@@ -614,8 +643,6 @@ void inicializarMenuBotoes(MenuBotoes* botao, Bitmaps* bitmap) {
     botao->botaoSairAltura = al_get_bitmap_height(bitmap->botaoSair);
     botao->fundoMenuLargura = al_get_bitmap_width(bitmap->fundoMenu);
     botao->fundoMenuAltura = al_get_bitmap_height(bitmap->fundoMenu);
-    botao->abaRegrasLargura = al_get_bitmap_width(bitmap->abaRegras);
-    botao->abaRegrasAltura = al_get_bitmap_height(bitmap->abaRegras);
     botao->botaoVoltarLargura = al_get_bitmap_width(bitmap->botaoVoltar);
     botao->botaoVoltarAltura = al_get_bitmap_height(bitmap->botaoVoltar);
 
@@ -645,106 +672,6 @@ void inicializarGameOver(GameOver* gameOver, Bitmaps* bitmap) {
     // Posições dos botões
     gameOver->botaoSairDoJogoX = 445;
     gameOver->botaoSairDoJogoY = 560;
-}
-
-void inicializarDialogo(Dialogo* dialogo, Bitmaps* bitmap, ALLEGRO_FONT* fonte) {
-    if (!dialogo || !bitmap) return;
-
-    // Bitmaps - inicializa mesmo se fonte for NULL
-    dialogo->falando = bitmap->falando;
-    dialogo->balao = bitmap->balao;
-    dialogo->fonteDialogo = fonte;
-
-    // Dimensões dos bitmaps - verifica se bitmaps existem
-    if (bitmap->falando) {
-        dialogo->falandoLargura = al_get_bitmap_width(bitmap->falando);
-        dialogo->falandoAltura = al_get_bitmap_height(bitmap->falando);
-    }
-    else {
-        dialogo->falandoLargura = 0;
-        dialogo->falandoAltura = 0;
-    }
-
-    if (bitmap->balao) {
-        dialogo->balaoLargura = al_get_bitmap_width(bitmap->balao);
-        dialogo->balaoAltura = al_get_bitmap_height(bitmap->balao);
-    }
-    else {
-        dialogo->balaoLargura = 0;
-        dialogo->balaoAltura = 0;
-    }
-
-    // Configurações de animação
-    dialogo->frameAtual = 0;
-    dialogo->contadorFrame = 0;
-    dialogo->velocidadeAnimacao = 20;
-
-    // Estados iniciais
-    dialogo->numeroTextos = 0;
-    dialogo->textoAtual = 0;
-    dialogo->dialogo1 = false;
-    dialogo->dialogo2 = false;
-    dialogo->dialogo3 = false;
-
-    // Configura textos da fase 1 (padrão)
-    configurarTextosDialogo(dialogo, 1);
-}
-
-void configurarTextosDialogo(Dialogo* dialogo, int fase) {
-    if (!dialogo) return;
-
-    // Limpa textos anteriores
-    dialogo->numeroTextos = 0;
-    dialogo->textoAtual = 0;
-
-    // Define textos baseado na fase
-    switch (fase) {
-    case 1:
-        dialogo->textos[0] = "Sou Oswaldo Cruz, diretor de Saúde Pública desde 1903.";
-        dialogo->textos[1] = "Fui chamado pelo presidente Rodrigues Alves para sanear a capital.";
-        dialogo->textos[2] = "A cidade está doente: varíola, febre amarela e peste.";
-        dialogo->textos[3] = "A lei tornou a vacina da varíola obrigatória em todo o Brasil.";
-        dialogo->textos[4] = "A medida gerou medo, boatos e protestos nas ruas.";
-        dialogo->textos[5] = "Não recuarei: ciência, limpeza urbana e vacinação salvam vidas.";
-        dialogo->textos[6] = "Preciso de você no campo: vacinar, desinfetar e exterminar ratos.";
-        dialogo->textos[7] = "Cada ferramenta é eficaz à apenas um tipo de inimigo.";
-        dialogo->textos[8] = "A vassoura extermina o rato, o veneno neutraliza o mosquito e a vacina cura o povo.";
-        dialogo->textos[9] = "Aperte 1 para usar a vassoura, 2 para selecionar o veneno e 3 para a vacina.";
-        dialogo->textos[10] = "A ordem é proteger bairros e reduzir contágios rapidamente.";
-        dialogo->textos[11] = "Quando a cidade entender, venceremos as epidemias juntos.";
-        dialogo->numeroTextos = 12;
-        break;
-
-    case 2:
-        // Textos para a fase 2 (pode personalizar depois)
-        dialogo->textos[0] = "A situação se agravou. Novos focos de infecção surgem.";
-        dialogo->textos[1] = "Os protestos aumentaram, mas não podemos recuar.";
-        dialogo->textos[2] = "Continue vacinando e controlando os vetores.";
-        dialogo->textos[3] = "A ciência prevalecerá sobre a ignorância.";
-        dialogo->numeroTextos = 4;
-        break;
-
-    case 3:
-        // Textos para a fase 3 (pode personalizar depois)
-        dialogo->textos[0] = "Esta é a última etapa da campanha.";
-        dialogo->textos[1] = "O povo começa a entender a importância da vacinação.";
-        dialogo->textos[2] = "Juntos, erradicaremos as epidemias do Rio de Janeiro.";
-        dialogo->numeroTextos = 3;
-        break;
-    case 4:  // === DIÁLOGO DE VITÓRIA ===
-        dialogo->textos[0] = "VITÓRIA!";
-        dialogo->textos[1] = "As epidemias foram controladas no Rio de Janeiro.";
-        dialogo->textos[2] = "A vacinação obrigatória, apesar da resistência inicial,";
-        dialogo->textos[3] = "salvou milhares de vidas e transformou a saúde pública.";
-        dialogo->textos[4] = "A ciência e a determinação venceram o medo e a ignorância.";
-        dialogo->textos[5] = "O legado de Oswaldo Cruz vive até hoje.";
-        dialogo->textos[6] = "Parabéns por completar sua missão!";
-        dialogo->numeroTextos = 7;
-        break;
-    default:
-        dialogo->numeroTextos = 0;
-        break;
-    }
 }
 
 void configurarPosicoesBotoesPausa(MenuBotoes* menuBotao) {

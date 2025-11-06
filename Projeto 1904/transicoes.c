@@ -5,6 +5,8 @@
 #include "jogo.h"
 #include "personagem.h"
 #include "caravana.h"
+#include "menu.h"
+#include "dialogos.h"
 
 // ============= IMPLEMENTAÇÃO DO SISTEMA DE FADE =============
 

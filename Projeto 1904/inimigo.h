@@ -36,6 +36,9 @@ typedef struct Inimigo { //Aqui cria uma tag que indica pra outro include que es
     // Variáveis de dano
     float dano;
     float timer_intangibilidade;
+    
+    bool colidindo_caravana;      
+    double timer_colisao_inicio;  
 } Inimigo;
 
 void desenhar_inimigo(Inimigo* inimigo, bool em_movimento);
@@ -61,5 +64,7 @@ void spawnar_boss_rato(Inimigo* inimigo, ALLEGRO_BITMAP* ratodir, ALLEGRO_BITMAP
 void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float distanciaParada);
 
 void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera);
+
+void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade);
 
 #endif

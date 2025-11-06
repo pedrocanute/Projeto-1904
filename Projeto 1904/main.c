@@ -10,6 +10,7 @@
 #include "infeccao.h"
 #include "caravana.h"
 #include "introducao.h"
+#include "dialogos.h"
 #include "transicoes.h"
 #include "jogo.h"
 
@@ -95,8 +96,9 @@ int main() {
     Dialogo dialogo;
     inicializarDialogo(&dialogo, &bitmap, fonteDialogo);
 
+    //=====================================================INICIO DO JOGO============================================================================
     // ========== MENU PRINCIPAL ==========
-    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo);
+    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo, &bitmap);
 
     // Se saiu do menu sem jogar, encerra
     if (!jogando) {
@@ -205,6 +207,8 @@ int main() {
 
             atualizar_movimento_inimigos(&entidades.caravana, entidades.inimigos, MAX_INIMIGOS);
 
+            atualizar_timer_colisao_inimigos(entidades.inimigos, MAX_INIMIGOS);
+
             // Atualiza boss se estiver ativo
             atualizarBossAtivo(&entidades, &barras);
 
@@ -250,7 +254,7 @@ int main() {
             al_identity_transform(&camera);
             al_use_transform(&camera);
             
-            // Mostra diálogo da fase atual (pode ser fase 2, 3 ou 4 - vitória)
+            // Mostra diálogo da fase atual 
             if (!executarDialogoInicial(&dialogo, &entidades.sistemaFase, &menuEvent, &menuEstado)) {
                 menuEstado.jogando = false;
             }
@@ -259,7 +263,7 @@ int main() {
             a = false;
             s = false;
             d = false;
-            espaco = false;  // IMPORTANTE: Impede tiro automático
+            espaco = false; 
             shift = false;
             esc = false;
             num1 = false;
@@ -276,7 +280,7 @@ int main() {
             if (entidades.sistemaFase.faseAtual > 3) {
                 // Jogo concluído! Encerra após mostrar diálogo de vitória (fase 4)
                 menuEstado.jogando = false;
-                // Não precisa restaurar o timer, pois o jogo vai encerrar
+             
             }
             else {
                 // Restaura timer para continuar jogando
@@ -352,6 +356,7 @@ int main() {
     }
 
     destruir_bitmaps(&bitmap);
+    al_destroy_font(font);
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);
     al_destroy_timer(timer);

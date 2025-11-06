@@ -23,6 +23,9 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
     inimigo->vida = 1;
     inimigo->vidaMaxima = 1;  
     inimigo->timer_intangibilidade = 0.0f;
+    
+    inimigo->colidindo_caravana = false;
+    inimigo->timer_colisao_inicio = 0.0;
 
     // ATRIBUTOS DOS INIMIGOS
     switch (tipo) {
@@ -289,4 +292,25 @@ void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float dis
     boss->em_movimento = true;
     boss->virado_direita = (direcaoX >= 0.0f);
 
+}
+// Atualiza timer de colisão e desativa inimigos 
+void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade) {
+    const double TEMPO_VIDA_COLISAO = 2.5; // 2.5 segundos até morrer
+    double tempo_atual = al_get_time();
+    
+    for (int i = 0; i < quantidade; i++) {
+        if (!inimigos[i].ativo) continue;
+        
+        // Se está colidindo com a caravana
+        if (inimigos[i].colidindo_caravana) {
+            // Calcula há quanto tempo está colidindo
+            double tempo_colisao = tempo_atual - inimigos[i].timer_colisao_inicio;
+            
+            // Se passou 2 segundos, desativa o inimigo
+            if (tempo_colisao >= TEMPO_VIDA_COLISAO) {
+                inimigos[i].ativo = false;
+                inimigos[i].colidindo_caravana = false;
+            }
+        }
+    }
 }

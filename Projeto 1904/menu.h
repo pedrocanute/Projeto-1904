@@ -11,9 +11,6 @@
 #include "input.h"
 #include "cenario.h"
 
-#define MAX_DIALOGOS 15
-
-
 typedef struct {
     bool* telaMenu;
     bool* jogando;
@@ -54,30 +51,6 @@ typedef struct {
     int abaRegrasLargura, abaRegrasAltura;
 } MenuBotoes;
 
-// Em menu.h
-
-typedef struct {
-    ALLEGRO_BITMAP* falando;
-    ALLEGRO_BITMAP* balao;
-    ALLEGRO_FONT* fonteDialogo;
-    int falandoLargura, falandoAltura;
-    int balaoLargura, balaoAltura;
-
-    // Animação da spritesheet
-    int frameAtual;
-    int contadorFrame;
-    int velocidadeAnimacao;
-
-    char* textos[MAX_DIALOGOS];  // Array de textos
-    int numeroTextos;             // Quantidade total de textos
-    int textoAtual;               // Texto atual sendo exibido
-
-    // Estados de diálogo
-    bool dialogo1;
-    bool dialogo2;
-    bool dialogo3;
-} Dialogo;
-
 typedef struct {
     ALLEGRO_BITMAP* telaGameOver;
     ALLEGRO_BITMAP* botaoSairDoJogo;
@@ -90,13 +63,11 @@ typedef struct {
 } GameOver;
 
 // Funções
-void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte);
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, Bitmaps* bitmap);
 
 void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte);
 
 void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
-
-void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
 void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando, bool* regrasAberta, bool* esc, bool* jogoPausado, bool* fimDeJogo);
 
@@ -107,10 +78,6 @@ void inicializarMenuImagens(MenuImagens* img, Bitmaps* bitmap);
 void inicializarMenuBotoes(MenuBotoes* botao, Bitmaps* bitmap);
 
 void inicializarGameOver(GameOver* gameOver, Bitmaps* bitmap);
-
-void inicializarDialogo(Dialogo* dialogo, Bitmaps* bitmap, ALLEGRO_FONT* fonte);
-
-void configurarTextosDialogo(Dialogo* dialogo, int fase);
 
 void configurarPosicoesBotoesPausa(MenuBotoes* menuBotao);
 
