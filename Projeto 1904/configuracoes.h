@@ -1,4 +1,4 @@
-#ifndef CONFIGURACOES_H
+﻿#ifndef CONFIGURACOES_H
 #define CONFIGURACOES_H
 
 #include <stdio.h>
@@ -51,9 +51,11 @@ typedef struct {
     ALLEGRO_BITMAP* atacando_veneno_direita;
     ALLEGRO_BITMAP* atacando_veneno_esquerda;
     ALLEGRO_BITMAP* projetil_veneno;
-    // Cen�rio
+    // Cenário
     ALLEGRO_BITMAP* cenario1;
     ALLEGRO_BITMAP* cenario2;
+    ALLEGRO_BITMAP* mapaMenu1;
+    ALLEGRO_BITMAP* mapaMenu2;
     // Menu
     ALLEGRO_BITMAP* fundoMenu;
     ALLEGRO_BITMAP* botaoJogar;

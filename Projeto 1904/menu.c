@@ -1,6 +1,7 @@
 ﻿#include "menu.h"
 #include "configuracoes.h"
 #include "dialogos.h"
+#include <math.h>
 
 // Estrutura para controlar a animação do menu
 typedef struct {
@@ -25,6 +26,9 @@ typedef struct {
     bool ratoAtivo;
     bool mosquitoAtivo;
     double tempoUltimaAnimacao;
+    // Scrolling do mapa de fundo
+    float offsetMapaX;
+    float velocidadeScrolling;
 } AnimacaoMenu;
 
 void inicializarAnimacaoMenu(AnimacaoMenu* anim) {
@@ -51,6 +55,10 @@ void inicializarAnimacaoMenu(AnimacaoMenu* anim) {
     anim->ratoAtivo = false;
     anim->mosquitoAtivo = false;
     anim->tempoUltimaAnimacao = al_get_time();
+    
+    // Inicializa scrolling do mapa
+    anim->offsetMapaX = 0.0f;
+    anim->velocidadeScrolling = 1.5f;  // Velocidade do scrolling para a direita
 }
 
 void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
@@ -59,6 +67,15 @@ void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
     const float VELOCIDADE_RATO = 4.0f;
     const float VELOCIDADE_MOSQUITO = 3.5f;
     const int FRAMES_POR_SPRITE = 8;
+
+    // Atualiza scrolling do mapa de fundo
+    anim->offsetMapaX += anim->velocidadeScrolling;
+    
+    // Quando o offset atingir a largura do mapa, reinicia (loop infinito)
+    // Assumindo que o mapa tem largura de 1280 (WIDTH)
+    if (anim->offsetMapaX >= WIDTH) {
+   anim->offsetMapaX = 0.0f;
+    }
 
     // Atualiza posição do jogador
     if (anim->jogadorAtivo) {
@@ -138,7 +155,35 @@ void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
 }
 
 void desenharAnimacaoMenu(AnimacaoMenu* anim, Bitmaps* bitmap) {
-    // Desenha jogador (se ativo)
+    // Desenha o mapa de fundo com scrolling infinito
+    if (bitmap->mapaMenu1 && bitmap->mapaMenu2) {
+        // Calcula as posições dos dois mapas para criar o efeito de loop
+        // Usa fmodf para garantir transição suave sem gaps
+        float offset = fmodf(anim->offsetMapaX, WIDTH);
+        
+        float pos1X = -offset;
+  float pos2X = WIDTH - offset;
+   
+        // Desenha o primeiro mapa (escala para preencher a tela)
+        al_draw_scaled_bitmap(bitmap->mapaMenu1,
+            0, 0,
+  al_get_bitmap_width(bitmap->mapaMenu1),
+    al_get_bitmap_height(bitmap->mapaMenu1),
+      pos1X, 0,
+          WIDTH, HEIGHT,
+      0);
+        
+        // Desenha o segundo mapa (logo após o primeiro para continuidade)
+        al_draw_scaled_bitmap(bitmap->mapaMenu2,
+    0, 0,
+    al_get_bitmap_width(bitmap->mapaMenu2),
+    al_get_bitmap_height(bitmap->mapaMenu2),
+            pos2X, 0,
+       WIDTH, HEIGHT,
+      0);
+    }
+
+    // Desenha jogador (se ativo) - por cima do mapa
     if (anim->jogadorAtivo && anim->jogadorX > -150.0f && anim->jogadorX < WIDTH + 150.0f) {
         ALLEGRO_BITMAP* spriteJogador = bitmap->sprite_andando_direita;
         
@@ -199,12 +244,15 @@ void desenharAnimacaoMenu(AnimacaoMenu* anim, Bitmaps* bitmap) {
     }
 }
 
-void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, Bitmaps* bitmap) {
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, Bitmaps* bitmap, SistemaSom* sons) {
     ALLEGRO_EVENT event;
 
     // Inicializa animação do menu
     AnimacaoMenu animMenu;
     inicializarAnimacaoMenu(&animMenu);
+
+    // Inicia a música do menu
+    tocarMusicaMenu(sons);
 
     // Limpa fila de eventos
     al_flush_event_queue(menuEvent->fila_eventos);
@@ -231,6 +279,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
             // Botão Jogar
             if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= menuBotao->botaoJogarX + menuBotao->botaoJogarLargura && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= menuBotao->botaoJogarY + menuBotao->botaoJogarAltura) {
+                tocarSomClick(sons);
                 *menuEstado->telaMenu = false;
                 *menuEstado->jogando = true;
                 break;
@@ -238,6 +287,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
 
             // Botão Regras
             if (*menuEvent->mouseX >= menuBotao->botaoRegrasX && *menuEvent->mouseX <= menuBotao->botaoRegrasX + menuBotao->botaoRegrasLargura && *menuEvent->mouseY >= menuBotao->botaoRegrasY && *menuEvent->mouseY <= menuBotao->botaoRegrasY + menuBotao->botaoRegrasAltura) {
+                tocarSomClick(sons);
                 *menuEstado->regrasAberta = true;
 
                 while (*menuEstado->regrasAberta) {
@@ -317,6 +367,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
 
                     if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
                         if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= botaoVoltarYAjustado && *menuEvent->mouseY <= botaoVoltarYAjustado + menuBotao->botaoVoltarAltura) {
+                            tocarSomClick(sons);
                             *menuEstado->regrasAberta = false;
                         }
                     }
@@ -325,6 +376,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
 
             // Botão Sair
             if (*menuEvent->mouseX >= menuBotao->botaoSairX && *menuEvent->mouseX <= menuBotao->botaoSairX + menuBotao->botaoSairLargura && *menuEvent->mouseY >= menuBotao->botaoSairY && *menuEvent->mouseY <= menuBotao->botaoSairY + menuBotao->botaoSairAltura) {
+                tocarSomClick(sons);
                 *menuEstado->telaMenu = false;
                 *menuEstado->jogando = false;
                 break;
@@ -333,13 +385,13 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
 
         // ========== DESENHO DO MENU PRINCIPAL ==========
         
-        // Desenha fundo do menu
-        al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0, menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
-
-        // Desenha animação de fundo (jogador e zumbi)
+        // Desenha animação de fundo com mapa scrolling e personagens
         desenharAnimacaoMenu(&animMenu, bitmap);
 
-        // Desenha botões por cima da animação
+        // Desenha o fundo do menu (menu.png) por cima do mapa e personagens
+   al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0, menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
+
+        // Desenha botões por cima de tudo
 
         // Botão Jogar (hover)
         if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= menuBotao->botaoJogarX + menuBotao->botaoJogarLargura && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= menuBotao->botaoJogarY + menuBotao->botaoJogarAltura) {
@@ -367,9 +419,12 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
 
         al_flip_display();
     }
+
+  // Para a música do menu ao sair
+    pararMusicaMenu(sons);
 }
 
-void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte) {
+void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, SistemaSom* sons) {
     if (!*menuEstado->esc) return;
 
     al_stop_timer(menuEvent->timer);
@@ -408,6 +463,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
             // Continuar
             if (*menuEvent->mouseX >= menuBotao->botaoJogarX && *menuEvent->mouseX <= menuBotao->botaoJogarX + menuBotao->botaoJogarLargura && *menuEvent->mouseY >= menuBotao->botaoJogarY && *menuEvent->mouseY <= menuBotao->botaoJogarY + menuBotao->botaoJogarAltura) {
+                tocarSomClick(sons);
                 *menuEstado->jogoPausado = false;
                 *menuEstado->esc = false;
                 break;
@@ -415,6 +471,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
 
             // Regras
             if (*menuEvent->mouseX >= menuBotao->botaoRegrasX && *menuEvent->mouseX <= menuBotao->botaoRegrasX + menuBotao->botaoRegrasLargura && *menuEvent->mouseY >= menuBotao->botaoRegrasY && *menuEvent->mouseY <= menuBotao->botaoRegrasY + menuBotao->botaoRegrasAltura) {
+                tocarSomClick(sons);
 
                 // Entra no submenu de regras
                 bool regrasAbertaLocal = true;
@@ -441,6 +498,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
                         int botaoVoltarYAjustado = 600;
                         if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= botaoVoltarYAjustado && *menuEvent->mouseY <= botaoVoltarYAjustado + menuBotao->botaoVoltarAltura) {
                             regrasAbertaLocal = false;
+                            tocarSomClick(sons);
                             // Limpa eventos antes de voltar
                             al_flush_event_queue(menuEvent->fila_eventos);
                         }
@@ -510,6 +568,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
 
             // Botão Sair
             if (*menuEvent->mouseX >= menuBotao->botaoSairX && *menuEvent->mouseX <= menuBotao->botaoSairX + menuBotao->botaoSairLargura && *menuEvent->mouseY >= menuBotao->botaoSairY && *menuEvent->mouseY <= menuBotao->botaoSairY + menuBotao->botaoSairAltura) {
+                tocarSomClick(sons);
                 *menuEstado->jogando = false;
                 *menuEstado->jogoPausado = false;
                 *menuEstado->esc = false;
@@ -552,7 +611,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
 }
 
 void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado) {
-    ALLEGRO_EVENT event;
+ ALLEGRO_EVENT event;
 
     // Limpa fila de eventos
     al_flush_event_queue(menuEvent->fila_eventos);

@@ -10,6 +10,7 @@
 #include "fases.h"
 #include "input.h"
 #include "cenario.h"
+#include "som.h"
 
 typedef struct {
     bool* telaMenu;
@@ -63,9 +64,9 @@ typedef struct {
 } GameOver;
 
 // Funções
-void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, Bitmaps* bitmap);
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, Bitmaps* bitmap, SistemaSom* sons);
 
-void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte);
+void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, SistemaSom* sons);
 
 void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
 

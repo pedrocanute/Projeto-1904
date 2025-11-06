@@ -13,6 +13,7 @@
 #include "dialogos.h"
 #include "transicoes.h"
 #include "jogo.h"
+#include "som.h"
 
 int main() {
     // ========== INICIALIZAÇÃO DO ALLEGRO ===========
@@ -23,6 +24,11 @@ int main() {
     al_install_keyboard();
     al_init_primitives_addon();
     al_install_mouse();
+
+    if (!inicializarSistemaAudio()) {
+        fprintf(stderr, "Erro ao inicializar sistema de áudio!\n");
+        return -1;
+    }
 
     ALLEGRO_DISPLAY* janela = al_create_display(WIDTH, HEIGHT);
     al_set_window_title(janela, "Projeto 1904");
@@ -45,6 +51,12 @@ int main() {
     // ========== CARREGAMENTO DE RECURSOS ==========
     Bitmaps bitmap = { 0 };
     carregar_bitmaps(&bitmap);
+
+    SistemaSom sons;
+    if (!carregarSons(&sons)) {
+        fprintf(stderr, "Aviso: Sons não foram carregados corretamente.\n");
+        // Continua o jogo mesmo sem sons
+    }
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_FONT* fonteDialogo = al_load_ttf_font("joystix monospace.otf", 20, 0);
@@ -98,13 +110,14 @@ int main() {
 
     //=====================================================INICIO DO JOGO============================================================================
     // ========== MENU PRINCIPAL ==========
-    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo, &bitmap);
+    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo, &bitmap, &sons);
 
     // Se saiu do menu sem jogar, encerra
     if (!jogando) {
         // Limpeza e encerramento
         if (fonteDialogo) al_destroy_font(fonteDialogo);
         destruir_bitmaps(&bitmap);
+        destruirSons(&sons);
         al_destroy_display(janela);
         al_destroy_event_queue(fila_eventos);
         al_destroy_timer(timer);
@@ -177,8 +190,8 @@ int main() {
             
             configurarPosicoesBotoesPausa(&menuBotao);
 
-            menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo);
-            
+            menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo, &sons);
+
             // LIMPA TODOS OS ESTADOS DE INPUT APÓS SAIR DO PAUSE
             w = false;
             a = false;
@@ -320,7 +333,7 @@ int main() {
             desenhar_todos_inimigos(entidades.inimigos, MAX_INIMIGOS);
 
             // tiros
-            atirar_multiplos_inimigos(&entidades.projetil, entidades.jogador, entidades.inimigos, MAX_INIMIGOS, &bitmap, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, jogoCamera.posicaoCamera, &entidades.sistemaFase, &barras.barraVidaBoss);
+            atirar_multiplos_inimigos(&entidades.projetil, entidades.jogador, entidades.inimigos, MAX_INIMIGOS, &bitmap, espaco, LARGURA_PROJETIL, ALTURA_PROJETIL, ALTURA_JOGADOR, LARGURA_JOGADOR, WIDTH, VELOCIDADE_PROJETIL, CADENCIA, jogoCamera.posicaoCamera, &entidades.sistemaFase, &barras.barraVidaBoss, &sons);
 
             // HUD (fixo na tela)
             char texto[100];

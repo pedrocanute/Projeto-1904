@@ -40,6 +40,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="projetil.c" />
+    <ClCompile Include="som.c" />
     <ClCompile Include="transicoes.c" />
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +58,7 @@
     <ClInclude Include="menu.h" />
     <ClInclude Include="personagem.h" />
     <ClInclude Include="projetil.h" />
+    <ClInclude Include="som.h" />
     <ClInclude Include="transicoes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -150,7 +152,7 @@
     <Allegro_AddonPhysfs>true</Allegro_AddonPhysfs>
     <Allegro_AddonDialog>true</Allegro_AddonDialog>
     <Allegro_AddonMemfile>true</Allegro_AddonMemfile>
- <Allegro_AddonFont>true</Allegro_AddonFont>
+    <Allegro_AddonFont>true</Allegro_AddonFont>
     <Allegro_AddonColor>true</Allegro_AddonColor>
     <Allegro_AddonVideo>true</Allegro_AddonVideo>
     <Allegro_LibraryType>DynamicRelease</Allegro_LibraryType>

@@ -2,7 +2,7 @@
 #include "fases.h"
 #include <math.h>
 
-void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, Bitmaps *bitmap, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss) {
+void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, Bitmaps *bitmap, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss, SistemaSom* sons) {
 
     if (pp->tipo == ARMA_VASSOURA) {
         ataque_corpo_a_corpo(pp, jogador, inimigos, numInimigos, espaco, larguraJogador, alturaJogador, sistemaFase, barraVidaBoss);
@@ -15,6 +15,11 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
     if (espaco && projetilTimer >= pp->proxProjetil) {
         for (int i = 0; i < 50; i++) {
             if (!pp->projetilAtivo[i]) {
+                // Toca o som de tiro apenas para a arma VACINA
+                if (pp->tipo == ARMA_VACINA) {
+                    tocarSomTiro(sons);
+                }
+     
                 pp->tipoProjetil[i] = pp->tipo;
                 pp->frameProjetil[i] = 0;
                 pp->contadorFrameProjetil[i] = 0;
