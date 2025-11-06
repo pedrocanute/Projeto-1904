@@ -1,7 +1,7 @@
 ﻿#include "menu.h"
 #include "configuracoes.h"
 
-void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao) {
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte) {
     ALLEGRO_EVENT event;
 
     // Limpa fila de eventos
@@ -48,23 +48,68 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
                         *menuEvent->mouseY = event.mouse.y;
                     }
 
-                    // Desenha aba de regras
-                    al_draw_scaled_bitmap(menuImg->abaRegras, 0, 0,
-                        menuBotao->abaRegrasLargura, menuBotao->abaRegrasAltura,
-                        0, 0, WIDTH, HEIGHT, 0);
+                    // ========== DESENHA TELA DE REGRAS COM FUNDO ROXO ==========
+                    
+                    // Fundo roxo sólido (mesma cor do menu de pausa)
+                    al_clear_to_color(al_map_rgb(45, 29, 46));
 
-                    // Botão Voltar (hover)
-                    if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura) {
-                        al_draw_bitmap(menuImg->botaoVoltar2, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
+                    // Título
+                    float centroX = WIDTH / 2.0f;
+                    float inicioY = 60.0f;
+                    float espacamento = 32.0f;
+
+                    if (fonte) {
+                        // Título
+                        al_draw_text(fonte, al_map_rgb(255, 215, 0), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "COMANDOS DO JOGO");
+                        inicioY += espacamento * 1.8f;
+
+                        // Comandos de movimento
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "WASD - Mover");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "SHIFT - Correr");
+                        inicioY += espacamento;
+
+                        // Comandos de combate
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "ESPACO - Atirar");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "1 - Vassoura (Efetivo contra Ratos)");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "2 - Veneno (Efetivo contra Mosquitos)");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "3 - Vacina (Efetivo contra Zumbis)");
+                        inicioY += espacamento * 1.5f;
+
+                        // Menu
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "ESC - Pausar");
+                        inicioY += espacamento * 1.8f;
+
+                        // Objetivo
+                        al_draw_text(fonte, al_map_rgb(255, 215, 0), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "OBJETIVO");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Proteja a caravana e elimine as epidemias!");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Use a arma certa para cada inimigo.");
+                    }
+
+                    // Botão Voltar 
+                    int botaoVoltarYAjustado = 600;
+                    if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= botaoVoltarYAjustado && *menuEvent->mouseY <= botaoVoltarYAjustado + menuBotao->botaoVoltarAltura) {
+                        al_draw_bitmap(menuImg->botaoVoltar2, menuBotao->botaoVoltarX, botaoVoltarYAjustado, 0);
                     }
                     else {
-                        al_draw_bitmap(menuImg->botaoVoltar, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
+                        al_draw_bitmap(menuImg->botaoVoltar, menuBotao->botaoVoltarX, botaoVoltarYAjustado, 0);
                     }
 
                     al_flip_display();
 
                     if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-                        if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura) {
+                        if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= botaoVoltarYAjustado && *menuEvent->mouseY <= botaoVoltarYAjustado + menuBotao->botaoVoltarAltura) {
                             *menuEstado->regrasAberta = false;
                         }
                     }
@@ -110,7 +155,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
     }
 }
 
-void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao) {
+void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte) {
     if (!*menuEstado->esc) return;
 
     al_stop_timer(menuEvent->timer);
@@ -179,22 +224,70 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
 
                     if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
                         // Verifica clique no botão voltar
-                        if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura) {
+                        int botaoVoltarYAjustado = 600;
+                        if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= botaoVoltarYAjustado && *menuEvent->mouseY <= botaoVoltarYAjustado + menuBotao->botaoVoltarAltura) {
                             regrasAbertaLocal = false;
                             // Limpa eventos antes de voltar
                             al_flush_event_queue(menuEvent->fila_eventos);
                         }
                     }
 
-                    // Desenha aba de regras
-                    al_draw_scaled_bitmap(menuImg->abaRegras, 0, 0, menuBotao->abaRegrasLargura, menuBotao->abaRegrasAltura, 0, 0, WIDTH, HEIGHT, 0);
+                    // ========== DESENHA TELA DE REGRAS COM FUNDO ROXO ==========
+                    
+                    // Fundo roxo sólido
+                    al_clear_to_color(al_map_rgb(45, 29, 46));
 
-                    // Desenha botão voltar (com hover)
-                    if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= menuBotao->botaoVoltarY && *menuEvent->mouseY <= menuBotao->botaoVoltarY + menuBotao->botaoVoltarAltura) {
-                        al_draw_bitmap(menuImg->botaoVoltar2, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
+                    // Título
+                    float centroX = WIDTH / 2.0f;
+                    float inicioY = 60.0f;
+                    float espacamento = 32.0f;
+
+                    if (fonte) {
+                        // Título
+                        al_draw_text(fonte, al_map_rgb(255, 215, 0), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "COMANDOS DO JOGO");
+                        inicioY += espacamento * 1.8f;
+
+                        // Comandos de movimento
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "WASD - Mover");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "SHIFT - Correr");
+                        inicioY += espacamento;
+
+                        // Comandos de combate
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "ESPACO - Atirar");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "1 - Vassoura (Efetivo contra Ratos)");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "2 - Veneno (Efetivo contra Mosquitos)");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "3 - Vacina (Efetivo contra Zumbis)");
+                        inicioY += espacamento * 1.5f;
+
+                        // Menu
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "ESC - Pausar");
+                        inicioY += espacamento * 1.8f;
+
+                        // Objetivo
+                        al_draw_text(fonte, al_map_rgb(255, 215, 0), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "OBJETIVO");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Proteja a caravana e elimine as epidemias!");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Use a arma certa para cada inimigo.");
+                    }
+
+                    // Desenha botão voltar 
+                    int botaoVoltarYAjustado = 600;
+                    if (*menuEvent->mouseX >= menuBotao->botaoVoltarX && *menuEvent->mouseX <= menuBotao->botaoVoltarX + menuBotao->botaoVoltarLargura && *menuEvent->mouseY >= botaoVoltarYAjustado && *menuEvent->mouseY <= botaoVoltarYAjustado + menuBotao->botaoVoltarAltura) {
+                        al_draw_bitmap(menuImg->botaoVoltar2, menuBotao->botaoVoltarX, botaoVoltarYAjustado, 0);
                     }
                     else {
-                        al_draw_bitmap(menuImg->botaoVoltar, menuBotao->botaoVoltarX, menuBotao->botaoVoltarY, 0);
+                        al_draw_bitmap(menuImg->botaoVoltar, menuBotao->botaoVoltarX, botaoVoltarYAjustado, 0);
                     }
 
                     al_flip_display();

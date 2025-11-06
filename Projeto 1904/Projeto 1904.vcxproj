@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="trans" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="caravana.c" />

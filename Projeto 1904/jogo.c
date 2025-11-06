@@ -95,6 +95,8 @@ void inicializarJogoControle(JogoControle* controle) {
     controle->inimigos_spawnados = 0;
     controle->timer_spawn_individual = 0.0f;
     controle->INTERVALO_SPAWN_INDIVIDUAL = 1.0f; // Spawna 1 inimigo a cada 1s
+    
+    controle->cutscene_concluida = false;  // NOVO: Inicializa como false
 }
 
 void inicializarJogoAnimacao(JogoAnimacao* animacao) {
@@ -218,6 +220,11 @@ void processarRegeneracaoVida(JogoBarras* barras, JogoControle* controle, bool c
 
 // Processa spawn de inimigos
 void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bitmaps* bitmap, float* posicaoCamera) {
+    // NÃO SPAWNA INIMIGOS ATÉ A CUTSCENE TERMINAR
+    if (!controle->cutscene_concluida) {
+        return;
+    }
+
     if (controle->fase_boss_ativa) {
         return; // Não spawna inimigos durante boss
     }
@@ -283,7 +290,7 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
                     bitmap->mosquito_direita, bitmap->mosquito_esquerda,
                     posicaoCamera);
                 
-                // Aplica buffs baseado na fase (CORRIGIDO: removido o quarto parâmetro)
+                // Aplica buffs baseado na fase
                 aplicar_buffs_por_fase(entidades->inimigos, MAX_INIMIGOS, entidades->sistemaFase.faseAtual);
                 
                 // Ativa o primeiro inimigo imediatamente

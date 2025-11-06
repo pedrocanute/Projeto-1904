@@ -49,22 +49,10 @@ typedef struct {
     int botaoJogarLargura, botaoJogarAltura;
     int botaoRegrasLargura, botaoRegrasAltura;
     int botaoSairLargura, botaoSairAltura;
+    int botaoVoltarLargura, botaoVoltarAltura;
     int fundoMenuLargura, fundoMenuAltura;
     int abaRegrasLargura, abaRegrasAltura;
-    int botaoVoltarLargura, botaoVoltarAltura;
 } MenuBotoes;
-
-// Tela game over
-typedef struct {
-    ALLEGRO_BITMAP* telaGameOver;
-    ALLEGRO_BITMAP* botaoJogarNovamente;  ALLEGRO_BITMAP* botaoJogarNovamente2;
-    ALLEGRO_BITMAP* botaoSairDoJogo;  ALLEGRO_BITMAP* botaoSairDoJogo2;
-    int botaoJogarNovamenteX, botaoJogarNovamenteY;
-    int botaoSairDoJogoX, botaoSairDoJogoY;
-    int botaoJogarNovamenteLargura, botaoJogarNovamenteAltura;
-    int botaoSairDoJogoLargura, botaoSairDoJogoAltura;
-    int telaGameOverLargura, telaGameOverAltura;
-} GameOver;
 
 // Em menu.h
 
@@ -82,7 +70,7 @@ typedef struct {
 
     char* textos[MAX_DIALOGOS];  // Array de textos
     int numeroTextos;             // Quantidade total de textos
-    int textoAtual;
+    int textoAtual;               // Texto atual sendo exibido
 
     // Estados de diálogo
     bool dialogo1;
@@ -90,15 +78,26 @@ typedef struct {
     bool dialogo3;
 } Dialogo;
 
-void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);
+typedef struct {
+    ALLEGRO_BITMAP* telaGameOver;
+    ALLEGRO_BITMAP* botaoSairDoJogo;
+    ALLEGRO_BITMAP* botaoSairDoJogo2;
 
-void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao);
+    int telaGameOverLargura, telaGameOverAltura;
+    int botaoSairDoJogoLargura, botaoSairDoJogoAltura;
+
+    int botaoSairDoJogoX, botaoSairDoJogoY;
+} GameOver;
+
+// Funções
+void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte);
+
+void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte);
 
 void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
 void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* menuEvent, MenuEstados* menuEstado);
 
-//==========INICIALIZACAO DOS SISTEMAS===========
 void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando, bool* regrasAberta, bool* esc, bool* jogoPausado, bool* fimDeJogo);
 
 void inicializarMenuEvents(MenuEvents* events, ALLEGRO_EVENT_QUEUE* fila, ALLEGRO_TIMER* timer, ALLEGRO_TRANSFORM* camera, float* mouseX, float* mouseY);
@@ -107,15 +106,12 @@ void inicializarMenuImagens(MenuImagens* img, Bitmaps* bitmap);
 
 void inicializarMenuBotoes(MenuBotoes* botao, Bitmaps* bitmap);
 
-// Inicialização do Game Over
 void inicializarGameOver(GameOver* gameOver, Bitmaps* bitmap);
 
-// Inicialização do Diálogo
-void inicializarDialogo(Dialogo* dialogo, Bitmaps* bitmap,ALLEGRO_FONT* fonte);
+void inicializarDialogo(Dialogo* dialogo, Bitmaps* bitmap, ALLEGRO_FONT* fonte);
 
 void configurarTextosDialogo(Dialogo* dialogo, int fase);
 
-// Nova função para configurar posições dos botões do menu de pausa
 void configurarPosicoesBotoesPausa(MenuBotoes* menuBotao);
 
-#endif 
+#endif

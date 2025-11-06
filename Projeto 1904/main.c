@@ -96,10 +96,10 @@ int main() {
     inicializarDialogo(&dialogo, &bitmap, fonteDialogo);
 
     // ========== MENU PRINCIPAL ==========
-    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao);
+    menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo);
 
     // Se saiu do menu sem jogar, encerra
-    if (!menuEstado.jogando) {
+    if (!jogando) {
         // Limpeza e encerramento
         if (fonteDialogo) al_destroy_font(fonteDialogo);
         destruir_bitmaps(&bitmap);
@@ -125,6 +125,12 @@ int main() {
     if (menuEstado.jogando) {
         al_rest(0.3);
         if (!executarDialogoInicial(&dialogo, &entidades.sistemaFase, &menuEvent, &menuEstado)) {
+            menuEstado.jogando = false;
+        }
+    }
+
+    if (menuEstado.jogando) {
+        if (!executarCutsceneInicial(&entidades, &jogoCamera, &animacao, &menuEvent, &menuEstado, &bitmap, &controle, fonteDialogo)) {
             menuEstado.jogando = false;
         }
     }
@@ -169,7 +175,7 @@ int main() {
             
             configurarPosicoesBotoesPausa(&menuBotao);
 
-            menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao);
+            menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo);
             
             // LIMPA TODOS OS ESTADOS DE INPUT APÓS SAIR DO PAUSE
             w = false;

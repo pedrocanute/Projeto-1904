@@ -53,6 +53,7 @@ typedef struct {
     float INTERVALO_SPAWN_INDIVIDUAL;
 
     bool mostrar_dialogo_transicao;
+    bool cutscene_concluida;  // NOVO: Flag para controlar início do spawn
 } JogoControle;
 
 // Estrutura para animação
