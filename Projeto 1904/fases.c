@@ -4,7 +4,7 @@
 void inicializarSistemaFases(SistemaFases* sistema, Inimigo* inimigo) {
 	sistema->faseAtual = 1;
 	sistema->inimigosMortos = 0;
-	sistema->metaEliminacoes = 200;
+	sistema->metaEliminacoes = 40;
 	sistema->faseCompleta = false;
 	configurarFase(sistema, sistema->faseAtual, inimigo);
 }
@@ -16,13 +16,13 @@ void configurarFase(SistemaFases* sistema, int numeroFase, Inimigo* inimigo) {
 
 	switch (numeroFase) {
 	case FASE_1:
-		sistema->metaEliminacoes = 2;
+		sistema->metaEliminacoes = 40;
 		break;
 	case FASE_2:
-		sistema->metaEliminacoes = 2;
+		sistema->metaEliminacoes = 40;
 		break;
 	case FASE_3:
-		sistema->metaEliminacoes = 2;
+		sistema->metaEliminacoes = 40;
 		break;
 	default:
 		// Fase inválida ou jogo concluído

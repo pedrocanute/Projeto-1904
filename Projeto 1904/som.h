@@ -15,6 +15,7 @@ typedef struct {
     ALLEGRO_SAMPLE* somVassoura;
     ALLEGRO_SAMPLE* somZumbi;
     ALLEGRO_SAMPLE* somVeneno;
+    ALLEGRO_SAMPLE* somRato;
     ALLEGRO_AUDIO_STREAM* musicaMenu;
     
 } SistemaSom;
@@ -25,34 +26,27 @@ bool inicializarSistemaAudio();
 // Função para carregar todos os sons do jogo
 bool carregarSons(SistemaSom* sons);
 
-// Função para tocar o som de tiro
 void tocarSomTiro(SistemaSom* sons);
 
-// Função para tocar o som de clique
 void tocarSomClick(SistemaSom* sons);
 
-// Função para tocar o som de passos
 void tocarSomAndando(SistemaSom* sons);
 
-// Função para tocar o som do mosquito
 void tocarSomMosquito(SistemaSom* sons);
 
-// Função para tocar o som da vassoura
 void tocarSomVassoura(SistemaSom* sons);
 
-// Função para tocar o som do zumbi
 void tocarSomZumbi(SistemaSom* sons);
 
-// Função para tocar o som do veneno
 void tocarSomVeneno(SistemaSom* sons);
 
-// Função para tocar a música do menu
+void tocarSomRato(SistemaSom* sons);
+
 void tocarMusicaMenu(SistemaSom* sons);
 
-// Função para parar a música do menu
 void pararMusicaMenu(SistemaSom* sons);
 
 // Função para destruir e liberar memória dos sons
 void destruirSons(SistemaSom* sons);
 
-#endif // SOM_H
+#endif

@@ -18,6 +18,10 @@ bool carregar_bitmaps(Bitmaps* bitmap) {
     bitmap->mosquito_esquerda = carregar("imagens/MosquitoEsquerda.png");
     bitmap->boss_variola_esquerda = carregar("imagens/variolabossEsquerda.png");
     bitmap->boss_variola_direita = carregar("imagens/variolabossDireita.png");
+    bitmap->boss_rato_direita = carregar("imagens/BossRato.png");
+    bitmap->boss_rato_esquerda = carregar("imagens/BossRato.png");
+    bitmap->boss_mosquito_direita = carregar("imagens/BossMosquito.png");
+    bitmap->boss_mosquito_esquerda = carregar("imagens/BossMosquito.png");
 
     bitmap->sprite_andando_direita = carregar("imagens/AndandoDireita.png");
     bitmap->sprite_andando_esquerda = carregar("imagens/AndandoEsquerda.png");
@@ -54,9 +58,6 @@ bool carregar_bitmaps(Bitmaps* bitmap) {
     bitmap->abaRegras = carregar("imagens/abavazia.png");
     bitmap->botaoVoltar = carregar("imagens/voltar1.png");
     bitmap->botaoVoltar2 = carregar("imagens/voltar2.png");
-    bitmap->telaGameOver = carregar("imagens/telaGameOver.png");
-    bitmap->botaoSairDoJogo = carregar("imagens/botaoSairDoJogo.png");
-    bitmap->botaoSairDoJogo2 = carregar("imagens/botaoSairDoJogo2.png");
     bitmap->falando = carregar("imagens/falando.png");
     bitmap->balao = carregar("imagens/balao.png");
 
@@ -78,6 +79,10 @@ void destruir_bitmaps(Bitmaps* bitmap) {
     destruir_um(&bitmap->mosquito_esquerda);
     destruir_um(&bitmap->boss_variola_esquerda);
     destruir_um(&bitmap->boss_variola_direita);
+    destruir_um(&bitmap->boss_rato_direita);
+    destruir_um(&bitmap->boss_rato_esquerda);
+    destruir_um(&bitmap->boss_mosquito_direita);
+    destruir_um(&bitmap->boss_mosquito_esquerda);
     destruir_um(&bitmap->sprite_andando_direita);
     destruir_um(&bitmap->sprite_andando_esquerda);
     destruir_um(&bitmap->sprite_atirando_direita);
@@ -108,9 +113,6 @@ void destruir_bitmaps(Bitmaps* bitmap) {
     destruir_um(&bitmap->abaRegras);
     destruir_um(&bitmap->botaoVoltar);
     destruir_um(&bitmap->botaoVoltar2);
-    destruir_um(&bitmap->telaGameOver);
-    destruir_um(&bitmap->botaoSairDoJogo);
-    destruir_um(&bitmap->botaoSairDoJogo2);
     destruir_um(&bitmap->falando);
     destruir_um(&bitmap->balao);
 }

@@ -1,5 +1,6 @@
 ﻿#include "personagem.h"
 #include "projetil.h"
+#include "configuracoes.h"
 
 void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocidade, int* frames_por_sprite) {
     float velocidade_caminhada = velocidade;
@@ -135,6 +136,11 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
     bool esta_atirando = espaco;
     bool esta_em_movimento = (a || d || s || w);
 
+    // VERIFICA SE DEVE APLICAR EFEITO VISUAL DE DANO
+    const float DURACAO_EFEITO_VISUAL = 0.15f;
+    bool aplicar_efeito_dano = (al_get_time() - jogador->timer_dano_visual) < DURACAO_EFEITO_VISUAL;
+    ALLEGRO_COLOR tint_cor = aplicar_efeito_dano ? al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f) : al_map_rgb(255, 255, 255);
+
     if (esta_atirando) {
 
         if (*virado_direita) {
@@ -152,14 +158,36 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
             *contador_frame_tiro = 0;
         }
 
+        // Som da vassoura sincronizado com o frame 1 da animação de ataque
+        if (arma_equipada == ARMA_VASSOURA) {
+            if (*frame_tiro == 1 && !jogador->somVassouraTocado) {
+                tocarSomVassoura(sons);
+                jogador->somVassouraTocado = true;
+            }
+            else if (*frame_tiro == 0) {
+                jogador->somVassouraTocado = false;
+            }
+        }
+
+        // Som do veneno sincronizado com o frame 1 da animação de ataque
+        if (arma_equipada == ARMA_VENENO) {
+            if (*frame_tiro == 1 && !jogador->somVenenoTocado) {
+                tocarSomVeneno(sons);
+                jogador->somVenenoTocado = true;
+            }
+            else if (*frame_tiro == 0) {
+                jogador->somVenenoTocado = false;
+            }
+        }
+
         // Calcula coordenadas
         int largura_frame = al_get_bitmap_width(sprite_atual) / frames_ataque;
         int altura_frame = al_get_bitmap_height(sprite_atual);
         int sx = *frame_tiro * largura_frame;
         int sy = 0;
 
-        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame,
-            jogador->jogadorX, jogador->jogadorY, 0);
+        // DESENHA COM TINT (VERMELHO SE LEVOU DANO)
+        al_draw_tinted_bitmap_region(sprite_atual, tint_cor, sx, sy, largura_frame, altura_frame, jogador->jogadorX, jogador->jogadorY, 0);
     }
     else {
 
@@ -172,31 +200,31 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
 
         *frame_tiro = 0;
         *contador_frame_tiro = 0;
+        jogador->somVassouraTocado = false; // Reseta quando não está atacando
+        jogador->somVenenoTocado = false; // Reseta quando não está atacando
 
         // ANIMAÇÃO NORMAL DE CAMINHADA (2 colunas)
         if (esta_em_movimento) {
             (*contador_frame)++;
             if (*contador_frame >= frames_por_sprite) {
-                int frame_anterior = *frame_atual;
                 *frame_atual = (*frame_atual + 1) % 2;
                 *contador_frame = 0;
+            }
 
-                // Toca som de passos apenas quando muda para o frame 1 E passou tempo suficiente E está em movimento
-                float tempo_atual = al_get_time();
-                float tempo_minimo_entre_passos = 0.3f; // Mínimo 0.3 segundos entre sons
-
-                if (*frame_atual == 1 && frame_anterior == 0 && esta_em_movimento) {
-                    if (tempo_atual - jogador->tempoUltimoPasso >= tempo_minimo_entre_passos) {
-                        tocarSomAndando(sons);
-                        jogador->tempoUltimoPasso = tempo_atual;
-                    }
-                }
+            // Som toca APENAS quando está no frame 1 E em movimento
+            if (*frame_atual == 1 && !jogador->somPassoTocado) {
+                tocarSomAndando(sons);
+                jogador->somPassoTocado = true;
+            }
+            else if (*frame_atual == 0) {
+                jogador->somPassoTocado = false;
             }
         }
         else {
-            // Parado - primeiro frame e reseta contador
+            // Parado - primeiro frame e reseta tudo
             *frame_atual = 0;
             *contador_frame = 0;
+            jogador->somPassoTocado = false; // Reseta a flag quando parado
         }
 
         // Calcula coordenadas usando 2 colunas para caminhada
@@ -205,7 +233,9 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
         int sx = *frame_atual * largura_frame;
         int sy = 0;
 
-        al_draw_bitmap_region(sprite_atual, sx, sy, largura_frame, altura_frame, jogador->jogadorX, jogador->jogadorY, 0);
+        // VERMELHO SE LEVOU DANO
+        al_draw_tinted_bitmap_region(sprite_atual, tint_cor, sx, sy, largura_frame, altura_frame,
+            jogador->jogadorX, jogador->jogadorY, 0);
     }
 }
 

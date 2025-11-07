@@ -17,6 +17,7 @@ void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* 
     entidades->jogador.paraDireita = true;
     entidades->jogador.paraEsquerda = false;
     entidades->jogador.tempoUltimoPasso = 0.0f;
+    entidades->jogador.timer_dano_visual = 0.0f; 
 
     // Sprites do jogador
     entidades->spritesJogador.sprite_andando_direita = bitmap->sprite_andando_direita;
@@ -32,7 +33,7 @@ void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* 
     entidades->spritesJogador.atacando_veneno_direita = bitmap->atacando_veneno_direita;
     entidades->spritesJogador.atacando_veneno_esquerda = bitmap->atacando_veneno_esquerda;
 
-    // Projetil - inicialização correta para arrays
+    // Projetil
     for (int i = 0; i < 50; i++) {
         entidades->projetil.projetilX[i] = 0.0f;
         entidades->projetil.projetilY[i] = 0.0f;
@@ -49,7 +50,7 @@ void inicializarJogoEntidades(JogoEntidades* entidades, Bitmaps* bitmap, float* 
 
     // Sistema de fases
     inicializarSistemaFases(&entidades->sistemaFase, &entidades->inimigos[0]);
-    
+
     // Inicializa array de inimigos mas não ativa ainda (spawn cadenciado)
     inicializar_array_inimigos(entidades->inimigos, MAX_INIMIGOS, bitmap->zumbi_direita, bitmap->zumbi_esquerda, bitmap->rato_direita, bitmap->rato_esquerda, bitmap->mosquito_direita, bitmap->mosquito_esquerda, posicaoCamera, sons);
 }
@@ -91,13 +92,13 @@ void inicializarJogoControle(JogoControle* controle) {
     controle->boss_spawnado = false;
     controle->fase_boss_ativa = false;
     controle->mostrar_dialogo_transicao = false;
-    
+
     // =======SPAWN CADENCIADO==========
     controle->inimigos_spawnados = 0;
     controle->timer_spawn_individual = 0.0f;
     controle->INTERVALO_SPAWN_INDIVIDUAL = 1.0f; // Spawna 1 inimigo a cada 1s
-    
-    controle->cutscene_concluida = false;  // NOVO: Inicializa como false
+
+    controle->cutscene_concluida = false;  
 }
 
 void inicializarJogoAnimacao(JogoAnimacao* animacao) {
@@ -110,13 +111,17 @@ void inicializarJogoAnimacao(JogoAnimacao* animacao) {
 }
 
 // Atualiza boss ativo
-void atualizarBossAtivo(JogoEntidades* entidades, JogoBarras* barras) {
+void atualizarBossAtivo(JogoEntidades* entidades, JogoBarras* barras, Bitmaps* bitmap, SistemaSom* sons) {
     for (int i = 0; i < MAX_INIMIGOS; i++) {
         if (entidades->inimigos[i].ativo &&
-            (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO)) {
+            (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO || entidades->inimigos[i].tipo == TIPO_BOSS_MOSQUITO)) {
 
             atualizar_boss_perseguindo(&entidades->inimigos[i], &entidades->jogador, 100.0f);
             posicionarBarraVidaBoss(barras, &entidades->inimigos[i]);
+
+            // Sistema de minions e buffs
+            atualizar_sistema_boss(&entidades->inimigos[i], entidades->inimigos, MAX_INIMIGOS,bitmap->zumbi_direita, bitmap->zumbi_esquerda,bitmap->rato_direita, bitmap->rato_esquerda,bitmap->mosquito_direita, bitmap->mosquito_esquerda,&entidades->jogador, sons);
+
             break;
         }
     }
@@ -156,12 +161,12 @@ ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras,
 
     const float DURACAO_DANO_VISUAL = 0.12f;
     const float INFECCAO_MAXIMA = 400.0f;
+    const float DANO_CONTINUO_CARAVANA_INTERVALO = 0.5f; // Dano a cada 0.5 segundos na caravana
 
     if (controle->fase_boss_ativa) {
         // Colisão boss com jogador
         for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (entidades->inimigos[i].ativo &&
-                (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO)) {
+            if (entidades->inimigos[i].ativo && (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO || entidades->inimigos[i].tipo == TIPO_BOSS_MOSQUITO)) {
 
                 if (colisao_jogador_inimigo(&entidades->inimigos[i], &entidades->jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
                     float tempoAtual = al_get_time();
@@ -169,13 +174,51 @@ ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras,
                     if (tempoAtual - entidades->inimigos[i].timer_intangibilidade >= controle->TEMPO_INTANGIBILIDADE) {
                         resultado.ocorreuColisao = true;
                         barras->barraInfeccao.barraLargura += entidades->inimigos[i].dano;
+
+                        // Garante que a barra não ultrapasse o máximo
+                        if (barras->barraInfeccao.barraLargura > INFECCAO_MAXIMA) {
+                            barras->barraInfeccao.barraLargura = INFECCAO_MAXIMA;
+                        }
+
                         controle->timer_regen_infeccao = tempoAtual;
                         entidades->inimigos[i].timer_intangibilidade = tempoAtual;
 
-                        // Efeito visual de dano
+                        // Efeito visual de dano - MARCA NO JOGADOR TAMBÉM
+                        entidades->jogador.timer_dano_visual = tempoAtual;
+
+                        // Efeito visual na caravana
                         float fimDanoVisual = tempoAtual + DURACAO_DANO_VISUAL;
                         if (al_get_time() < fimDanoVisual) {
-                            resultado.corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                            resultado.corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Colisão de minions de boss com jogador (DURANTE FASE DE BOSS)
+        for (int i = 0; i < MAX_INIMIGOS; i++) {
+            if (entidades->inimigos[i].ativo && entidades->inimigos[i].eh_minion_de_boss) {
+                if (colisao_jogador_inimigo(&entidades->inimigos[i], &entidades->jogador, LARGURA_JOGADOR, ALTURA_JOGADOR)) {
+                    float tempoAtual = al_get_time();
+
+                    if (tempoAtual - entidades->inimigos[i].timer_intangibilidade >= controle->TEMPO_INTANGIBILIDADE) {
+                        resultado.ocorreuColisao = true;
+                        barras->barraInfeccao.barraLargura += entidades->inimigos[i].dano;
+
+                        if (barras->barraInfeccao.barraLargura > INFECCAO_MAXIMA) {
+                            barras->barraInfeccao.barraLargura = INFECCAO_MAXIMA;
+                        }
+
+                        controle->timer_regen_infeccao = tempoAtual;
+                        entidades->inimigos[i].timer_intangibilidade = tempoAtual;
+
+                        // Efeito visual de dano 
+                        entidades->jogador.timer_dano_visual = tempoAtual;
+
+                        float fimDanoVisual = tempoAtual + DURACAO_DANO_VISUAL;
+                        if (al_get_time() < fimDanoVisual) {
+                            resultado.corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f);
                         }
                     }
                 }
@@ -183,40 +226,60 @@ ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras,
         }
     }
     else {
-        // Colisão inimigos com caravana
+        // COLISÃO DE INIMIGOS NORMAIS COM A CARAVANA (FORA DA FASE DE BOSS)
         for (int i = 0; i < MAX_INIMIGOS; i++) {
-            if (colisao_inimigo_caravana(&entidades->inimigos[i], &entidades->caravana,
-                entidades->caravana.caravanaLargura, entidades->caravana.caravanaAltura) &&
-                barras->barraInfeccao.barraLargura < INFECCAO_MAXIMA) {
+            if (!entidades->inimigos[i].ativo) continue;
+
+            // Ignora bosses e minions
+            if (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO || entidades->inimigos[i].tipo == TIPO_BOSS_MOSQUITO || entidades->inimigos[i].eh_minion_de_boss) {
+                continue;
+            }
+
+            // Verifica colisão com a caravana
+            if (colisao_inimigo_caravana(&entidades->inimigos[i], &entidades->caravana, entidades->caravana.caravanaLargura, entidades->caravana.caravanaAltura)) {
 
                 float tempoAtual = al_get_time();
-                
-                // Registra início da colisão
+
+                // Se acabou de colidir, inicia o timer
                 if (!entidades->inimigos[i].colidindo_caravana) {
-                    
                     entidades->inimigos[i].colidindo_caravana = true;
                     entidades->inimigos[i].timer_colisao_inicio = tempoAtual;
-                }
+                    entidades->inimigos[i].ultimo_dano_aplicado = tempoAtual; 
 
-                if (tempoAtual - entidades->inimigos[i].timer_intangibilidade >= controle->TEMPO_INTANGIBILIDADE) {
+                    // Aplica dano inicial
                     resultado.ocorreuColisao = true;
                     barras->barraInfeccao.barraLargura += entidades->inimigos[i].dano;
+
+                    if (barras->barraInfeccao.barraLargura > INFECCAO_MAXIMA) {
+                        barras->barraInfeccao.barraLargura = INFECCAO_MAXIMA;
+                    }
+
                     controle->timer_regen_infeccao = tempoAtual;
-                    entidades->inimigos[i].timer_intangibilidade = tempoAtual;
 
                     // Efeito visual de dano
-                    float fimDanoVisual = tempoAtual + DURACAO_DANO_VISUAL;
-                    if (al_get_time() < fimDanoVisual) {
-                        resultado.corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f); // vermelho claro
+                    resultado.corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f);
+                }
+                else {
+                    // Já está colidindo - aplica dano contínuo a cada intervalo
+                    if (tempoAtual - entidades->inimigos[i].ultimo_dano_aplicado >= DANO_CONTINUO_CARAVANA_INTERVALO) {
+                        resultado.ocorreuColisao = true;
+                        barras->barraInfeccao.barraLargura += entidades->inimigos[i].dano;
+
+                        if (barras->barraInfeccao.barraLargura > INFECCAO_MAXIMA) {
+                            barras->barraInfeccao.barraLargura = INFECCAO_MAXIMA;
+                        }
+
+                        controle->timer_regen_infeccao = tempoAtual;
+                        entidades->inimigos[i].ultimo_dano_aplicado = tempoAtual;
+
+                        // Efeito visual de dano
+                        resultado.corCaravana = al_map_rgba_f(1.0f, 0.3f, 0.3f, 1.0f);
                     }
                 }
             }
             else {
-                // reseta o timer
-                if (entidades->inimigos[i].colidindo_caravana) {
-                    entidades->inimigos[i].colidindo_caravana = false;
-                    entidades->inimigos[i].timer_colisao_inicio = 0.0;
-                }
+                // Não está mais colidindo
+                entidades->inimigos[i].colidindo_caravana = false;
             }
         }
     }
@@ -226,9 +289,7 @@ ResultadoColisao processarColisoes(JogoEntidades* entidades, JogoBarras* barras,
 
 // Processa regeneração de vida
 void processarRegeneracaoVida(JogoBarras* barras, JogoControle* controle, bool colisaoOcorreu) {
-    if (!colisaoOcorreu &&
-        al_get_time() - controle->timer_regen_infeccao >= controle->TEMPO_REGEN_INFECCAO &&
-        barras->barraInfeccao.barraLargura > barras->barraInfeccao.barraX) {
+    if (!colisaoOcorreu && al_get_time() - controle->timer_regen_infeccao >= controle->TEMPO_REGEN_INFECCAO && barras->barraInfeccao.barraLargura > barras->barraInfeccao.barraX) {
         barras->barraInfeccao.barraLargura--;
     }
 }
@@ -240,8 +301,8 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
         return;
     }
 
-    if (controle->fase_boss_ativa) {
-        return; // Não spawna inimigos durante boss
+    if (controle->fase_boss_ativa) { // Não spawna inimigos durante boss
+        return; 
     }
 
     // Verifica se atingiu meta da fase
@@ -258,9 +319,12 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
 
             if (idx_boss >= 0) {
                 if (entidades->sistemaFase.faseAtual == 1) {
-                    spawnar_boss_rato(&entidades->inimigos[idx_boss], bitmap->rato_direita, bitmap->rato_esquerda, posicaoCamera, sons);
+                    spawnar_boss_rato(&entidades->inimigos[idx_boss], bitmap->boss_rato_direita, bitmap->boss_rato_esquerda, posicaoCamera, sons);
                 }
-                else if (entidades->sistemaFase.faseAtual == 2 || entidades->sistemaFase.faseAtual == 3) {
+                else if (entidades->sistemaFase.faseAtual == 2) {
+                    spawnar_boss_mosquito(&entidades->inimigos[idx_boss], bitmap->boss_mosquito_direita, bitmap->boss_mosquito_esquerda, posicaoCamera, sons);
+                }
+                else if (entidades->sistemaFase.faseAtual == 3) {
                     spawnar_boss(&entidades->inimigos[idx_boss], bitmap->boss_variola_direita, bitmap->boss_variola_esquerda, posicaoCamera, sons);
                 }
                 controle->boss_spawnado = true;
@@ -281,9 +345,9 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
                 // Aplica buffs da fase atual
                 aplicar_buffs_por_fase(&entidades->inimigos[controle->inimigos_spawnados],1,entidades->sistemaFase.faseAtual);
 
-                // Agora sim ativa o inimigo
+                // ativa o inimigo
                 entidades->inimigos[controle->inimigos_spawnados].ativo = true;
-                
+
                 // Toca o som do inimigo ao ativar
                 tocar_som_inimigo(&entidades->inimigos[controle->inimigos_spawnados], sons);
 
@@ -302,21 +366,17 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
             }
             else if (al_get_time() - controle->timer_spawn_inimigos >= controle->TEMPO_SPAWN) {
                 // Após aguardar TEMPO_SPAWN, inicializa os inimigos
-                inicializar_array_inimigos(entidades->inimigos, MAX_INIMIGOS,
-                    bitmap->zumbi_direita, bitmap->zumbi_esquerda,
-                    bitmap->rato_direita, bitmap->rato_esquerda,
-                    bitmap->mosquito_direita, bitmap->mosquito_esquerda,
-                    posicaoCamera, sons);
-                
+                inicializar_array_inimigos(entidades->inimigos, MAX_INIMIGOS,bitmap->zumbi_direita, bitmap->zumbi_esquerda,bitmap->rato_direita, bitmap->rato_esquerda,bitmap->mosquito_direita, bitmap->mosquito_esquerda,posicaoCamera, sons);
+
                 // Aplica buffs baseado na fase
                 aplicar_buffs_por_fase(entidades->inimigos, MAX_INIMIGOS, entidades->sistemaFase.faseAtual);
-                
+
                 // Ativa o primeiro inimigo imediatamente
                 entidades->inimigos[0].ativo = true;
-                
+
                 // Toca o som do primeiro inimigo
                 tocar_som_inimigo(&entidades->inimigos[0], sons);
-     
+
                 // Reseta contadores para spawn cadenciado (começa no índice 1)
                 controle->inimigos_spawnados = 1;
                 controle->timer_spawn_individual = al_get_time();
@@ -334,21 +394,22 @@ void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle) {
 
     bool bossVivo = false;
     for (int i = 0; i < MAX_INIMIGOS; ++i) {
-        if (entidades->inimigos[i].ativo && (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO)) {
+        if (entidades->inimigos[i].ativo && (entidades->inimigos[i].tipo == TIPO_BOSS || entidades->inimigos[i].tipo == TIPO_BOSS_RATO || entidades->inimigos[i].tipo == TIPO_BOSS_MOSQUITO)) {
             bossVivo = true;
             break;
         }
     }
 
     if (!bossVivo) {
-        // Boss derrotado: avança fase e ativa diálogo de transição
+        
+        desativar_minions_boss(entidades->inimigos, MAX_INIMIGOS);
+
         avancarFase(&entidades->sistemaFase, entidades->inimigos);
         controle->fase_boss_ativa = false;
         controle->boss_spawnado = false;
         controle->spawn_ativo = false;
         controle->inimigos_spawnados = 0; // Reseta contador de spawn cadenciado
-        
-        // Ativa flag para mostrar diálogo de transição
+
         controle->mostrar_dialogo_transicao = true;
     }
 }

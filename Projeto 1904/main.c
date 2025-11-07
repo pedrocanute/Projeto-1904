@@ -25,10 +25,7 @@ int main() {
     al_init_primitives_addon();
     al_install_mouse();
 
-    if (!inicializarSistemaAudio()) {
-        fprintf(stderr, "Erro ao inicializar sistema de áudio!\n");
-        return -1;
-    }
+    inicializarSistemaAudio();
 
     ALLEGRO_DISPLAY* janela = al_create_display(WIDTH, HEIGHT);
     al_set_window_title(janela, "Projeto 1904");
@@ -53,10 +50,7 @@ int main() {
     carregar_bitmaps(&bitmap);
 
     SistemaSom sons;
-    if (!carregarSons(&sons)) {
-        fprintf(stderr, "Aviso: Sons não foram carregados corretamente.\n");
-        // Continua o jogo mesmo sem sons
-    }
+    carregarSons(&sons);
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     ALLEGRO_FONT* fonteDialogo = al_load_ttf_font("joystix monospace.otf", 20, 0);
@@ -68,7 +62,7 @@ int main() {
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
     al_register_event_source(fila_eventos, al_get_mouse_event_source());
-   
+
     al_start_timer(timer);
 
     // ========== INICIALIZAÇÃO DAS ESTRUTURAS DO JOGO  ==========
@@ -152,6 +146,13 @@ int main() {
 
     // =============LOOP PRINCIPAL==============
     ALLEGRO_EVENT event;
+
+    // Inicializa resultado de colisão com valores padrão
+    ResultadoColisao resultadoColisao = {
+        .ocorreuColisao = false,
+        .corCaravana = al_map_rgb(255, 255, 255)
+    };
+
     while (menuEstado.jogando) {
         al_wait_for_event(fila_eventos, &event);
 
@@ -181,13 +182,13 @@ int main() {
         if (esc) {
             // Para o timer durante o pause
             al_stop_timer(timer);
-            
+
             // Limpa a fila de eventos acumulados
             ALLEGRO_EVENT ev_temp;
             while (al_get_next_event(fila_eventos, &ev_temp)) {
                 // Descarta eventos acumulados durante o jogo
             }
-            
+
             configurarPosicoesBotoesPausa(&menuBotao);
 
             menu_pausa(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo, &sons);
@@ -199,11 +200,11 @@ int main() {
             d = false;
             espaco = false;
             shift = false;
-            esc = false;  
+            esc = false;
             num1 = false;
             num2 = false;
             num3 = false;
-            
+
             // Reinicia o timer se voltar ao jogo
             if (*menuEstado.jogando) {
                 al_start_timer(timer);
@@ -223,22 +224,22 @@ int main() {
             atualizar_timer_colisao_inimigos(entidades.inimigos, MAX_INIMIGOS);
 
             // Atualiza boss se estiver ativo
-            atualizarBossAtivo(&entidades, &barras);
+            atualizarBossAtivo(&entidades, &barras, &bitmap, &sons);
 
             camera_jogador(jogoCamera.posicaoCamera, entidades.jogador, WIDTH, LARGURA_JOGADOR, ALTURA_JOGADOR, entidades.caravana.caravanaX, entidades.caravana.caravanaVelocidade);
             redesenhar = true;
-            
+
             // Atualiza movimento da caravana apenas se não houver boss ativo
             if (!controle.fase_boss_ativa) {
                 atualizar_movimento_caravana(&entidades.caravana);
             }
+
+            // Processa colisões e dano 
+            resultadoColisao = processarColisoes(&entidades, &barras, &controle, &jogoCamera);
+
+            // Regeneração de vida
+            processarRegeneracaoVida(&barras, &controle, resultadoColisao.ocorreuColisao);
         }
-
-        // Processa colisões e dano 
-        ResultadoColisao resultadoColisao = processarColisoes(&entidades, &barras, &controle, &jogoCamera);
-
-        // Regeneração de vida
-        processarRegeneracaoVida(&barras, &controle, resultadoColisao.ocorreuColisao);
 
         // VERIFICAÇÃO DE GAME OVER 
         if (barras.barraInfeccao.barraLargura >= 400.0f) {
@@ -246,10 +247,10 @@ int main() {
             al_stop_timer(timer);
             al_identity_transform(&camera);
             al_use_transform(&camera);
-            desenhar_tela_gameOver(&gameOver, &barras.barraInfeccao, &menuEvent, &menuEstado);
-            if (!jogando) {
+            desenhar_tela_gameOver(&gameOver, &barras.barraInfeccao, &menuEvent, &menuEstado, fonteDialogo);
+            if (!jogando)
                 break;
-            }
+
         }
 
         // SISTEMA DE SPAWN E FASES 
@@ -261,22 +262,22 @@ int main() {
         // Verifica se precisa mostrar diálogo de transição de fase
         if (controle.mostrar_dialogo_transicao) {
             controle.mostrar_dialogo_transicao = false;
-                
+
             // Para o jogo e mostra diálogo
             al_stop_timer(timer);
             al_identity_transform(&camera);
             al_use_transform(&camera);
-            
+
             // Mostra diálogo da fase atual 
             if (!executarDialogoInicial(&dialogo, &entidades.sistemaFase, &menuEvent, &menuEstado)) {
                 menuEstado.jogando = false;
             }
-            
+
             w = false;
             a = false;
             s = false;
             d = false;
-            espaco = false; 
+            espaco = false;
             shift = false;
             esc = false;
             num1 = false;
@@ -293,7 +294,7 @@ int main() {
             if (entidades.sistemaFase.faseAtual > 3) {
                 // Jogo concluído! Encerra após mostrar diálogo de vitória (fase 4)
                 menuEstado.jogando = false;
-             
+
             }
             else {
                 // Restaura timer para continuar jogando
@@ -341,14 +342,14 @@ int main() {
             if (controle.spawn_ativo) {
                 float tempo_restante = controle.TEMPO_SPAWN - (al_get_time() - controle.timer_spawn_inimigos);
                 if (tempo_restante > 0)
-                    sprintf_s(texto, sizeof(texto), "PROJETO 1904 - NOVOS INIMIGOS EM: %.1f s", tempo_restante);
+                    sprintf_s(texto, sizeof(texto), "NOVOS INIMIGOS EM: %.1f s", tempo_restante);
                 else
-                    sprintf_s(texto, sizeof(texto), "PROJETO 1904 - SPAWNING...");
+                    sprintf_s(texto, sizeof(texto), "SPAWNING...");
             }
             else {
                 int inimigos_restantes = entidades.sistemaFase.metaEliminacoes - entidades.sistemaFase.inimigosMortos;
                 if (inimigos_restantes < 0) inimigos_restantes = 0;
-                sprintf_s(texto, sizeof(texto), "PROJETO 1904 - INIMIGOS RESTANTES: %d | FASE %d", inimigos_restantes, entidades.sistemaFase.faseAtual);
+                sprintf_s(texto, sizeof(texto), "INIMIGOS RESTANTES: %d | FASE %d", inimigos_restantes, entidades.sistemaFase.faseAtual);
             }
 
             ALLEGRO_TRANSFORM world_backup;

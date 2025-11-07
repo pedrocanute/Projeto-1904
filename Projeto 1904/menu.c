@@ -40,7 +40,7 @@ void inicializarAnimacaoMenu(AnimacaoMenu* anim) {
     anim->ratoY = 450.0f;
     anim->mosquitoX = WIDTH + 150.0f;
     anim->mosquitoY = 380.0f;
-    
+
     anim->frameJogador = 0;
     anim->contadorFrameJogador = 0;
     anim->frameZumbi = 0;
@@ -49,13 +49,13 @@ void inicializarAnimacaoMenu(AnimacaoMenu* anim) {
     anim->contadorFrameRato = 0;
     anim->frameMosquito = 0;
     anim->contadorFrameMosquito = 0;
-    
+
     anim->jogadorAtivo = true;
     anim->zumbiAtivo = false;
     anim->ratoAtivo = false;
     anim->mosquitoAtivo = false;
     anim->tempoUltimaAnimacao = al_get_time();
-    
+
     // Inicializa scrolling do mapa
     anim->offsetMapaX = 0.0f;
     anim->velocidadeScrolling = 1.5f;  // Velocidade do scrolling para a direita
@@ -70,17 +70,17 @@ void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
 
     // Atualiza scrolling do mapa de fundo
     anim->offsetMapaX += anim->velocidadeScrolling;
-    
+
     // Quando o offset atingir a largura do mapa, reinicia (loop infinito)
     // Assumindo que o mapa tem largura de 1280 (WIDTH)
     if (anim->offsetMapaX >= WIDTH) {
-   anim->offsetMapaX = 0.0f;
+        anim->offsetMapaX = 0.0f;
     }
 
     // Atualiza posição do jogador
     if (anim->jogadorAtivo) {
         anim->jogadorX += VELOCIDADE_DOUTOR;
-        
+
         // Animação do jogador
         anim->contadorFrameJogador++;
         if (anim->contadorFrameJogador >= FRAMES_POR_SPRITE) {
@@ -99,7 +99,7 @@ void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
     // Atualiza posição do zumbi
     if (anim->zumbiAtivo) {
         anim->zumbiX -= VELOCIDADE_ZUMBI;
-        
+
         // Animação do zumbi
         anim->contadorFrameZumbi++;
         if (anim->contadorFrameZumbi >= FRAMES_POR_SPRITE) {
@@ -118,7 +118,7 @@ void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
     // Atualiza posição do rato
     if (anim->ratoAtivo) {
         anim->ratoX += VELOCIDADE_RATO;
-        
+
         // Animação do rato
         anim->contadorFrameRato++;
         if (anim->contadorFrameRato >= FRAMES_POR_SPRITE) {
@@ -137,7 +137,7 @@ void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
     // Atualiza posição do mosquito
     if (anim->mosquitoAtivo) {
         anim->mosquitoX -= VELOCIDADE_MOSQUITO;
-        
+
         // Animação do mosquito
         anim->contadorFrameMosquito++;
         if (anim->contadorFrameMosquito >= FRAMES_POR_SPRITE) {
@@ -157,89 +157,89 @@ void atualizarAnimacaoMenu(AnimacaoMenu* anim) {
 void desenharAnimacaoMenu(AnimacaoMenu* anim, Bitmaps* bitmap) {
     // Desenha o mapa de fundo com scrolling infinito
     if (bitmap->mapaMenu1 && bitmap->mapaMenu2) {
-        // Calcula as posições dos dois mapas para criar o efeito de loop
+        // Cria o efeito de loopp
         // Usa fmodf para garantir transição suave sem gaps
         float offset = fmodf(anim->offsetMapaX, WIDTH);
-        
+
         float pos1X = -offset;
-  float pos2X = WIDTH - offset;
-   
+        float pos2X = WIDTH - offset;
+
         // Desenha o primeiro mapa (escala para preencher a tela)
         al_draw_scaled_bitmap(bitmap->mapaMenu1,
             0, 0,
-  al_get_bitmap_width(bitmap->mapaMenu1),
-    al_get_bitmap_height(bitmap->mapaMenu1),
-      pos1X, 0,
-          WIDTH, HEIGHT,
-      0);
-        
+            al_get_bitmap_width(bitmap->mapaMenu1),
+            al_get_bitmap_height(bitmap->mapaMenu1),
+            pos1X, 0,
+            WIDTH, HEIGHT,
+            0);
+
         // Desenha o segundo mapa (logo após o primeiro para continuidade)
         al_draw_scaled_bitmap(bitmap->mapaMenu2,
-    0, 0,
-    al_get_bitmap_width(bitmap->mapaMenu2),
-    al_get_bitmap_height(bitmap->mapaMenu2),
+            0, 0,
+            al_get_bitmap_width(bitmap->mapaMenu2),
+            al_get_bitmap_height(bitmap->mapaMenu2),
             pos2X, 0,
-       WIDTH, HEIGHT,
-      0);
+            WIDTH, HEIGHT,
+            0);
     }
 
     // Desenha jogador (se ativo) - por cima do mapa
     if (anim->jogadorAtivo && anim->jogadorX > -150.0f && anim->jogadorX < WIDTH + 150.0f) {
         ALLEGRO_BITMAP* spriteJogador = bitmap->sprite_andando_direita;
-        
+
         if (spriteJogador) {
             int larguraTotal = al_get_bitmap_width(spriteJogador);
             int alturaFrame = al_get_bitmap_height(spriteJogador);
             int larguraFrame = larguraTotal / 2;  // 2 frames
             int sx = anim->frameJogador * larguraFrame;
-            
-            al_draw_bitmap_region(spriteJogador, sx, 0, larguraFrame, alturaFrame, 
-                                 anim->jogadorX, anim->jogadorY, 0);
+
+            al_draw_bitmap_region(spriteJogador, sx, 0, larguraFrame, alturaFrame,
+                anim->jogadorX, anim->jogadorY, 0);
         }
     }
 
     // Desenha zumbi (se ativo)
     if (anim->zumbiAtivo && anim->zumbiX > -150.0f && anim->zumbiX < WIDTH + 150.0f) {
         ALLEGRO_BITMAP* spriteZumbi = bitmap->zumbi_esquerda;
-        
+
         if (spriteZumbi) {
             int larguraTotal = al_get_bitmap_width(spriteZumbi);
             int alturaFrame = al_get_bitmap_height(spriteZumbi);
             int larguraFrame = larguraTotal / 2;  // 2 frames
             int sx = anim->frameZumbi * larguraFrame;
-            
-            al_draw_bitmap_region(spriteZumbi, sx, 0, larguraFrame, alturaFrame, 
-                                 anim->zumbiX, anim->zumbiY, 0);
+
+            al_draw_bitmap_region(spriteZumbi, sx, 0, larguraFrame, alturaFrame,
+                anim->zumbiX, anim->zumbiY, 0);
         }
     }
 
     // Desenha rato (se ativo)
     if (anim->ratoAtivo && anim->ratoX > -150.0f && anim->ratoX < WIDTH + 150.0f) {
         ALLEGRO_BITMAP* spriteRato = bitmap->rato_direita;
-        
+
         if (spriteRato) {
             int larguraTotal = al_get_bitmap_width(spriteRato);
             int alturaFrame = al_get_bitmap_height(spriteRato);
             int larguraFrame = larguraTotal / 2;  // 2 frames
             int sx = anim->frameRato * larguraFrame;
-            
-            al_draw_bitmap_region(spriteRato, sx, 0, larguraFrame, alturaFrame, 
-                                 anim->ratoX, anim->ratoY, 0);
+
+            al_draw_bitmap_region(spriteRato, sx, 0, larguraFrame, alturaFrame,
+                anim->ratoX, anim->ratoY, 0);
         }
     }
 
     // Desenha mosquito (se ativo)
     if (anim->mosquitoAtivo && anim->mosquitoX > -150.0f && anim->mosquitoX < WIDTH + 150.0f) {
         ALLEGRO_BITMAP* spriteMosquito = bitmap->mosquito_esquerda;
-        
+
         if (spriteMosquito) {
             int larguraTotal = al_get_bitmap_width(spriteMosquito);
             int alturaFrame = al_get_bitmap_height(spriteMosquito);
             int larguraFrame = larguraTotal / 2;  // 2 frames
             int sx = anim->frameMosquito * larguraFrame;
-            
-            al_draw_bitmap_region(spriteMosquito, sx, 0, larguraFrame, alturaFrame, 
-                                 anim->mosquitoX, anim->mosquitoY, 0);
+
+            al_draw_bitmap_region(spriteMosquito, sx, 0, larguraFrame, alturaFrame,
+                anim->mosquitoX, anim->mosquitoY, 0);
         }
     }
 }
@@ -306,7 +306,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
                     }
 
                     // ========== DESENHA TELA DE REGRAS COM FUNDO ROXO ==========
-                    
+
                     // Fundo roxo sólido (mesma cor do menu de pausa)
                     al_clear_to_color(al_map_rgb(45, 29, 46));
 
@@ -384,12 +384,12 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
         }
 
         // ========== DESENHO DO MENU PRINCIPAL ==========
-        
+
         // Desenha animação de fundo com mapa scrolling e personagens
         desenharAnimacaoMenu(&animMenu, bitmap);
 
         // Desenha o fundo do menu (menu.png) por cima do mapa e personagens
-   al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0, menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
+        al_draw_scaled_bitmap(menuImg->fundoMenu, 0, 0, menuBotao->fundoMenuLargura, menuBotao->fundoMenuAltura, 0, 0, WIDTH, HEIGHT, 0);
 
         // Desenha botões por cima de tudo
 
@@ -420,7 +420,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
         al_flip_display();
     }
 
-  // Para a música do menu ao sair
+    // Para a música do menu ao sair
     pararMusicaMenu(sons);
 }
 
@@ -453,8 +453,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
         }
 
         // ESC para continuar
-        if (event.type == ALLEGRO_EVENT_KEY_DOWN &&
-            event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
+        if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
             *menuEstado->jogoPausado = false;
             *menuEstado->esc = false;
             break;
@@ -505,7 +504,7 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
                     }
 
                     // ========== DESENHA TELA DE REGRAS COM FUNDO ROXO ==========
-                    
+
                     // Fundo roxo sólido
                     al_clear_to_color(al_map_rgb(45, 29, 46));
 
@@ -610,11 +609,29 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
     configurarPosicoesBotoesPausa(menuBotao);
 }
 
-void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado) {
- ALLEGRO_EVENT event;
+void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado, ALLEGRO_FONT* fonte) {
+    ALLEGRO_EVENT event;
 
     // Limpa fila de eventos
     al_flush_event_queue(menuEvent->fila_eventos);
+
+    // Define cores
+    ALLEGRO_COLOR corFundoRoxo = al_map_rgb(45, 29, 46); // Roxo
+    ALLEGRO_COLOR corTexto = al_map_rgb(255, 255, 255); // Branco
+
+    // DESENHA IMEDIATAMENTE antes de entrar no loop
+    al_clear_to_color(corFundoRoxo);
+
+    const char* titulo = "FIM DE JOGO";
+    int larguraTitulo = al_get_text_width(fonte, titulo);
+    int posXTitulo = (WIDTH - larguraTitulo) / 2;
+    int posYTitulo = 250;
+    al_draw_text(fonte, corTexto, posXTitulo, posYTitulo, 0, titulo);
+
+    // Desenha botão inicialmente
+    al_draw_bitmap(gameover->botaoSairDoJogo, gameover->botaoSairDoJogoX, gameover->botaoSairDoJogoY, 0);
+
+    al_flip_display();
 
     while (*menuEstado->fimDeJogo) {
         al_wait_for_event(menuEvent->fila_eventos, &event);
@@ -639,22 +656,30 @@ void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEv
             }
         }
 
-        // Desenha tela de Game Over
-        al_draw_scaled_bitmap(gameover->telaGameOver, 0, 0, gameover->telaGameOverLargura, gameover->telaGameOverAltura, 0, 0, WIDTH, HEIGHT, 0);
+        // Redesenha apenas quando necessário
+        if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_TIMER) {
+            al_clear_to_color(corFundoRoxo);
 
-        // Botão Sair (hover)
-        if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX && *menuEvent->mouseX <= gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura && *menuEvent->mouseY >= gameover->botaoSairDoJogoY && *menuEvent->mouseY <= gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura) {
-            al_draw_bitmap(gameover->botaoSairDoJogo2, gameover->botaoSairDoJogoX, gameover->botaoSairDoJogoY, 0);
-        }
-        else {
-            al_draw_bitmap(gameover->botaoSairDoJogo, gameover->botaoSairDoJogoX, gameover->botaoSairDoJogoY, 0);
-        }
+            // Desenha título "FIM DE JOGO" centralizado
+            al_draw_text(fonte, corTexto, posXTitulo, posYTitulo, 0, titulo);
 
-        al_flip_display();
+            // Botão Sair (hover)
+            if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX &&
+                *menuEvent->mouseX <= gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura &&
+                *menuEvent->mouseY >= gameover->botaoSairDoJogoY &&
+                *menuEvent->mouseY <= gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura) {
+                al_draw_bitmap(gameover->botaoSairDoJogo2, gameover->botaoSairDoJogoX, gameover->botaoSairDoJogoY, 0);
+            }
+            else {
+                al_draw_bitmap(gameover->botaoSairDoJogo, gameover->botaoSairDoJogoX, gameover->botaoSairDoJogoY, 0);
+            }
+
+            al_flip_display();
+        }
     }
 }
 
-void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando,bool* regrasAberta, bool* esc, bool* jogoPausado,bool* fimDeJogo) {
+void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando, bool* regrasAberta, bool* esc, bool* jogoPausado, bool* fimDeJogo) {
     if (!estado) return;
 
     estado->telaMenu = telaMenu;
@@ -665,7 +690,7 @@ void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando,b
     estado->fimDeJogo = fimDeJogo;
 }
 
-void inicializarMenuEvents(MenuEvents* events, ALLEGRO_EVENT_QUEUE* fila,ALLEGRO_TIMER* timer, ALLEGRO_TRANSFORM* camera,float* mouseX, float* mouseY) {
+void inicializarMenuEvents(MenuEvents* events, ALLEGRO_EVENT_QUEUE* fila, ALLEGRO_TIMER* timer, ALLEGRO_TRANSFORM* camera, float* mouseX, float* mouseY) {
     if (!events) return;
 
     events->fila_eventos = fila;
@@ -719,18 +744,15 @@ void inicializarMenuBotoes(MenuBotoes* botao, Bitmaps* bitmap) {
 void inicializarGameOver(GameOver* gameOver, Bitmaps* bitmap) {
     if (!gameOver || !bitmap) return;
 
-    gameOver->telaGameOver = bitmap->telaGameOver;
-    gameOver->botaoSairDoJogo = bitmap->botaoSairDoJogo;
-    gameOver->botaoSairDoJogo2 = bitmap->botaoSairDoJogo2;
+    gameOver->botaoSairDoJogo = bitmap->botaoSair;
+    gameOver->botaoSairDoJogo2 = bitmap->botaoSair2;
 
-    gameOver->telaGameOverLargura = al_get_bitmap_width(bitmap->telaGameOver);
-    gameOver->telaGameOverAltura = al_get_bitmap_height(bitmap->telaGameOver);
-    gameOver->botaoSairDoJogoLargura = al_get_bitmap_width(bitmap->botaoSairDoJogo);
-    gameOver->botaoSairDoJogoAltura = al_get_bitmap_height(bitmap->botaoSairDoJogo);
+    gameOver->botaoSairDoJogoLargura = al_get_bitmap_width(bitmap->botaoSair);
+    gameOver->botaoSairDoJogoAltura = al_get_bitmap_height(bitmap->botaoSair);
 
-    // Posições dos botões
-    gameOver->botaoSairDoJogoX = 445;
-    gameOver->botaoSairDoJogoY = 560;
+    // Posição centralizada do botão
+    gameOver->botaoSairDoJogoX = (WIDTH - gameOver->botaoSairDoJogoLargura) / 2;
+    gameOver->botaoSairDoJogoY = 400;
 }
 
 void configurarPosicoesBotoesPausa(MenuBotoes* menuBotao) {

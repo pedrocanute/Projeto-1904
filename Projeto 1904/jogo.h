@@ -53,7 +53,7 @@ typedef struct {
     float INTERVALO_SPAWN_INDIVIDUAL;
 
     bool mostrar_dialogo_transicao;
-    bool cutscene_concluida;  // NOVO: Flag para controlar início do spawn
+    bool cutscene_concluida;   //Flag para controlar início do spawn
 } JogoControle;
 
 // Estrutura para animação
@@ -80,7 +80,7 @@ void inicializarJogoControle(JogoControle* controle);
 void inicializarJogoAnimacao(JogoAnimacao* animacao);
 
 // Funções de atualização de boss
-void atualizarBossAtivo(JogoEntidades* entidades, JogoBarras* barras);
+void atualizarBossAtivo(JogoEntidades* entidades, JogoBarras* barras, Bitmaps* bitmap, SistemaSom* sons);
 void posicionarBarraVidaBoss(JogoBarras* barras, Inimigo* boss);
 
 // Funções de colisão e dano

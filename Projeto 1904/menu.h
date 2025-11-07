@@ -53,13 +53,10 @@ typedef struct {
 } MenuBotoes;
 
 typedef struct {
-    ALLEGRO_BITMAP* telaGameOver;
     ALLEGRO_BITMAP* botaoSairDoJogo;
     ALLEGRO_BITMAP* botaoSairDoJogo2;
 
-    int telaGameOverLargura, telaGameOverAltura;
     int botaoSairDoJogoLargura, botaoSairDoJogoAltura;
-
     int botaoSairDoJogoX, botaoSairDoJogoY;
 } GameOver;
 
@@ -68,7 +65,7 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
 
 void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* menuImg, MenuBotoes* menuBotao, ALLEGRO_FONT* fonte, SistemaSom* sons);
 
-void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado);
+void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado, ALLEGRO_FONT* fonte);
 
 void inicializarMenuEstados(MenuEstados* estado, bool* telaMenu, bool* jogando, bool* regrasAberta, bool* esc, bool* jogoPausado, bool* fimDeJogo);
 

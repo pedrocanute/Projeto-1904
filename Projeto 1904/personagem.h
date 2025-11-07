@@ -22,6 +22,11 @@ typedef struct {
     float cadenciaAtual;
 
     float tempoUltimoPasso; // Timer para controlar som de passos
+    bool somPassoTocado; // Flag para evitar tocar som múltiplas vezes no mesmo ciclo
+    bool somVassouraTocado; // Flag para sincronizar som da vassoura com animação
+    bool somVenenoTocado; // Flag para sincronizar som do veneno com animação
+    
+    double timer_dano_visual; // Timer para efeito visual de dano
 } Jogador;
 
 // Estrutura para armazenar todos os sprites do jogador

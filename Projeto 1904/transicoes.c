@@ -295,9 +295,7 @@ bool executarCutsceneInicial(JogoEntidades* entidades, JogoCamera* jogoCamera, J
 
         // Desenha caravana (se já deve aparecer)
         if (cutscene.estado == CUTSCENE_CARAVANA_ENTRADA) {
-            desenhar_caravana(bitmap->soldado, entidades->caravana.caravanaX, entidades->caravana.caravanaY,
-                            entidades->caravana.caravanaLargura, entidades->caravana.caravanaAltura, 
-                            al_map_rgb(255, 255, 255));
+            desenhar_caravana(bitmap->soldado, entidades->caravana.caravanaX, entidades->caravana.caravanaY,entidades->caravana.caravanaLargura, entidades->caravana.caravanaAltura,al_map_rgb(255, 255, 255));
         }
 
         // Desenha jogador

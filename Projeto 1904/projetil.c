@@ -2,12 +2,11 @@
 #include "fases.h"
 #include <math.h>
 
-void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, Bitmaps *bitmap, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss, SistemaSom* sons) {
+void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigos, int numInimigos, Bitmaps* bitmap, bool espaco, int projetilLargura, int projetilAltura, int alturaJogador, int larguraJogador, int width, float projetilVelocidade, float projetilCadencia, float* posicaoCamera, SistemaFases* sistemaFase, BarraBoss* barraVidaBoss, SistemaSom* sons) {
 
     if (pp->tipo == ARMA_VASSOURA) {
         ataque_corpo_a_corpo(pp, jogador, inimigos, numInimigos, espaco, larguraJogador, alturaJogador, sistemaFase, barraVidaBoss, sons);
     }
-
 
     const float projetilTimer = al_get_time();
 
@@ -19,10 +18,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                 if (pp->tipo == ARMA_VACINA) {
                     tocarSomTiro(sons);
                 }
-                else if (pp->tipo == ARMA_VENENO) {
-                    tocarSomVeneno(sons);
-                }
-     
+
                 pp->tipoProjetil[i] = pp->tipo;
                 pp->frameProjetil[i] = 0;
                 pp->contadorFrameProjetil[i] = 0;
@@ -83,7 +79,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
     // MOVER E VERIFICAR PROJÉTEIS
     for (int i = 0; i < 50; i++) {
         if (pp->projetilAtivo[i]) {
-            
+
             pp->projetilX[i] += pp->projetilDirecao[i];
 
             float distanciaPercorrida = fabsf(pp->projetilX[i] - pp->posicaoInicialX[i]);
@@ -93,37 +89,37 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
             int frameAtual = 0;
 
             switch (pp->tipoProjetil[i]) {
-                case ARMA_VASSOURA:
-                    break;
+            case ARMA_VASSOURA:
+                break;
 
-                case ARMA_VENENO:
-                    spriteProjetil = bitmap->projetil_veneno;
+            case ARMA_VENENO:
+                spriteProjetil = bitmap->projetil_veneno;
 
-                    pp->contadorFrameProjetil[i]++;
-                    if (pp->contadorFrameProjetil[i] >= 10) { //VELOCIDADE ANIMACAO VENENO
+                pp->contadorFrameProjetil[i]++;
+                if (pp->contadorFrameProjetil[i] >= 10) { //VELOCIDADE ANIMACAO VENENO
 
-                        if (pp->frameProjetil[i] < 2)
-                            pp->frameProjetil[i]++;
+                    if (pp->frameProjetil[i] < 2)
+                        pp->frameProjetil[i]++;
 
-                        pp->contadorFrameProjetil[i] = 0;
-                    }
-                    frameAtual = pp->frameProjetil[i];
-
-                    if (pp->projetilDirecao[i] < 0)
-                        espelhar = ALLEGRO_FLIP_HORIZONTAL;
-                    break;
-
-                case ARMA_VACINA:
-                    if (pp->projetilDirecao[i] > 0) {
-                        spriteProjetil = bitmap->projetilDireita;
-                    }
-                    else {
-                        spriteProjetil = bitmap->projetilEsquerda;
-                    }
-                    espelhar = 0;
-                    frameAtual = 0;
-                    break;
+                    pp->contadorFrameProjetil[i] = 0;
                 }
+                frameAtual = pp->frameProjetil[i];
+
+                if (pp->projetilDirecao[i] < 0)
+                    espelhar = ALLEGRO_FLIP_HORIZONTAL;
+                break;
+
+            case ARMA_VACINA:
+                if (pp->projetilDirecao[i] > 0) {
+                    spriteProjetil = bitmap->projetilDireita;
+                }
+                else {
+                    spriteProjetil = bitmap->projetilEsquerda;
+                }
+                espelhar = 0;
+                frameAtual = 0;
+                break;
+            }
 
             // DESENHAR PROJÉTIL
             if (spriteProjetil != NULL)
@@ -155,26 +151,26 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
                 // Verificação de tipo de projétil e inimigo
                 bool podeAtingir = false;
                 switch (pp->tipoProjetil[i]) {
-                    case ARMA_VACINA:
-                        podeAtingir = (inimigos[j].tipo == TIPO_ZUMBI || inimigos[j].tipo == TIPO_BOSS);
-                        break;
-                    case ARMA_VENENO:
-                        podeAtingir = (inimigos[j].tipo == TIPO_MOSQUITO);
-                        break;
+                case ARMA_VACINA:
+                    podeAtingir = (inimigos[j].tipo == TIPO_ZUMBI || inimigos[j].tipo == TIPO_BOSS);
+                    break;
+                case ARMA_VENENO:
+                    podeAtingir = (inimigos[j].tipo == TIPO_MOSQUITO || inimigos[j].tipo == TIPO_BOSS_MOSQUITO);
+                    break;
                     // Vassoura não dispara projétil, só corpo a corpo
-                    default:
-                        podeAtingir = false;
-                        break;
+                default:
+                    podeAtingir = false;
+                    break;
                 }
 
                 if (!podeAtingir) continue;
 
                 if (colisao_projetil_inimigo(pp->projetilX[i], pp->projetilY[i], pp->larguraProjetil[i], pp->alturaProjetil[i], &inimigos[j])) {
-                    
-                    // SISTEMA DE VIDA E “MORTE” 
+
+                    // SISTEMA DE VIDA E "MORTE" 
                     inimigos[j].vida--;
                     if (inimigos[j].vida <= 0) {
-                        
+                        parar_som_inimigo(&inimigos[j]); // Para o som antes de desativar
                         inimigos[j].ativo = false;
                         sistemaFase->inimigosMortos++;
                     }
@@ -197,7 +193,7 @@ void atirar_multiplos_inimigos(ProjetilPosicao* pp, Jogador jogador, Inimigo* in
 }
 
 void inicializar_armas(ProjetilPosicao* arma, Arma tipo_arma, float x, float y, ALLEGRO_BITMAP* sprite_esq, ALLEGRO_BITMAP* sprite_dir) {
-    
+
     arma->tipo = tipo_arma;
     arma->proxProjetil = 0.0f;
 
@@ -265,11 +261,6 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
         pp->duracaoAtaque = 0.3f;
         pp->proxProjetil = tempoAtual + cadencia;
 
-        // Toca som da vassoura
-        if (sons) {
-            tocarSomVassoura(sons);
-        }
-
         for (int k = 0; k < 20; k++) {  // MAX_INIMIGOS
             pp->inimigosAtingidos[k] = false;
         }
@@ -287,20 +278,20 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
         if (jogador.paraDireita) {
             ataqueX = jogador.jogadorX + larguraJogador;
             ataqueY = jogador.jogadorY + (alturaJogador * 0.3f);
-            ataqueLargura = 60.0f; //ALCANCE
+            ataqueLargura = 80.0f; //ALCANCE
             ataqueAltura = alturaJogador * 0.5f;
         }
         else if (jogador.paraEsquerda) {
             ataqueX = jogador.jogadorX - 60.0f;
             ataqueY = jogador.jogadorY + (alturaJogador * 0.3f);
-            ataqueLargura = 60.0f;
+            ataqueLargura = 80.0f;
             ataqueAltura = alturaJogador * 0.5f;
         }
         else {
             // Parado - ataque para frente da última direção
             ataqueX = jogador.jogadorX + larguraJogador;
             ataqueY = jogador.jogadorY + (alturaJogador * 0.3f);
-            ataqueLargura = 60.0f;
+            ataqueLargura = 80.0f;
             ataqueAltura = alturaJogador * 0.5f;
         }
 
@@ -316,16 +307,17 @@ void ataque_corpo_a_corpo(ProjetilPosicao* pp, Jogador jogador, Inimigo* inimigo
             if (colisao_aabb(ataqueX, ataqueY, ataqueLargura, ataqueAltura, inimigos[j].botX, inimigos[j].botY, inimigos[j].larguraBot, inimigos[j].alturaBot)) {
 
                 pp->inimigosAtingidos[j] = true;
-                
+
                 // Boss recebe mais dano que inimigos normais
                 int dano = 1;
                 if (inimigos[j].tipo == TIPO_BOSS_RATO) {
                     dano = 3;  // Boss Rato recebe 3 de dano (30 vida / 3 = 10 ataques = 5 segundos)
                 }
-                
+
                 inimigos[j].vida -= dano;
 
                 if (inimigos[j].vida <= 0) {
+                    parar_som_inimigo(&inimigos[j]); // Para o som antes de desativar
                     inimigos[j].ativo = false;
                     sistemaFase->inimigosMortos++;
                 }
