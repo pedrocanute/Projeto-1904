@@ -57,41 +57,45 @@ void configurarTextosDialogo(Dialogo* dialogo, int fase) {
     case 1:
         dialogo->textos[0] = "Sou Oswaldo Cruz, diretor de Saúde Pública desde 1903.";
         dialogo->textos[1] = "Fui chamado pelo presidente Rodrigues Alves para sanear a capital.";
-        dialogo->textos[2] = "A cidade está doente: varíola, febre amarela e peste.";
-        dialogo->textos[3] = "A lei tornou a vacina da varíola obrigatória em todo o Brasil.";
+        dialogo->textos[2] = "A cidade está doente: a varíola, a febre amarela e a peste bulbônica estão começando a tomar conta da cidade.";
+        dialogo->textos[3] = "A vacinação da varíola se tornou obrigatória em todo o Brasil.";
         dialogo->textos[4] = "A medida gerou medo, boatos e protestos nas ruas.";
-        dialogo->textos[5] = "Não recuarei: ciência, limpeza urbana e vacinação salvam vidas.";
-        dialogo->textos[6] = "Preciso de você no campo: vacinar, desinfetar e exterminar ratos.";
-        dialogo->textos[7] = "Cada ferramenta é eficaz à apenas um tipo de inimigo.";
-        dialogo->textos[8] = "A vassoura extermina o rato, o veneno neutraliza o mosquito e a vacina cura o povo.";
-        dialogo->textos[9] = "Aperte 1 para usar a vassoura, 2 para selecionar o veneno e 3 para a vacina.";
-        dialogo->textos[10] = "A ordem é proteger bairros e reduzir contágios rapidamente.";
-        dialogo->textos[11] = "Quando a cidade entender, venceremos as epidemias juntos.";
+        dialogo->textos[5] = "Não podemos recuar: ciência, limpeza urbana e vacinação precisam ser implementadas, somente assim salvaremos essas vidas.";
+        dialogo->textos[6] = "Preciso de você no campo para: vacinar, desinfetar e exterminar ratos.";
+        dialogo->textos[7] = "Cada ferramenta é eficaz à apenas um tipo de infecção.";
+        dialogo->textos[8] = "A vassoura extermina os ratos, o veneno neutraliza os mosquitos e a vacina cura o povo.";
+        dialogo->textos[9] = "Aperte 1 para usar a vassoura, 2 para trocar para o veneno e 3 para a vacina.";
+        dialogo->textos[10] = "A ordem é proteger os bairros e reduzir contágios rapidamente.";
+        dialogo->textos[11] = "Quando a cidade perceber, já teremos vencido as epidemias juntos.";
         dialogo->numeroTextos = 12;
         break;
 
     case 2:
-        dialogo->textos[0] = "A situação se agravou. Novos focos de infecção surgem.";
-        dialogo->textos[1] = "Os protestos aumentaram, mas não podemos recuar.";
-        dialogo->textos[2] = "Continue vacinando e controlando os vetores.";
-        dialogo->textos[3] = "A ciência prevalecerá sobre a ignorância.";
-        dialogo->numeroTextos = 4;
+        dialogo->textos[0] = "Muito bom! Mas ainda não podemos descansar.";
+        dialogo->textos[1] = "A situação se agravou. Os focos de infecção continuam surgindo.";
+        dialogo->textos[2] = "E só porque não explicamos a população o que é uma vacina, e estamos obrigando ela a tomar, o número de protestantes aumentou!";
+        dialogo->textos[3] = "E está até rolando alguns boatos de que a vacina é perigosa e pode causar mortes. Esses tolos, eles não vêm que estamos fazendo isso para o bem deles.";
+        dialogo->textos[4] = "De qualquer forma, continue vacinando e controlando os vetores das doenças.";
+        dialogo->textos[5] = "A ciência prevalecerá sobre a ignorância.";
+        dialogo->numeroTextos = 6;
         break;
 
     case 3:
-        dialogo->textos[0] = "Esta é a última etapa da campanha.";
-        dialogo->textos[1] = "O povo começa a entender a importância da vacinação.";
-        dialogo->textos[2] = "Juntos, erradicaremos as epidemias do Rio de Janeiro.";
-        dialogo->numeroTextos = 3;
+        dialogo->textos[0] = "Parabéns estagiário, depois disso tudo eu te prometo uma cadeira melhor! Agora, esta é a última etapa da campanha.";
+        dialogo->textos[1] = "Os protestos foram respondidos com repressão, prisões e até deportações.";
+        dialogo->textos[2] = "De qualquer forma.";
+        dialogo->textos[3] = "Por bem ou por mal, o povo vai ter que começar a entender a importância da vacinação.";
+        dialogo->textos[4] = "Juntos, erradicaremos as epidemias do Rio de Janeiro.";
+        dialogo->numeroTextos = 5;
         break;
 
     case 4:  // === DIÁLOGO DE VITÓRIA ===
         dialogo->textos[0] = "VITÓRIA!";
-        dialogo->textos[1] = "As epidemias foram controladas no Rio de Janeiro.";
-        dialogo->textos[2] = "A vacinação obrigatória, apesar da resistência inicial,";
-        dialogo->textos[3] = "salvou milhares de vidas e transformou a saúde pública.";
-        dialogo->textos[4] = "A ciência e a determinação venceram o medo e a ignorância.";
-        dialogo->textos[5] = "O legado de Oswaldo Cruz vive até hoje.";
+        dialogo->textos[1] = "Só que, por conta da revolta, se vacinar se tornou um ato voluntário.";
+        dialogo->textos[2] = "Mas não irá demorar muito para ela voltar a ser obrigatória.";
+        dialogo->textos[3] = "As epidemias foram controladas no Rio de Janeiro.";
+        dialogo->textos[4] = "E o fato é que isso só foi possível por conta da vacinação,";
+        dialogo->textos[5] = "onde ela salvou milhares de vidas e transformou a saúde pública.";
         dialogo->textos[6] = "Parabéns por completar sua missão!";
         dialogo->numeroTextos = 7;
         break;
