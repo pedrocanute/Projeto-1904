@@ -233,8 +233,8 @@ void configuracoes_armas(Arma tipo, float* velocidade, float* cadencia) {
         *cadencia = 0.5f;
         break;
     case ARMA_VENENO:
-        *velocidade = 4.0f;
-        *cadencia = 0.5f;
+        *velocidade = 6.0f;
+        *cadencia = 0.3f;
         break;
     case ARMA_VACINA:
         *velocidade = 15.5f;

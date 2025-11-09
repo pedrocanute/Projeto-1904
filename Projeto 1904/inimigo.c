@@ -246,12 +246,18 @@ void aplicar_buffs_por_fase(Inimigo* inimigos, int quantidade, int faseAtual) {
         }
 
         // Buffs progressivos baseados na fase
-        
-        float multiplicador = faseAtual;
+        float multiplicador;
+        if(faseAtual < 3) {
+            multiplicador = faseAtual;
+        }
+        else {
+            multiplicador = faseAtual - 1;
+        }
 
         // Aumenta vida máxima
         inimigos[i].vidaMaxima = inimigos[i].vidaMaxima * multiplicador;
-        if (inimigos[i].vidaMaxima < 1) inimigos[i].vidaMaxima = 1;
+        if (inimigos[i].vidaMaxima < 1) 
+            inimigos[i].vidaMaxima = 1;
         inimigos[i].vida = inimigos[i].vidaMaxima;
 
         // Aumenta dano 
