@@ -102,7 +102,7 @@ int main() {
     Dialogo dialogo;
     inicializarDialogo(&dialogo, &bitmap, fonteDialogo);
 
-    //=====================================================INICIO DO JOGO============================================================================
+    //==============================INICIO DO JOGO==========================================
     // ========== MENU PRINCIPAL ==========
     menu_principal(&menuEstado, &menuEvent, &menuImg, &menuBotao, fonteDialogo, &bitmap, &sons);
 
