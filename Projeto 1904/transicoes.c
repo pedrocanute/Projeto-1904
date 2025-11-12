@@ -300,11 +300,10 @@ bool executarCutsceneInicial(JogoEntidades* entidades, JogoCamera* jogoCamera, J
 
         // Desenha jogador
         ALLEGRO_BITMAP* spriteAtual = bitmap->sprite_andando_direita;
-        
-        // Dimensões corretas: sprite tem 2 frames lado a lado
+       
         int larguraTotal = al_get_bitmap_width(spriteAtual);
         int alturaFrame = al_get_bitmap_height(spriteAtual);
-        int larguraFrame = larguraTotal / 2;  // 2 colunas
+        int larguraFrame = larguraTotal / 2;
         
         // Seleciona o frame correto
         int frame = (cutscene.estado == CUTSCENE_JOGADOR_ENTRADA) ? animacao->frame_atual : 0;

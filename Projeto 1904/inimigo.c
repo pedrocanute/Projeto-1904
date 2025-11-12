@@ -572,3 +572,11 @@ void desativar_minions_boss(Inimigo* inimigos, int quantidade) {
         }
     }
 }
+
+void parar_todos_sons_inimigos(Inimigo* inimigos, int quantidade) {
+    for (int i = 0; i < quantidade; i++) {
+        if (inimigos[i].somTocado) {
+            parar_som_inimigo(&inimigos[i]);
+        }
+    }
+}

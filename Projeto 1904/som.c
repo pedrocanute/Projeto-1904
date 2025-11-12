@@ -74,7 +74,7 @@ void tocarSomTiro(SistemaSom* sons) {
 
     al_play_sample(
         sons->somTiro,
-        0.5f, // Volume 80%
+        0.5f, // Volume 50%
         0.0f, // Centro (stereo)
         1.0f, // Velocidade normal
         ALLEGRO_PLAYMODE_ONCE,
@@ -104,7 +104,7 @@ void tocarSomAndando(SistemaSom* sons) {
 
     al_play_sample(
         sons->somAndando,
-        0.9f, // Volume 50%
+        0.9f, // Volume 90%
         0.0f, // Centro (stereo)
         1.0f, // Velocidade normal
         ALLEGRO_PLAYMODE_ONCE,
@@ -119,7 +119,7 @@ void tocarSomMosquito(SistemaSom* sons) {
 
     al_play_sample(
         sons->somMosquito,
-        1.5f, // Volume 40%
+        1.5f, // Volume 150%
         0.0f, // Centro (stereo)
         1.0f, // Velocidade normal
         ALLEGRO_PLAYMODE_ONCE,
@@ -134,7 +134,7 @@ void tocarSomVassoura(SistemaSom* sons) {
 
     al_play_sample(
         sons->somVassoura,
-        0.1f, // Volume 70%
+        0.1f, // Volume 40%
         0.0f, // Centro (stereo)
         1.0f, // Velocidade normal
         ALLEGRO_PLAYMODE_ONCE,
@@ -149,7 +149,7 @@ void tocarSomZumbi(SistemaSom* sons) {
 
     al_play_sample(
         sons->somZumbi,
-        0.5f, // Volume 40%
+        0.02f, // Volume 2%
         0.0f, // Centro (stereo)
         1.0f, // Velocidade normal
         ALLEGRO_PLAYMODE_ONCE,
@@ -164,7 +164,7 @@ void tocarSomVeneno(SistemaSom* sons) {
 
     al_play_sample(
         sons->somVeneno,
-        0.4f, // Volume 60%
+        0.1f, // Volume 20%
         0.0f, // Centro (stereo)
         1.0f, // Velocidade normal
         ALLEGRO_PLAYMODE_ONCE,
@@ -179,7 +179,7 @@ void tocarSomRato(SistemaSom* sons) {
 
   al_play_sample(
         sons->somRato,
-        0.2f, // Volume 50%
+        0.02f, // Volume 2%
         0.0f, // Centro (stereo)
         1.0f, // Velocidade normal
         ALLEGRO_PLAYMODE_ONCE,

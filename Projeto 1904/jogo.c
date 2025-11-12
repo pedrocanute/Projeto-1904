@@ -1,6 +1,8 @@
 ﻿#include "jogo.h"
 #include <allegro5/allegro_primitives.h>
 #include "inimigo.h"
+#include "transicoes.h"
+#include "dialogos.h"
 
 void inicializarJogoCamera(JogoCamera* camera, ALLEGRO_TRANSFORM* transform) {
     camera->posicaoCamera[0] = 0.0f;
@@ -98,7 +100,8 @@ void inicializarJogoControle(JogoControle* controle) {
     controle->timer_spawn_individual = 0.0f;
     controle->INTERVALO_SPAWN_INDIVIDUAL = 1.0f; // Spawna 1 inimigo a cada 1s
 
-    controle->cutscene_concluida = false;  
+    controle->cutscene_concluida = false; 
+    controle->game_over_processado = false;
 }
 
 void inicializarJogoAnimacao(JogoAnimacao* animacao) {
@@ -412,4 +415,84 @@ void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle) {
 
         controle->mostrar_dialogo_transicao = true;
     }
+}
+
+// Verifica game over e processa reinício do jogo
+bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc) {
+
+    if (barras->barraInfeccao.barraLargura < 400.0f) {
+        return false; // Jogo continua normalmente
+    }
+
+    // Game Over detectado
+    al_stop_timer(menuEvent->timer);
+
+    // Para todos os sons dos inimigos
+    parar_todos_sons_inimigos(entidades->inimigos, MAX_INIMIGOS);
+
+    al_identity_transform(menuEvent->camera);
+    al_use_transform(menuEvent->camera);
+
+    // Indica o gameover e nao reinicia
+    *(menuEstado->fimDeJogo) = true;
+    gameOver->reiniciar = false;
+
+    // Espera o jogador clicar em algum botao
+    desenhar_tela_gameOver(gameOver, &barras->barraInfeccao, menuEvent, menuEstado, fonteDialogo);
+
+    // Após retornar da tela de game over, verifica qual botão foi clicado
+    if (gameOver->reiniciar) {
+        // Jogador clicou em "Jogar Novamente"
+
+        // Para todos os sons novamente
+        parar_todos_sons_inimigos(entidades->inimigos, MAX_INIMIGOS);
+
+        // Reseta estados de controle
+        *(menuEstado->fimDeJogo) = false;
+        *redesenhar = false;
+
+        // Reseta inputs
+        *w = false;
+        *a = false;
+        *s = false;
+        *d = false;
+        *espaco = false;
+        *shift = false;
+        *esc = false;
+
+        // Limpa fila de eventos
+        ALLEGRO_EVENT evento_temp;
+        while (al_get_next_event(menuEvent->fila_eventos, &evento_temp)) {
+            // Descarta eventos acumulados
+        }
+
+        // Reseta todos os estados do jogo
+        inicializarJogoCamera(jogoCamera, menuEvent->camera);
+        inicializarJogoEntidades(entidades, bitmap, jogoCamera->posicaoCamera, sons);
+        inicializarJogoBarras(barras);
+        inicializarJogoControle(controle);
+        inicializarJogoAnimacao(animacao);
+
+        // Reseta resultado de colisão
+        resultadoColisao->ocorreuColisao = false;
+        resultadoColisao->corCaravana = al_map_rgb(255, 255, 255);
+
+        // Reseta a câmera
+        al_identity_transform(menuEvent->camera);
+        al_use_transform(menuEvent->camera);
+
+        // Executa cutscene inicial
+        if (!executarCutsceneInicial(entidades, jogoCamera, animacao, menuEvent, menuEstado, bitmap, controle, fonteDialogo)) {
+            *(menuEstado->jogando) = false;
+            return true; // Sai do jogo
+        }
+
+        // Reinicia o timer após a cutscene
+        al_start_timer(menuEvent->timer);
+
+        return false; // Continua o loop (reiniciou)
+    }
+
+    // Jogador escolheu sair (clicou no botão Sair) ou fechou a janela
+    return true; // Encerra o jogo
 }

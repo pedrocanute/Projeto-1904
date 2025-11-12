@@ -31,6 +31,7 @@ typedef struct {
     float velocidadeScrolling;
 } AnimacaoMenu;
 
+
 void inicializarAnimacaoMenu(AnimacaoMenu* anim) {
     anim->jogadorX = -150.0f;  // Fora da tela à esquerda
     anim->jogadorY = 400.0f;
@@ -612,6 +613,9 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
 void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEvent, MenuEstados* menuEstado, ALLEGRO_FONT* fonte) {
     ALLEGRO_EVENT event;
 
+    // Reseta flag de reiniciar
+    gameover->reiniciar = false;
+
     // Limpa fila de eventos
     al_flush_event_queue(menuEvent->fila_eventos);
 
@@ -628,7 +632,8 @@ void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEv
     int posYTitulo = 250;
     al_draw_text(fonte, corTexto, posXTitulo, posYTitulo, 0, titulo);
 
-    // Desenha botão inicialmente
+    // Desenha botões inicialmente
+    al_draw_bitmap(gameover->botaoJogarNovamente, gameover->botaoJogarNovamenteX, gameover->botaoJogarNovamenteY, 0);
     al_draw_bitmap(gameover->botaoSairDoJogo, gameover->botaoSairDoJogoX, gameover->botaoSairDoJogoY, 0);
 
     al_flip_display();
@@ -648,8 +653,23 @@ void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEv
         }
 
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+            // Jogar Novamente
+            if (*menuEvent->mouseX >= gameover->botaoJogarNovamenteX &&
+                *menuEvent->mouseX <= gameover->botaoJogarNovamenteX + gameover->botaoJogarNovamenteLargura &&
+                *menuEvent->mouseY >= gameover->botaoJogarNovamenteY &&
+                *menuEvent->mouseY <= gameover->botaoJogarNovamenteY + gameover->botaoJogarNovamenteAltura) {
+
+                gameover->reiniciar = true;
+                *menuEstado->fimDeJogo = false;
+                break;
+            }
+
             // Sair do jogo
-            if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX && *menuEvent->mouseX <= gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura && *menuEvent->mouseY >= gameover->botaoSairDoJogoY && *menuEvent->mouseY <= gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura) {
+            if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX &&
+                *menuEvent->mouseX <= gameover->botaoSairDoJogoX + gameover->botaoSairDoJogoLargura &&
+                *menuEvent->mouseY >= gameover->botaoSairDoJogoY &&
+                *menuEvent->mouseY <= gameover->botaoSairDoJogoY + gameover->botaoSairDoJogoAltura) {
+
                 *menuEstado->jogando = false;
                 *menuEstado->fimDeJogo = false;
                 break;
@@ -662,6 +682,17 @@ void desenhar_tela_gameOver(GameOver* gameover, Barra* infec, MenuEvents* menuEv
 
             // Desenha título "FIM DE JOGO" centralizado
             al_draw_text(fonte, corTexto, posXTitulo, posYTitulo, 0, titulo);
+
+            // Botão Jogar Novamente (hover)
+            if (*menuEvent->mouseX >= gameover->botaoJogarNovamenteX &&
+                *menuEvent->mouseX <= gameover->botaoJogarNovamenteX + gameover->botaoJogarNovamenteLargura &&
+                *menuEvent->mouseY >= gameover->botaoJogarNovamenteY &&
+                *menuEvent->mouseY <= gameover->botaoJogarNovamenteY + gameover->botaoJogarNovamenteAltura) {
+                al_draw_bitmap(gameover->botaoJogarNovamente2, gameover->botaoJogarNovamenteX, gameover->botaoJogarNovamenteY, 0);
+            }
+            else {
+                al_draw_bitmap(gameover->botaoJogarNovamente, gameover->botaoJogarNovamenteX, gameover->botaoJogarNovamenteY, 0);
+            }
 
             // Botão Sair (hover)
             if (*menuEvent->mouseX >= gameover->botaoSairDoJogoX &&
@@ -746,13 +777,23 @@ void inicializarGameOver(GameOver* gameOver, Bitmaps* bitmap) {
 
     gameOver->botaoSairDoJogo = bitmap->botaoSair;
     gameOver->botaoSairDoJogo2 = bitmap->botaoSair2;
+    gameOver->botaoJogarNovamente = bitmap->botaoJogar;
+    gameOver->botaoJogarNovamente2 = bitmap->botaoJogar2;
 
     gameOver->botaoSairDoJogoLargura = al_get_bitmap_width(bitmap->botaoSair);
     gameOver->botaoSairDoJogoAltura = al_get_bitmap_height(bitmap->botaoSair);
 
-    // Posição centralizada do botão
+    gameOver->botaoJogarNovamenteLargura = al_get_bitmap_width(bitmap->botaoJogar);
+    gameOver->botaoJogarNovamenteAltura = al_get_bitmap_height(bitmap->botaoJogar);
+
+    // Posições centralizadas dos botões (um acima do outro)
+    gameOver->botaoJogarNovamenteX = (WIDTH - gameOver->botaoJogarNovamenteLargura) / 2;
+    gameOver->botaoJogarNovamenteY = 350;
+
     gameOver->botaoSairDoJogoX = (WIDTH - gameOver->botaoSairDoJogoLargura) / 2;
-    gameOver->botaoSairDoJogoY = 400;
+    gameOver->botaoSairDoJogoY = 450;
+
+    gameOver->reiniciar = false;
 }
 
 void configurarPosicoesBotoesPausa(MenuBotoes* menuBotao) {

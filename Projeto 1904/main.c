@@ -242,15 +242,22 @@ int main() {
         }
 
         // VERIFICAÇÃO DE GAME OVER 
-        if (barras.barraInfeccao.barraLargura >= 400.0f) {
-            fimDeJogo = true;
-            al_stop_timer(timer);
-            al_identity_transform(&camera);
-            al_use_transform(&camera);
-            desenhar_tela_gameOver(&gameOver, &barras.barraInfeccao, &menuEvent, &menuEstado, fonteDialogo);
-            if (!jogando)
-                break;
+        if (barras.barraInfeccao.barraLargura >= 400.0f && !controle.game_over_processado) {
+            // Marca que o game over está sendo processado
+            controle.game_over_processado = true;
 
+            // Chama a função modularizada que retorna:
+            // - false se o jogador escolheu reiniciar (jogo continua)
+            // - true se o jogador escolheu sair (encerra o loop)
+            bool deve_encerrar = verificarGameOver(&barras, &entidades, &jogoCamera, &controle, &animacao, &gameOver, &menuEvent, &menuEstado, &bitmap, &sons, fonteDialogo, &resultadoColisao, &redesenhar, &w, &a, &s, &d, &espaco, &shift, &esc);
+
+            if (deve_encerrar) {
+                break; // Jogador escolheu sair
+            }
+
+            // Se chegou aqui, jogador escolheu reiniciar
+            // A flag game_over_processado será resetada em inicializarJogoControle()
+            continue; // Pula para o próximo ciclo do loop (jogo reiniciado)
         }
 
         // SISTEMA DE SPAWN E FASES 

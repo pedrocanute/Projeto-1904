@@ -8,6 +8,7 @@
 #include "caravana.h"
 #include "infeccao.h"
 #include "fases.h"
+#include "menu.h"
 #include <allegro5/allegro.h>
 
 // Estrutura para câmera e cores
@@ -54,6 +55,7 @@ typedef struct {
 
     bool mostrar_dialogo_transicao;
     bool cutscene_concluida;   //Flag para controlar início do spawn
+    bool game_over_processado;
 } JogoControle;
 
 // Estrutura para animação
@@ -90,5 +92,8 @@ void processarRegeneracaoVida(JogoBarras* barras, JogoControle* controle, bool c
 // Funções de spawn e fases
 void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bitmaps* bitmap, float* posicaoCamera, SistemaSom* sons);
 void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle);
+
+// Função de verificação de game over e reinício
+bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc);
 
 #endif

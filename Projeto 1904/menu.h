@@ -55,9 +55,16 @@ typedef struct {
 typedef struct {
     ALLEGRO_BITMAP* botaoSairDoJogo;
     ALLEGRO_BITMAP* botaoSairDoJogo2;
+    ALLEGRO_BITMAP* botaoJogarNovamente;
+    ALLEGRO_BITMAP* botaoJogarNovamente2;
 
     int botaoSairDoJogoLargura, botaoSairDoJogoAltura;
     int botaoSairDoJogoX, botaoSairDoJogoY;
+
+    int botaoJogarNovamenteLargura, botaoJogarNovamenteAltura;
+    int botaoJogarNovamenteX, botaoJogarNovamenteY;
+
+    bool reiniciar; // Flag para indicar se deve reiniciar o jogo
 } GameOver;
 
 // Funções

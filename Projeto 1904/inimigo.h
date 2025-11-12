@@ -101,4 +101,6 @@ void tocar_som_inimigo(Inimigo* inimigo, SistemaSom* sons);
 // Para o som do inimigo quando ele é desativado
 void parar_som_inimigo(Inimigo* inimigo);
 
+void parar_todos_sons_inimigos(Inimigo* inimigos, int quantidade);
+
 #endif
