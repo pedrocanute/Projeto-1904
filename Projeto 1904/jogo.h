@@ -55,7 +55,7 @@ typedef struct {
 
     bool mostrar_dialogo_transicao;
     bool cutscene_concluida;   //Flag para controlar início do spawn
-    bool game_over_processado;
+    bool game_over_processado; 
 } JogoControle;
 
 // Estrutura para animação
