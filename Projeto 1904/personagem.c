@@ -58,8 +58,19 @@ void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocid
 }
 
 void restringirPosicao(Jogador* p, Caravana* caravana, float maximoX, float maximoY, float larguraJogador, float alturaJogador) {
+    
+    const float LIMITE_TELAS = 2.f;
+    const float LARGURA_TELA = 1280.f;
+
     if (p->jogadorX < caravana->caravanaX + caravana->caravanaLargura)
         p->jogadorX = caravana->caravanaX + caravana->caravanaLargura;
+
+    float limite_direita = caravana->caravanaX + (LIMITE_TELAS * LARGURA_TELA);
+    if (p->jogadorX + larguraJogador > limite_direita)
+        p->jogadorX = limite_direita - larguraJogador;
+
+    // Restricoes verticais
+    
     if (p->jogadorY < 0)
         p->jogadorY = 0;
 
@@ -240,8 +251,19 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
 }
 
 void camera_jogador(float* posicaoCamera, Jogador jogador, int larguraTela, int larguraJogador, int alturaJogador, float caravanaX, float caravanaVelocidade) {
+    const float LIMITE_TELAS = 2.0f;
+    const float LARGURA_TELA = 1280.0f;
+
+    // Centraliza câmera no jogador
     posicaoCamera[0] = jogador.jogadorX - (larguraTela / 2) + (larguraJogador / 2);
 
+    // Limite esquerdo: não pode voltar além da caravana
     if (posicaoCamera[0] < caravanaX + caravanaVelocidade)
         posicaoCamera[0] = caravanaX + caravanaVelocidade;
+
+    // Limite direito: câmera não pode ultrapassar 2 telas à frente da caravana
+    float limite_direita_camera = caravanaX + (LIMITE_TELAS * LARGURA_TELA);
+    if (posicaoCamera[0] + larguraTela > limite_direita_camera) {
+        posicaoCamera[0] = limite_direita_camera - larguraTela;
+    }
 }

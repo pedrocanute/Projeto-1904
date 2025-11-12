@@ -83,7 +83,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->velocidade_original = 1.5f;
         inimigo->vida = 30;
         inimigo->vidaMaxima = 30;
-        inimigo->dano = 60;
+        inimigo->dano = 40;
         inimigo->dano_original = 15;
         break;
     case TIPO_BOSS_MOSQUITO:
@@ -94,7 +94,7 @@ void inicializar_inimigo(Inimigo* inimigo, TipoInimigo tipo, float x, float y, A
         inimigo->velocidade_original = 2.0f;
         inimigo->vida = 40;
         inimigo->vidaMaxima = 40;
-        inimigo->dano = 60;
+        inimigo->dano = 40;
         inimigo->dano_original = 12;
         break;
     }
@@ -348,7 +348,7 @@ void atualizar_boss_perseguindo(Inimigo* boss, const Jogador* jogador, float dis
 }
 
 // Atualiza timer de colisão e desativa inimigos coilidindo na caravana
-void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade) {
+void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade, SistemaFases* sistemaFase) {
     const double TEMPO_VIDA_COLISAO = 2.5; // 2.5 segundos até morrer
     double tempo_atual = al_get_time();
 
@@ -362,6 +362,8 @@ void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade) {
                 parar_som_inimigo(&inimigos[i]); // Para o som antes de desativar
                 inimigos[i].ativo = false;
                 inimigos[i].colidindo_caravana = false;
+                if (sistemaFase)
+                    sistemaFase->inimigosMortos++;
             }
         }
     }

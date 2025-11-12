@@ -221,7 +221,7 @@ int main() {
 
             atualizar_movimento_inimigos(&entidades.caravana, entidades.inimigos, MAX_INIMIGOS);
 
-            atualizar_timer_colisao_inimigos(entidades.inimigos, MAX_INIMIGOS);
+            atualizar_timer_colisao_inimigos(entidades.inimigos, MAX_INIMIGOS, &entidades.sistemaFase);
 
             // Atualiza boss se estiver ativo
             atualizarBossAtivo(&entidades, &barras, &bitmap, &sons);

@@ -8,6 +8,8 @@
 
 #define MAX_INIMIGOS 20
 
+typedef struct SistemaFases SistemaFases;
+
 typedef enum {
     TIPO_ZUMBI,
     TIPO_RATO,
@@ -91,7 +93,7 @@ void atualizar_minions_perseguindo(Inimigo* inimigos, int quantidade, const Joga
 
 void respawn_inimigo_na_camera(Inimigo* inimigo, ALLEGRO_BITMAP* zumbi_dir, ALLEGRO_BITMAP* zumbi_esq, ALLEGRO_BITMAP* rato_dir, ALLEGRO_BITMAP* rato_esq, ALLEGRO_BITMAP* mosquito_dir, ALLEGRO_BITMAP* mosquito_esq, float* posicaoCamera, SistemaSom* sons);
 
-void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade);
+void atualizar_timer_colisao_inimigos(Inimigo* inimigos, int quantidade, SistemaFases* sistemaFase);
 
 // Toca o som do inimigo quando ele é ativado
 void tocar_som_inimigo(Inimigo* inimigo, SistemaSom* sons);

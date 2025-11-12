@@ -84,7 +84,7 @@ void inicializarJogoBarras(JogoBarras* barras) {
 
 void inicializarJogoControle(JogoControle* controle) {
     controle->timer_regen_infeccao = 0.0f;
-    controle->TEMPO_REGEN_INFECCAO = 5.0f;
+    controle->TEMPO_REGEN_INFECCAO = 4.0f;
     controle->TEMPO_INTANGIBILIDADE = 0.7f;
     controle->timer_spawn_inimigos = 0.0f;
     controle->spawn_ativo = false;
