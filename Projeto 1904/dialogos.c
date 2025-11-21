@@ -57,7 +57,7 @@ void configurarTextosDialogo(Dialogo* dialogo, int fase) {
     case 1:
         dialogo->textos[0] = "Sou Oswaldo Cruz, diretor de Saúde Pública desde 1903.";
         dialogo->textos[1] = "Fui chamado pelo presidente Rodrigues Alves para sanear a capital.";
-        dialogo->textos[2] = "A cidade está doente: a varíola, a febre amarela e a peste bulbônica estão começando a tomar conta da cidade.";
+        dialogo->textos[2] = "A cidade está doente: a varíola, a febre amarela e a peste bubônica estão começando a tomar conta da cidade.";
         dialogo->textos[3] = "A vacinação da varíola se tornou obrigatória em todo o Brasil.";
         dialogo->textos[4] = "A medida gerou medo, boatos e protestos nas ruas.";
         dialogo->textos[5] = "Não podemos recuar: ciência, limpeza urbana e vacinação precisam ser implementadas, somente assim salvaremos essas vidas.";
@@ -71,17 +71,17 @@ void configurarTextosDialogo(Dialogo* dialogo, int fase) {
         break;
 
     case 2:
-        dialogo->textos[0] = "Muito bom! Mas ainda não podemos descansar.";
+        dialogo->textos[0] = "Muito bom! Você conseguiu eliminar o maior causador da Peste Bubônica, mas ainda não podemos descansar.";
         dialogo->textos[1] = "A situação se agravou. Os focos de infecção continuam surgindo.";
-        dialogo->textos[2] = "E só porque não explicamos a população o que é uma vacina, e estamos obrigando ela a tomar, o número de protestantes aumentou!";
-        dialogo->textos[3] = "E está até rolando alguns boatos de que a vacina é perigosa e pode causar mortes. Esses tolos, eles não vêm que estamos fazendo isso para o bem deles.";
+        dialogo->textos[2] = "E só porque não explicamos à população o que é uma vacina, e estamos obrigando ela a tomar, o número de protestantes aumentou!";
+        dialogo->textos[3] = "E surgiram alguns boatos de que a vacina é perigosa e pode causar mortes. Esses tolos, eles não vêm que estamos fazendo isso para o bem deles.";
         dialogo->textos[4] = "De qualquer forma, continue vacinando e controlando os vetores das doenças.";
         dialogo->textos[5] = "A ciência prevalecerá sobre a ignorância.";
         dialogo->numeroTextos = 6;
         break;
 
     case 3:
-        dialogo->textos[0] = "Parabéns estagiário, depois disso tudo eu te prometo uma cadeira melhor! Agora, esta é a última etapa da campanha.";
+        dialogo->textos[0] = "Parabéns, depois disso tudo eu te prometo um cargo melhor! Agora, esta é a última etapa da campanha. Resta eliminar o causador da Varíola e o remanescente das outras doenças";
         dialogo->textos[1] = "Os protestos foram respondidos com repressão, prisões e até deportações.";
         dialogo->textos[2] = "De qualquer forma.";
         dialogo->textos[3] = "Por bem ou por mal, o povo vai ter que começar a entender a importância da vacinação.";
