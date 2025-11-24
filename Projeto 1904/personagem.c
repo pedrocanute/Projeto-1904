@@ -2,11 +2,11 @@
 #include "projetil.h"
 #include "configuracoes.h"
 
-void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocidade, int* frames_por_sprite) {
+void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, bool seta_cima, bool seta_direita, bool seta_baixo, bool seta_esquerda, float velocidade, int* frames_por_sprite) {
     float velocidade_caminhada = velocidade;
     float velocidade_corrida = velocidade * 1.5;
 
-    if (w) {
+    if (w || seta_cima) {
         if (shift) {
             p->jogadorY -= velocidade_corrida;
             *frames_por_sprite = 4;
@@ -17,7 +17,7 @@ void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocid
         }
     }
 
-    if (a) {
+    if (a || seta_esquerda) {
         p->paraEsquerda = true;
         p->paraDireita = false;
 
@@ -31,7 +31,7 @@ void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocid
         }
     }
 
-    if (s) {
+    if (s || seta_baixo) {
         if (shift) {
             p->jogadorY += velocidade_corrida;
             *frames_por_sprite = 4;
@@ -42,7 +42,7 @@ void mover(Jogador* p, bool w, bool a, bool s, bool d, bool shift, float velocid
         }
     }
 
-    if (d) {
+    if (d || seta_direita) {
         p->paraDireita = true;
         p->paraEsquerda = false;
 
@@ -80,13 +80,13 @@ void restringirPosicao(Jogador* p, Caravana* caravana, float maximoX, float maxi
         p->jogadorY = HEIGHT - alturaJogador;
 }
 
-void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool espaco, SpritesJogador* sprites, int arma_equipada, int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita, int* frame_tiro, int* contador_frame_tiro, SistemaSom* sons) {
+void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool espaco, bool seta_cima, bool seta_direita, bool seta_baixo, bool seta_esquerda, SpritesJogador* sprites, int arma_equipada, int* frame_atual, int* contador_frame, int frames_por_sprite, bool* virado_direita, int* frame_tiro, int* contador_frame_tiro, SistemaSom* sons) {
 
     // Determina direção baseado no movimento
-    if (d || (d && s) || (d && w)) {
+    if (d || (d && s) || (d && w) || (seta_direita || (seta_direita && seta_baixo))) {
         *virado_direita = true;
     }
-    else if (a || (a && s) || (a && w)) {
+    else if (a || (a && s) || (a && w) || (seta_esquerda || (seta_esquerda && seta_cima))) {
         *virado_direita = false;
     }
 
@@ -145,7 +145,7 @@ void desenhar_jogador(Jogador* jogador, bool w, bool a, bool s, bool d, bool esp
     // ESCOLHER SPRITE E SISTEMA DE ANIMAÇÃO
     ALLEGRO_BITMAP* sprite_atual;
     bool esta_atirando = espaco;
-    bool esta_em_movimento = (a || d || s || w);
+    bool esta_em_movimento = (a || d || s || w || seta_cima || seta_direita || seta_baixo || seta_esquerda);
 
     // VERIFICA SE DEVE APLICAR EFEITO VISUAL DE DANO
     const float DURACAO_EFEITO_VISUAL = 0.15f;

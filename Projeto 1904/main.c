@@ -43,6 +43,7 @@ int main() {
     bool w = false, a = false, s = false, d = false;
     bool espaco = false, shift = false, esc = false;
     bool num1 = false, num2 = false, num3 = false;
+	bool seta_cima = false, seta_direita = false, seta_baixo = false, seta_esquerda = false;
     float mouseX = 0.0f, mouseY = 0.0f;
 
     // ========== CARREGAMENTO DE RECURSOS ==========
@@ -163,7 +164,7 @@ int main() {
 
         // TECLADO
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
-            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc, &num1, &num2, &num3);
+            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc, &num1, &num2, &num3, &seta_cima, &seta_direita, &seta_baixo, &seta_esquerda);
 
             if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
                 if (event.keyboard.keycode == ALLEGRO_KEY_1) {
@@ -198,6 +199,10 @@ int main() {
             a = false;
             s = false;
             d = false;
+            seta_cima = false;
+            seta_direita = false;
+			seta_baixo = false;
+			seta_esquerda = false;
             espaco = false;
             shift = false;
             esc = false;
@@ -216,7 +221,7 @@ int main() {
 
         // ATUALIZAÇÃO DE JOGO (quando não pausado)
         if (event.type == ALLEGRO_EVENT_TIMER && esc == false) {
-            mover(&entidades.jogador, w, a, s, d, shift, VELOCIDADE_JOGADOR, &animacao.frames_por_sprite);
+            mover(&entidades.jogador, w, a, s, d, shift, seta_cima, seta_direita, seta_baixo, seta_esquerda, VELOCIDADE_JOGADOR, &animacao.frames_por_sprite);
             restringirPosicao(&entidades.jogador, &entidades.caravana, WIDTH, HEIGHT, LARGURA_JOGADOR, ALTURA_JOGADOR);
 
             atualizar_movimento_inimigos(&entidades.caravana, entidades.inimigos, MAX_INIMIGOS);
@@ -246,7 +251,7 @@ int main() {
             // Marca que o game over está sendo processado
             controle.game_over_processado = true;
       
-            bool deve_encerrar = verificarGameOver(&barras, &entidades, &jogoCamera, &controle, &animacao, &gameOver, &menuEvent, &menuEstado, &bitmap, &sons, fonteDialogo, &resultadoColisao, &redesenhar, &w, &a, &s, &d, &espaco, &shift, &esc);
+            bool deve_encerrar = verificarGameOver(&barras, &entidades, &jogoCamera, &controle, &animacao, &gameOver, &menuEvent, &menuEstado, &bitmap, &sons, fonteDialogo, &resultadoColisao, &redesenhar, &w, &a, &s, &d, &espaco, &shift, &esc, &seta_cima, &seta_direita, &seta_baixo, &seta_esquerda);
 
             if (deve_encerrar) {
                 break; // Jogador escolheu sair
@@ -278,6 +283,10 @@ int main() {
             a = false;
             s = false;
             d = false;
+            seta_cima = false;
+            seta_direita = false;
+            seta_baixo = false;
+            seta_esquerda = false;
             espaco = false;
             shift = false;
             esc = false;
@@ -331,7 +340,7 @@ int main() {
             desenhar_caravana(bitmap.soldado, entidades.caravana.caravanaX, entidades.caravana.caravanaY, entidades.caravana.caravanaLargura, entidades.caravana.caravanaAltura, resultadoColisao.corCaravana);
 
             // jogador e inimigos
-            desenhar_jogador(&entidades.jogador, w, a, s, d, espaco, &entidades.spritesJogador, entidades.projetil.tipo, &animacao.frame_atual, &animacao.contador_frame, animacao.frames_por_sprite, &animacao.virado_direita, &animacao.frame_tiro, &animacao.contador_frame_tiro, &sons);
+            desenhar_jogador(&entidades.jogador, w, a, s, d, espaco, seta_cima, seta_direita, seta_baixo, seta_esquerda, &entidades.spritesJogador, entidades.projetil.tipo, &animacao.frame_atual, &animacao.contador_frame, animacao.frames_por_sprite, &animacao.virado_direita, &animacao.frame_tiro, &animacao.contador_frame_tiro, &sons);
 
             desenhar_todos_inimigos(entidades.inimigos, MAX_INIMIGOS);
 

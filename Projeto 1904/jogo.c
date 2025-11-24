@@ -418,7 +418,7 @@ void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle) {
 }
 
 // Verifica game over e processa reinício do jogo
-bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc) {
+bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc, bool* seta_cima, bool* seta_direita, bool* seta_baixo, bool* seta_esquerda) {
 
     if (barras->barraInfeccao.barraLargura < 400.0f) {
         return false; // Jogo continua normalmente
@@ -459,6 +459,10 @@ bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera*
         *espaco = false;
         *shift = false;
         *esc = false;
+        *seta_cima = false;
+        *seta_direita = false;
+        *seta_baixo = false;
+        *seta_esquerda = false;
 
         // Limpa fila de eventos
         ALLEGRO_EVENT evento_temp;
