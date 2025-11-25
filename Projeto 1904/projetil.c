@@ -224,6 +224,24 @@ void trocar_arma(ProjetilPosicao* pp, Arma nova_arma) {
     pp->tipo = nova_arma;
 }
 
+void trocar_arma_ciclica(ProjetilPosicao* pp) {
+    // Ciclo: VASSOURA -> VENENO -> VACINA -> VASSOURA
+    switch (pp->tipo) {
+    case ARMA_VASSOURA:
+        pp->tipo = ARMA_VENENO;
+        break;
+    case ARMA_VENENO:
+        pp->tipo = ARMA_VACINA;
+        break;
+    case ARMA_VACINA:
+        pp->tipo = ARMA_VASSOURA;
+        break;
+    default:
+        pp->tipo = ARMA_VASSOURA;
+        break;
+    }
+}
+
 void configuracoes_armas(Arma tipo, float* velocidade, float* cadencia) {
 
     //A VELOCIDADE DA ANIMACAO DEVE SER AJUSTADA EM desenhar_jogador EM PERSONAGEM.C

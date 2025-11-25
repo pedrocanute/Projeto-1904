@@ -344,7 +344,7 @@ bool executarCutsceneInicial(JogoEntidades* entidades, JogoCamera* jogoCamera, J
             al_draw_text(fonte, al_map_rgb(255, 255, 255), textoX, textoY, 0, "ESPAÇO - Atirar");
             textoY += espacamentoLinha;
 
-            al_draw_text(fonte, al_map_rgb(255, 255, 255), textoX, textoY, 0, "1/2/3 - Trocar Arma");
+            al_draw_text(fonte, al_map_rgb(255, 255, 255), textoX, textoY, 0, "R - Trocar Arma");
             textoY += espacamentoLinha;
 
             al_draw_text(fonte, al_map_rgb(255, 255, 255), textoX, textoY, 0, "ESC - Pausar");

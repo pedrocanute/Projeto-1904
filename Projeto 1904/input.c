@@ -1,7 +1,7 @@
 ﻿#include "input.h"
 #include <stdio.h>
 
-void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc, bool* num1, bool* num2, bool* num3,bool* seta_cima, bool* seta_direita, bool* seta_baixo, bool* seta_esquerda) {
+void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc, bool* seta_cima, bool* seta_direita, bool* seta_baixo, bool* seta_esquerda, bool* r) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
         case ALLEGRO_KEY_W:
@@ -25,16 +25,9 @@ void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bo
         case ALLEGRO_KEY_ESCAPE:
             *esc = true;
             break;
-        case ALLEGRO_KEY_1:
-            *num1 = true;
+        case ALLEGRO_KEY_R:
+            *r = true;
             break;
-        case ALLEGRO_KEY_2:
-            *num2 = true;
-            break;
-        case ALLEGRO_KEY_3:
-            *num3 = true;
-            break;
-
         case ALLEGRO_KEY_UP:
             *seta_cima = true;
             break;
@@ -70,16 +63,10 @@ void verificar_Input(ALLEGRO_EVENT event, bool* w, bool* a, bool* s, bool* d, bo
             *shift = false;
             break;
         case ALLEGRO_KEY_ESCAPE:
-            *esc = false;  
+            *esc = false;
             break;
-        case ALLEGRO_KEY_1:
-            *num1 = false;
-            break;
-        case ALLEGRO_KEY_2:
-            *num2 = false;
-            break;
-        case ALLEGRO_KEY_3:
-            *num3 = false;
+        case ALLEGRO_KEY_R:
+            *r = false;
             break;
         case ALLEGRO_KEY_UP:
             *seta_cima = false;

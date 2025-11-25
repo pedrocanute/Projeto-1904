@@ -40,7 +40,7 @@ int main() {
     bool jogoPausado = false;
     bool fimDeJogo = false;
     bool redesenhar = false;
-    bool w = false, a = false, s = false, d = false;
+	bool w = false, a = false, s = false, d = false, r = false;
     bool espaco = false, shift = false, esc = false;
     bool num1 = false, num2 = false, num3 = false;
 	bool seta_cima = false, seta_direita = false, seta_baixo = false, seta_esquerda = false;
@@ -164,17 +164,11 @@ int main() {
 
         // TECLADO
         if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
-            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc, &num1, &num2, &num3, &seta_cima, &seta_direita, &seta_baixo, &seta_esquerda);
+            verificar_Input(event, &w, &a, &s, &d, &espaco, &shift, &esc, &seta_cima, &seta_direita, &seta_baixo, &seta_esquerda, &r);
 
             if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-                if (event.keyboard.keycode == ALLEGRO_KEY_1) {
-                    trocar_arma(&entidades.projetil, ARMA_VASSOURA);
-                }
-                else if (event.keyboard.keycode == ALLEGRO_KEY_2) {
-                    trocar_arma(&entidades.projetil, ARMA_VENENO);
-                }
-                else if (event.keyboard.keycode == ALLEGRO_KEY_3) {
-                    trocar_arma(&entidades.projetil, ARMA_VACINA);
+                if (event.keyboard.keycode == ALLEGRO_KEY_R) {
+                    trocar_arma_ciclica(&entidades.projetil);
                 }
             }
         }
@@ -206,9 +200,7 @@ int main() {
             espaco = false;
             shift = false;
             esc = false;
-            num1 = false;
-            num2 = false;
-            num3 = false;
+            r = false;
 
             // Reinicia o timer se voltar ao jogo
             if (*menuEstado.jogando) {
@@ -290,9 +282,7 @@ int main() {
             espaco = false;
             shift = false;
             esc = false;
-            num1 = false;
-            num2 = false;
-            num3 = false;
+            r = false;
 
             // Limpa a fila de eventos que possam ter se acumulado durante o diálogo
             ALLEGRO_EVENT evento_temp;

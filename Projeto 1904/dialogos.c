@@ -258,7 +258,7 @@ void desenhar_tela_dialogo(Dialogo* dialogo, SistemaFases* fase, MenuEvents* men
                 float indicadorY = balaoY + 220;
 
                 if (dialogo->textoAtual < dialogo->numeroTextos - 1) {
-                    al_draw_text(dialogo->fonteDialogo, al_map_rgb(200, 200, 200), indicadorX, indicadorY, ALLEGRO_ALIGN_RIGHT, "[SPACE]");
+                    al_draw_text(dialogo->fonteDialogo, al_map_rgb(200, 200, 200), indicadorX, indicadorY, ALLEGRO_ALIGN_RIGHT, "[ESPAÇO]");
                 }
             }
 

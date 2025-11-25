@@ -332,13 +332,16 @@ void menu_principal(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens*
                         al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "ESPACO - Atirar");
                         inicioY += espacamento;
 
-                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "1 - Vassoura (Efetivo contra Ratos)");
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "R - Trocar Arma");
                         inicioY += espacamento;
 
-                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "2 - Veneno (Efetivo contra Mosquitos)");
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Arma 1 - Vassoura (Efetivo contra Ratos)");
                         inicioY += espacamento;
 
-                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "3 - Vacina (Efetivo contra Zumbis)");
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Arma 2 - Veneno (Efetivo contra Mosquitos)");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Arma 3 - Vacina (Efetivo contra Zumbis)");
                         inicioY += espacamento * 1.5f;
 
                         // Menu
@@ -530,13 +533,16 @@ void menu_pausa(MenuEstados* menuEstado, MenuEvents* menuEvent, MenuImagens* men
                         al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "ESPACO - Atirar");
                         inicioY += espacamento;
 
-                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "1 - Vassoura (Efetivo contra Ratos)");
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "R - Trocar Arma");
                         inicioY += espacamento;
 
-                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "2 - Veneno (Efetivo contra Mosquitos)");
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Arma 1 - Vassoura (Efetivo contra Ratos)");
                         inicioY += espacamento;
 
-                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "3 - Vacina (Efetivo contra Zumbis)");
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Arma 2 - Veneno (Efetivo contra Mosquitos)");
+                        inicioY += espacamento;
+
+                        al_draw_text(fonte, al_map_rgb(255, 255, 255), centroX, inicioY, ALLEGRO_ALIGN_CENTER, "Arma 3 - Vacina (Efetivo contra Zumbis)");
                         inicioY += espacamento * 1.5f;
 
                         // Menu
