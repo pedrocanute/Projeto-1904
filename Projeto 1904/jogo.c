@@ -418,7 +418,7 @@ void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle) {
 }
 
 // Verifica game over e processa reinício do jogo
-bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc, bool* seta_cima, bool* seta_direita, bool* seta_baixo, bool* seta_esquerda) {
+bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc, bool* seta_cima, bool* seta_direita, bool* seta_baixo, bool* seta_esquerda, Dialogo* dialogo) {
 
     if (barras->barraInfeccao.barraLargura < 400.0f) {
         return false; // Jogo continua normalmente
@@ -484,6 +484,18 @@ bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera*
         // Reseta a câmera
         al_identity_transform(menuEvent->camera);
         al_use_transform(menuEvent->camera);
+
+        // Reseta os estados dos diálogos para que sejam exibidos novamente
+        dialogo->dialogo1 = false;
+        dialogo->dialogo2 = false;
+        dialogo->dialogo3 = false;
+        dialogo->textoAtual = 0;
+
+        // Executa diálogo inicial da fase 1
+        if (!executarDialogoInicial(dialogo, &entidades->sistemaFase, menuEvent, menuEstado)) {
+            *(menuEstado->jogando) = false;
+            return true; // Sai do jogo
+        }
 
         // Executa cutscene inicial
         if (!executarCutsceneInicial(entidades, jogoCamera, animacao, menuEvent, menuEstado, bitmap, controle, fonteDialogo)) {

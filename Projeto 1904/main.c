@@ -251,7 +251,7 @@ int main() {
             // Marca que o game over está sendo processado
             controle.game_over_processado = true;
       
-            bool deve_encerrar = verificarGameOver(&barras, &entidades, &jogoCamera, &controle, &animacao, &gameOver, &menuEvent, &menuEstado, &bitmap, &sons, fonteDialogo, &resultadoColisao, &redesenhar, &w, &a, &s, &d, &espaco, &shift, &esc, &seta_cima, &seta_direita, &seta_baixo, &seta_esquerda);
+            bool deve_encerrar = verificarGameOver(&barras, &entidades, &jogoCamera, &controle, &animacao, &gameOver, &menuEvent, &menuEstado, &bitmap, &sons, fonteDialogo, &resultadoColisao, &redesenhar, &w, &a, &s, &d, &espaco, &shift, &esc, &seta_cima, &seta_direita, &seta_baixo, &seta_esquerda, &dialogo);
 
             if (deve_encerrar) {
                 break; // Jogador escolheu sair

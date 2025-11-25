@@ -9,6 +9,7 @@
 #include "infeccao.h"
 #include "fases.h"
 #include "menu.h"
+#include "dialogos.h"
 #include <allegro5/allegro.h>
 
 // Estrutura para câmera e cores
@@ -94,6 +95,6 @@ void processarSpawnInimigos(JogoEntidades* entidades, JogoControle* controle, Bi
 void verificarMorteBoss(JogoEntidades* entidades, JogoControle* controle);
 
 // Função de verificação de game over e reinício
-bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc, bool* seta_cima, bool* seta_direita, bool* seta_baixo, bool* seta_esquerda);
+bool verificarGameOver(JogoBarras* barras, JogoEntidades* entidades, JogoCamera* jogoCamera, JogoControle* controle, JogoAnimacao* animacao, GameOver* gameOver, MenuEvents* menuEvent, MenuEstados* menuEstado, Bitmaps* bitmap, SistemaSom* sons, ALLEGRO_FONT* fonteDialogo, ResultadoColisao* resultadoColisao, bool* redesenhar, bool* w, bool* a, bool* s, bool* d, bool* espaco, bool* shift, bool* esc, bool* seta_cima, bool* seta_direita, bool* seta_baixo, bool* seta_esquerda, Dialogo* dialogo);
 
 #endif
